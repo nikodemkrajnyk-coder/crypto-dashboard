@@ -63,6 +63,14 @@
   .stream .ln{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--gd)}
   .stream .ln.new{color:var(--g);text-shadow:0 0 6px var(--g)}
   .stream .ln .p{color:var(--dim)}
+  .rows{margin-top:12px;display:grid;gap:4px;font-size:.85em}
+  .row{display:grid;grid-template-columns:3.6em minmax(0,1fr) minmax(0,1fr) 5.2em 3.4em;gap:8px;padding:6px 8px;
+       border:1px solid #052;border-radius:4px;align-items:baseline;font-variant-numeric:tabular-nums}
+  .row.dt{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 5.2em minmax(0,1fr)}
+  .row.h{border:none;padding:0 8px;color:var(--gd);font-size:.78em;letter-spacing:.1em}
+  .row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .r{text-align:right} .row .full{grid-column:1/-1}
+  .up{color:var(--g);text-shadow:0 0 6px var(--g)} .dn{color:var(--red);text-shadow:0 0 6px var(--red)} .mute{color:var(--dim)}
   .guard{margin-top:10px;padding:6px 10px;border:1px solid var(--dim);border-radius:4px;font-size:.78em;
          letter-spacing:.1em;color:var(--gd)}
   .guard.on{border-color:var(--warn);color:var(--warn);text-shadow:0 0 8px var(--warn);animation:b 1.4s steps(2) infinite}
@@ -94,29 +102,31 @@
     <div class="card" id="acc">
       <h2>ACCUMULATION ENGINE <span class="tag" id="acc-mode">—</span></h2>
       <div class="grid">
-        <div class="cell"><div class="k">WEEKLY BUDGET</div><div class="v" id="acc-weekly">£—</div></div>
-        <div class="cell"><div class="k">COINS</div><div class="v" id="acc-coins" style="font-size:clamp(14px,1.4vw,20px)">—</div></div>
+        <div class="cell"><div class="k">UNREALISED P/L (WEIGHTED)</div><div class="v" id="acc-pnl">—</div></div>
+        <div class="cell"><div class="k">BUYS FILLED</div><div class="v" id="acc-buys">—</div></div>
       </div>
+      <div class="rows" id="acc-rows"></div>
       <div class="log" id="acc-status"></div>
     </div>
 
     <div class="card" id="dt">
       <h2>DAY-TRADE SLEEVE <span class="tag" id="dt-mode">PAPER</span></h2>
       <div class="grid">
-        <div class="cell"><div class="k">NET P/L (PAPER)</div><div class="v" id="dt-pnl">£—</div></div>
+        <div class="cell"><div class="k">NET P/L AFTER FEES</div><div class="v" id="dt-pnl">£—</div></div>
+        <div class="cell"><div class="k">GROSS P/L</div><div class="v" id="dt-gross">£—</div></div>
         <div class="cell"><div class="k">WIN RATE</div><div class="v" id="dt-wr">—</div></div>
-        <div class="cell"><div class="k">TRADES</div><div class="v" id="dt-trades">—</div></div>
-        <div class="cell"><div class="k">ETH-GBP</div><div class="v" id="dt-price">£—</div></div>
+        <div class="cell"><div class="k">TRADES CLOSED</div><div class="v" id="dt-trades">—</div></div>
       </div>
-      <div class="k" style="margin-top:12px">POT DEPLOYED <span id="dt-potlbl"></span></div>
+      <div class="k" style="margin-top:12px"><span id="dt-pair">ETH-GBP</span> <span id="dt-price">£—</span> · <span id="dt-potlbl"></span></div>
       <div class="bar"><i id="dt-potbar"></i></div>
       <div class="k" style="margin-top:10px" id="dt-fees"></div>
+      <div class="rows" id="dt-rows"></div>
       <div class="guard" id="dt-guard" hidden></div>
       <div class="log" id="dt-log"></div>
     </div>
   </div>
 
-  <div class="foot">WMBOT TERMINAL · PAPER MODE · NO REAL FUNDS AT RISK</div>
+  <div class="foot" id="foot">WMBOT TERMINAL</div>
 </div>
 
 <script>
@@ -134,6 +144,11 @@ setInterval(draw,60);
 
 const $=id=>document.getElementById(id);
 const gbp=n=>(n<0?"-£":"£")+Math.abs(Number(n)).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pctf=n=>n==null?'—':(n>0?'+':'')+(n*100).toFixed(2)+'%';
+const pcls=n=>n==null?'mute':n>0?'up':n<0?'dn':'';
+const pxf=n=>n==null?'—':'£'+Number(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:n<100?5:2});
+function row(cells,cls){const r=document.createElement('div');r.className='row'+(cls?' '+cls:'');
+  for(const [t,c] of cells){const s=document.createElement('span');s.textContent=t;if(c)s.className=c;r.append(s)}return r}
 
 // ---- neural feed: typewriter stream ----
 const stream=$('stream'),cursorLine=$('cursor-line');
@@ -187,23 +202,37 @@ async function load(){
     // accumulation
     const a=d.accumulation||{};
     $('acc-mode').textContent=(a.mode||'offline').toUpperCase();
-    $('acc-weekly').textContent=gbp(a.weekly_gbp||0);
-    $('acc-coins').textContent=a.assets?Object.keys(a.assets).map(k=>k.split('-')[0]).join(' '):'—';
-    $('acc-status').replaceChildren(Object.assign(document.createElement('div'),{textContent:a.status||'standing by'}));
+    const ap=$('acc-pnl');ap.textContent=pctf(a.pnl_pct);ap.className='v '+pcls(a.pnl_pct);
+    $('acc-buys').textContent=a.buys??'—';
+    // real money: prices and percentages only — never quantities or £ held
+    const coins=a.coins||{};
+    $('acc-rows').replaceChildren(row([['COIN'],['AVG BUY','r'],['NOW','r'],['P/L','r'],['BUYS','r']],'h'),
+      ...Object.entries(coins).map(([k,c])=>row([[k.split('-')[0]],[c.market===false?'no market':pxf(c.avg_price),'r'+(c.market===false?' mute':'')],
+        [pxf(c.price),'r'],[pctf(c.pnl_pct),'r '+pcls(c.pnl_pct)],[String(c.buys??0),'r']])));
+    const lb=a.last_buy?'last buy '+String(a.last_buy).slice(5,16).replace('T',' ')+'Z':'no fills yet';
+    $('acc-status').replaceChildren(...[a.status||'standing by',lb].map(l=>Object.assign(document.createElement('div'),{textContent:l})));
     // daytrade
     const t=d.daytrade||{};
     $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
-    const pnl=$('dt-pnl');pnl.textContent=gbp(t.realized_pnl_gbp||0);
-    pnl.className='v '+((t.realized_pnl_gbp||0)<0?'neg':'pos');
-    $('dt-wr').textContent=t.trades?Math.round((t.win_rate||0)*100)+'%':'—';
+    const net=t.net_pnl_after_fees??t.realized_pnl_gbp??0,gr=t.gross_pnl_gbp??0;
+    const pnl=$('dt-pnl');pnl.textContent=gbp(net);pnl.className='v '+(net<0?'neg':'pos');
+    const gp=$('dt-gross');gp.textContent=gbp(gr);gp.className='v '+(gr<0?'neg':'pos');
+    $('dt-wr').textContent=t.trades?Math.round((t.win_rate||0)*100)+'% ('+(t.wins||0)+'/'+t.trades+')':'—';
     $('dt-trades').textContent=t.trades??'—';
-    $('dt-price').textContent=t.last_price?gbp(t.last_price):'£—';
+    $('dt-pair').textContent=t.pair||'ETH-GBP';
+    $('dt-price').textContent=t.last_price?pxf(t.last_price):'£—';
     const dep=(t.invested_gbp||0),pot=(t.pot_gbp||20),pct=Math.min(100,Math.round(dep/pot*100));
     $('dt-potbar').style.width=pct+'%';
-    $('dt-potlbl').textContent=gbp(dep)+' / '+gbp(pot)+'  ('+(t.tranches_open||0)+'/'+(t.tranches_total||4)+' slots)';
+    $('dt-potlbl').textContent='POT '+gbp(pot)+' · DEPLOYED '+gbp(dep)+' · CASH '+gbp(t.cash_gbp??pot-dep)
+      +' · '+(t.tranches_open||0)+'/'+(t.tranches_total||4)+' SLOTS';
     const p2=n=>(Number(n)*100).toFixed(2)+'%';
-    $('dt-fees').textContent=t.fee_rate!=null?'FEE '+p2(t.fee_rate)+'/SIDE · TP FLOOR '+p2(t.effective_tp)
-      +' · GROSS '+gbp(t.gross_pnl_gbp||0)+' · NET '+gbp(t.net_pnl_after_fees||0):'';
+    $('dt-fees').textContent=t.fee_rate!=null?'MAKER FEE '+p2(t.fee_rate)+'/SIDE · TP FLOOR '+p2(t.effective_tp)
+      +' · BUY ON -'+p2(t.buy_dip_pct||0)+' DIP':'';
+    const tr=t.open_tranches||[];
+    $('dt-rows').replaceChildren(...(tr.length?[row([['ENTRY'],['NOW','r'],['UNREAL.','r'],['SELL ≥','r']],'dt h'),
+      ...tr.map(x=>row([[pxf(x.entry)+(x.status!=='held'?' ·'+x.status.replace('_',' '):'')],[pxf(t.last_price),'r'],
+        [pctf(x.unrealised_pct),'r '+pcls(x.unrealised_pct)],[pxf(x.target),'r']],'dt'))]
+      :[row([['no open tranches — waiting for a dip','mute full']],'dt')]));
     const g=$('dt-guard');
     if(t.losing_streak!=null){
       g.hidden=false;g.classList.toggle('on',!!t.cooldown_active);
@@ -213,6 +242,8 @@ async function load(){
     }
     $('dt-log').replaceChildren(...(t.journal&&t.journal.length?t.journal:['no trades yet']).slice(-8)
       .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
+    $('foot').textContent='WMBOT TERMINAL · ACCUMULATION '+(a.mode||'offline').toUpperCase()
+      +' · DAY-TRADE '+(t.mode||'paper').toUpperCase()+' · PERCENTAGES ONLY FOR REAL FUNDS';
     enqueue(d.thoughts&&d.thoughts.length?d.thoughts:['awaiting first reasoning run…']);
     heartbeat();
   }catch(e){
