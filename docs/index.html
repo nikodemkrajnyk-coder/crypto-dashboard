@@ -64,6 +64,32 @@
   .stream .ln.new{color:var(--g);text-shadow:0 0 6px var(--g)}
   .stream .ln .p{color:var(--dim)}
   .rows{margin-top:12px;display:grid;gap:4px;font-size:.85em}
+  /* encrypted portfolio */
+  #acc{container-type:inline-size}
+  .lockbox{border:1px dashed var(--dim);border-radius:6px;padding:16px;text-align:center}
+  .lockmsg{font-size:1.05em;letter-spacing:.12em;margin-bottom:12px;text-shadow:0 0 8px var(--g)}
+  .lockbox form{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .lockerr{margin-top:8px;color:var(--warn);font-size:.8em;letter-spacing:.1em;min-height:1em}
+  input,button{font:inherit;color:var(--g);background:#010;border:1px solid var(--dim);border-radius:4px;padding:7px 10px}
+  input{flex:1;min-width:0;max-width:16em} input:focus{outline:none;border-color:var(--g);box-shadow:0 0 8px rgba(0,255,102,.35)}
+  button{cursor:pointer;letter-spacing:.12em} button:hover{border-color:var(--g);box-shadow:0 0 8px rgba(0,255,102,.4)}
+  .lockbtn{font-size:.72em;padding:2px 8px;margin-left:6px}
+  .grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .grid.four .v{font-size:clamp(16px,1.8vw,26px)}
+  .pt{margin-top:12px;display:grid;gap:4px;font-size:.8em}
+  .pr{display:grid;grid-template-columns:3.4em repeat(7,minmax(0,1fr));gap:6px;padding:6px 8px;border:1px solid #052;
+      border-radius:4px;font-variant-numeric:tabular-nums;align-items:baseline}
+  .pr span{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pr span:first-child{text-align:left}
+  .pr.h{border:none;padding:0 8px;color:var(--gd);font-size:.85em;letter-spacing:.08em}
+  .pr.tot{border-color:var(--g);box-shadow:0 0 10px rgba(0,255,102,.15) inset}
+  @container (max-width:600px){
+    .grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .pr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:6px}
+    .pr.h{display:none}
+    .pr span,.pr span:first-child{text-align:left}
+    .pr span::before{content:attr(data-l);display:block;font-size:.75em;color:var(--gd);letter-spacing:.08em}
+  }
   .row{display:grid;grid-template-columns:3.6em minmax(0,1fr) minmax(0,1fr) 5.2em 3.4em;gap:8px;padding:6px 8px;
        border:1px solid #052;border-radius:4px;align-items:baseline;font-variant-numeric:tabular-nums}
   .row.dt{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 5.2em minmax(0,1fr)}
@@ -100,12 +126,24 @@
     </div>
 
     <div class="card" id="acc">
-      <h2>ACCUMULATION ENGINE <span class="tag" id="acc-mode">—</span></h2>
-      <div class="grid">
-        <div class="cell"><div class="k">UNREALISED P/L (WEIGHTED)</div><div class="v" id="acc-pnl">—</div></div>
-        <div class="cell"><div class="k">BUYS FILLED</div><div class="v" id="acc-buys">—</div></div>
+      <h2>ACCUMULATION ENGINE <span><span class="tag" id="acc-mode">—</span><button class="lockbtn" id="acc-lock" type="button" hidden>LOCK</button></span></h2>
+      <div class="lockbox" id="acc-locked">
+        <div class="lockmsg" id="acc-lockmsg">🔒 LOCKED — ENTER PASSCODE</div>
+        <form id="acc-form" autocomplete="off">
+          <input type="password" id="acc-pass" placeholder="passcode" aria-label="Passcode" autocomplete="off">
+          <button type="submit">UNLOCK</button>
+        </form>
+        <div class="lockerr" id="acc-lockerr"></div>
       </div>
-      <div class="rows" id="acc-rows"></div>
+      <div id="acc-open" hidden>
+        <div class="grid four">
+          <div class="cell"><div class="k">INVESTED</div><div class="v" id="acc-inv">£—</div></div>
+          <div class="cell"><div class="k">VALUE NOW</div><div class="v" id="acc-val">£—</div></div>
+          <div class="cell"><div class="k">P/L £</div><div class="v" id="acc-pl">£—</div></div>
+          <div class="cell"><div class="k">P/L %</div><div class="v" id="acc-plp">—</div></div>
+        </div>
+        <div class="pt" id="acc-table"></div>
+      </div>
       <div class="log" id="acc-status"></div>
     </div>
 
@@ -190,6 +228,82 @@ function heartbeat(){
 }
 setInterval(heartbeat,1000);heartbeat();
 
+// ---- encrypted accumulation portfolio ----
+// The real portfolio arrives only as AES-GCM ciphertext; the passcode never leaves this browser.
+const PASS_KEY='wmbot.passcode';
+const store={get(){try{return localStorage.getItem(PASS_KEY)}catch(e){return null}},
+  set(v){try{localStorage.setItem(PASS_KEY,v)}catch(e){}},del(){try{localStorage.removeItem(PASS_KEY)}catch(e){}}};
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let keyCache={id:null,key:null},lastAcc=null;
+async function decryptBlob(blob,pass){
+  const id=blob.salt+'|'+blob.iter+'|'+pass;
+  if(keyCache.id!==id){
+    const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+    const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(blob.salt),iterations:blob.iter,hash:'SHA-256'},
+      base,{name:'AES-GCM',length:256},false,['decrypt']);
+    keyCache={id,key};
+  }
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(blob.iv)},keyCache.key,b64(blob.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+function showLocked(msg,canUnlock,err){
+  $('acc-open').hidden=true;$('acc-locked').hidden=false;$('acc-lock').hidden=true;
+  $('acc-lockmsg').textContent=msg;$('acc-form').hidden=!canUnlock;$('acc-lockerr').textContent=err||'';
+}
+const sgbp=n=>(n>0?'+':n<0?'-':'')+'£'+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const amt=n=>Number(n).toLocaleString('en-GB',{maximumFractionDigits:8});
+function cell(el,text,cls){el.textContent=text;el.className='v'+(cls?' '+cls:'')}
+function prow(cells,cls){const r=document.createElement('div');r.className='pr'+(cls?' '+cls:'');
+  for(const [t,l,c] of cells){const s=document.createElement('span');s.textContent=t;s.dataset.l=l;if(c)s.className=c;r.append(s)}return r}
+function showPortfolio(p,prices){
+  $('acc-locked').hidden=true;$('acc-open').hidden=false;$('acc-lock').hidden=false;
+  const rows=Object.entries(p.coins||{}).map(([pair,c])=>{
+    const qty=Number(c.qty||0),inv=Number(c.invested||0),price=prices[pair]??null;
+    const value=price!=null?qty*price:(qty?null:0),pl=value!=null?value-inv:null;
+    return {pair,qty,inv,avg:c.avg_price!=null?Number(c.avg_price):null,price,value,pl,pct:inv>0&&pl!=null?pl/inv:null,buys:c.buys||0,last:c.last_buy};
+  });
+  const known=rows.filter(r=>r.value!=null),inv=known.reduce((s,r)=>s+r.inv,0),val=known.reduce((s,r)=>s+r.value,0);
+  const pl=val-inv,pct=inv>0?pl/inv:null;
+  cell($('acc-inv'),gbp(inv));cell($('acc-val'),gbp(val));
+  cell($('acc-pl'),sgbp(pl),pcls(pl));cell($('acc-plp'),pctf(pct),pcls(pct));
+  const L=['COIN','AMOUNT','AVG BUY','NOW','VALUE','P/L £','P/L %','ALLOC'];
+  $('acc-table').replaceChildren(prow(L.map(l=>[l,'']),'h'),
+    ...rows.map(r=>prow([[r.pair.split('-')[0],L[0]],[r.qty?amt(r.qty):'0',L[1]],[r.avg!=null?pxf(r.avg):'—',L[2]],
+      [r.price!=null?pxf(r.price):'no market',L[3],r.price==null?'mute':''],[r.value!=null?gbp(r.value):'—',L[4]],
+      [r.pl!=null&&r.inv?sgbp(r.pl):'—',L[5],pcls(r.inv?r.pl:null)],[pctf(r.pct),L[6],pcls(r.pct)],
+      [val>0&&r.value!=null?(r.value/val*100).toFixed(1)+'%':'—',L[7]]])),
+    prow([['TOTAL',L[0]],['',L[1]],['',L[2]],['',L[3]],[gbp(val),L[4]],[sgbp(pl),L[5],pcls(pl)],[pctf(pct),L[6],pcls(pct)],['100%',L[7]]],'tot'));
+  const lastBuy=rows.map(r=>r.last).filter(Boolean).sort().pop();
+  const plan=p.plan?'plan '+gbp(Object.values(p.plan).reduce((s,v)=>s+Number(v),0))+'/wk':'';
+  const missing=rows.filter(r=>r.qty&&r.value==null).map(r=>r.pair.split('-')[0]);
+  $('acc-status').replaceChildren(...[lastAcc&&lastAcc.status||'',
+    [plan,rows.reduce((s,r)=>s+r.buys,0)+' buys filled',lastBuy?'last buy '+String(lastBuy).slice(5,16).replace('T',' ')+'Z':'no fills yet'].filter(Boolean).join(' · '),
+    missing.length?'totals exclude '+missing.join(', ')+' (no live price)':''].filter(Boolean)
+    .map(l=>Object.assign(document.createElement('div'),{textContent:l})));
+}
+async function renderAcc(a,tryPass){
+  lastAcc=a;
+  const status=()=>$('acc-status').replaceChildren(Object.assign(document.createElement('div'),{textContent:a.status||'standing by'}));
+  if(!a.encrypted){
+    showLocked(a.reason==='DASH_PASSPHRASE not set'?'🔒 LOCKED — PORTFOLIO ENCRYPTION NOT SET UP':'🔒 LOCKED — NO ENCRYPTED SNAPSHOT YET',false);
+    return status();
+  }
+  if(!(window.crypto&&crypto.subtle)){showLocked('🔒 LOCKED — THIS BROWSER CAN\'T DECRYPT (NEEDS HTTPS)',false);return status()}
+  const pass=tryPass??store.get();
+  if(!pass){showLocked('🔒 LOCKED — ENTER PASSCODE',true);return status()}
+  if(tryPass)$('acc-lockerr').textContent='decrypting…';
+  try{
+    const p=await decryptBlob(a.encrypted,pass);
+    if(tryPass){store.set(pass);$('acc-pass').value=''}
+    showPortfolio(p,a.prices||{});
+  }catch(e){
+    if(!tryPass)store.del();          // stale or changed passcode — ask again
+    showLocked('🔒 LOCKED — ENTER PASSCODE',true,tryPass?'WRONG PASSCODE':'');status();
+  }
+}
+$('acc-form').addEventListener('submit',e=>{e.preventDefault();const v=$('acc-pass').value;if(v&&lastAcc)renderAcc(lastAcc,v)});
+$('acc-lock').addEventListener('click',()=>{store.del();keyCache={id:null,key:null};if(lastAcc)renderAcc(lastAcc)});
+
 // ---- data ----
 async function load(){
   try{
@@ -202,15 +316,7 @@ async function load(){
     // accumulation
     const a=d.accumulation||{};
     $('acc-mode').textContent=(a.mode||'offline').toUpperCase();
-    const ap=$('acc-pnl');ap.textContent=pctf(a.pnl_pct);ap.className='v '+pcls(a.pnl_pct);
-    $('acc-buys').textContent=a.buys??'—';
-    // real money: prices and percentages only — never quantities or £ held
-    const coins=a.coins||{};
-    $('acc-rows').replaceChildren(row([['COIN'],['AVG BUY','r'],['NOW','r'],['P/L','r'],['BUYS','r']],'h'),
-      ...Object.entries(coins).map(([k,c])=>row([[k.split('-')[0]],[c.market===false?'no market':pxf(c.avg_price),'r'+(c.market===false?' mute':'')],
-        [pxf(c.price),'r'],[pctf(c.pnl_pct),'r '+pcls(c.pnl_pct)],[String(c.buys??0),'r']])));
-    const lb=a.last_buy?'last buy '+String(a.last_buy).slice(5,16).replace('T',' ')+'Z':'no fills yet';
-    $('acc-status').replaceChildren(...[a.status||'standing by',lb].map(l=>Object.assign(document.createElement('div'),{textContent:l})));
+    renderAcc(a);
     // daytrade
     const t=d.daytrade||{};
     $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
@@ -243,7 +349,7 @@ async function load(){
     $('dt-log').replaceChildren(...(t.journal&&t.journal.length?t.journal:['no trades yet']).slice(-8)
       .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
     $('foot').textContent='WMBOT TERMINAL · ACCUMULATION '+(a.mode||'offline').toUpperCase()
-      +' · DAY-TRADE '+(t.mode||'paper').toUpperCase()+' · PERCENTAGES ONLY FOR REAL FUNDS';
+      +' · DAY-TRADE '+(t.mode||'paper').toUpperCase()+' · REAL PORTFOLIO ENCRYPTED';
     enqueue(d.thoughts&&d.thoughts.length?d.thoughts:['awaiting first reasoning run…']);
     heartbeat();
   }catch(e){
