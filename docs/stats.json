@@ -1,13 +1,13 @@
 {
-  "updated": "2026-10-29T18:27:05Z",
+  "updated": "2026-10-29T18:39:41Z",
   "daytrade": {
     "mode": "paper",
     "pair": "ETH-GBP",
     "pot_gbp": 20,
     "tranches_total": 4,
-    "tranches_open": 1,
-    "invested_gbp": 5.0,
-    "cash_gbp": 15.0,
+    "tranches_open": 2,
+    "invested_gbp": 10.0,
+    "cash_gbp": 10.0,
     "trades": 0,
     "wins": 0,
     "win_rate": 0,
@@ -20,19 +20,26 @@
     "max_losing_streak": 2,
     "cooldown_active": false,
     "cooldown_until": null,
-    "last_price": 1745.46,
+    "last_price": 1742.29,
     "open_tranches": [
       {
         "entry": 1756.88,
         "target": 1784.99,
-        "unrealised_pct": -0.0065,
+        "unrealised_pct": -0.0083,
+        "status": "held"
+      },
+      {
+        "entry": 1738.85,
+        "target": 1766.67,
+        "unrealised_pct": 0.002,
         "status": "held"
       }
     ],
     "buy_dip_pct": 0.01,
     "take_profit_pct": 0.015,
     "journal": [
-      "10-29 17:02Z BUY @ £1,756.88 (£5.00)"
+      "10-29 17:02Z BUY @ £1,756.88 (£5.00)",
+      "10-29 18:39Z BUY @ £1,738.85 (£5.00)"
     ]
   },
   "accumulation": {
@@ -45,10 +52,10 @@
       "ZEC-GBP"
     ],
     "prices": {
-      "BTC-GBP": 60377.36,
-      "ETH-GBP": 1745.46,
-      "LINK-GBP": 8.7606,
-      "ZEC-GBP": 988.17
+      "BTC-GBP": 60297.61,
+      "ETH-GBP": 1742.29,
+      "LINK-GBP": 8.69541,
+      "ZEC-GBP": 984.01
     },
     "price_via": {
       "ZEC-GBP": "USD"
@@ -64,13 +71,14 @@
   },
   "thoughts": [
     "earlier: 10-29 17:02Z BUY @ £1,756.88 (£5.00)",
-    "18:27Z run start · PAPER mode · scanning ETH-GBP",
-    "18:27Z streak 0/2 — trading normally",
-    "18:27Z take-profit floor 1.60% (fees 0.50%x2 + 0.60% net) · target 1.50% -> using 1.60%",
-    "18:27Z take-profit watch: entry £1756.88 needs £1785.13 (2.31% away) -> wait",
-    "18:27Z ETH-GBP £1744.82 | 6h high £1775.54 | drop 1.73% >= 1.00% buy-threshold",
-    "18:27Z -> HOLD (grid spacing: next buy at <= £1739.31)",
-    "18:27Z slots 1/4 open · invested £5.00 · cash £15.00 · realized £0.00",
-    "18:27Z accumulation: paper mode — logging would-be buys"
+    "earlier: 10-29 18:39Z BUY @ £1,738.85 (£5.00)",
+    "18:39Z run start · PAPER mode · scanning ETH-GBP",
+    "18:39Z streak 0/2 — trading normally",
+    "18:39Z take-profit floor 1.60% (fees 0.50%x2 + 0.60% net) · target 1.50% -> using 1.60%",
+    "18:39Z take-profit watch: entry £1756.88 needs £1785.13 (2.66% away) -> wait",
+    "18:39Z ETH-GBP £1738.85 | 6h high £1775.54 | drop 2.07% >= 1.00% buy-threshold",
+    "18:39Z -> BUY @ £1738.85 (£5.00)",
+    "18:39Z slots 2/4 open · invested £10.00 · cash £10.00 · realized £0.00",
+    "18:39Z accumulation: paper mode — logging would-be buys"
   ]
 }
