@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-29T17:02:36Z",
+  "updated": "2026-10-29T17:03:26Z",
   "daytrade": {
     "mode": "paper",
     "pair": "ETH-GBP",
@@ -20,12 +20,12 @@
     "max_losing_streak": 2,
     "cooldown_active": false,
     "cooldown_until": null,
-    "last_price": 1757.65,
+    "last_price": 1758.7,
     "open_tranches": [
       {
         "entry": 1756.88,
         "target": 1784.99,
-        "unrealised_pct": 0.0004,
+        "unrealised_pct": 0.001,
         "status": "held"
       }
     ],
@@ -45,16 +45,22 @@
       "ZEC-GBP"
     ],
     "prices": {
-      "BTC-GBP": 60682.14,
-      "ETH-GBP": 1757.65,
+      "BTC-GBP": 60680.94,
+      "ETH-GBP": 1758.7,
       "LINK-GBP": 8.86541,
-      "ZEC-GBP": 1004.68
+      "ZEC-GBP": 1005.44
     },
     "price_via": {
       "ZEC-GBP": "USD"
     },
-    "locked": true,
-    "reason": "DASH_PASSPHRASE not set"
+    "encrypted": {
+      "v": 1,
+      "kdf": "PBKDF2-SHA256/AES-256-GCM",
+      "iter": 600000,
+      "salt": "7Ym48rsJEGIjTbIMg/SVYQ==",
+      "iv": "/Y1HJkt/H6rZIAhi",
+      "ct": "N4gJcRtwF7nH/tPeZsM81X8Eyprf9umxukairYnKn2qmo8W/WXIrjX2uarMi2BN+T4KYcI6EoP8mSw/VTh2hdMcc7Twz742X/kw8CAcBW6b/HNTP8YsCgJxIwI9JnQxgrNSeU0DN1E9LYGkbYQF7Q2NhGVhlLuUY/it09EcKo3D/c+BjvOBNkaLzqe2N7kMtXeqzgr1PaTG8ySRgAOmQYXHtLfk2+sHh5tFyHfdxdGikXVRTo2nfJ/aCYtYyDLtZm7jJOT53W8+zfcwr3/XlLsJP8C8X+ej3J1Lau1MhQDE4mgJAUaQcPg/2X9nDj7gZf4JcfALCp0YnWifTrzYUDtGyoeDqIaZ3odIxznlVD1aHmn4f+nzSeiJj8Qr7Rr8PSWa+PDR2+mYzxZLLnNhR6tdk52dm5FyWFxtIAHA5Tlq867MpZTGfAKBraKAb7XJX274zGlozArmW9XOuHfUKECql95jKDzkCmLPDDIDTTGR8tTboyD/O4oUENZamicBd1NPjIPxr08BGvz6GA4nawvpLQJK2gRrjHgC0szv8Nh36eL5/oGJ8O/fNDweBAOA0Z3r/7oehoY+ab6W/WOT2zKN5IH4nxetLAja96YukxPi45SIHktFRFMPhHUzzsXxZhpNCe710nr1n2r0rVjIqMMycF1YB24DKBdDagVkSlYwFcWzp55tqtgDwpjIattHxyWf0ZqNzG/tScQwf9Kjc4pSRBt7ZO63nkq8eq8i/dVeHZi/jRjpjxPDksHLaTOeEmxyjho/O+o6le7cN7pt/Z8SjkQHpCHtqEsnII2JKTXyPOJw="
+    }
   },
   "thoughts": [
     "earlier: 10-29 17:02Z BUY @ £1,756.88 (£5.00)",
@@ -65,6 +71,6 @@
     "17:02Z ETH-GBP £1756.88 | 6h high £1775.54 | drop 1.05% >= 1.00% buy-threshold",
     "17:02Z -> BUY @ £1756.88 (£5.00)",
     "17:02Z slots 1/4 open · invested £5.00 · cash £15.00 · realized £0.00",
-    "17:02Z accumulation: paper mode — logging would-be buys"
+    "17:03Z accumulation: paper mode — logging would-be buys"
   ]
 }
