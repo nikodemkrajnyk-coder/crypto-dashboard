@@ -107,6 +107,7 @@
       </div>
       <div class="k" style="margin-top:12px">POT DEPLOYED <span id="dt-potlbl"></span></div>
       <div class="bar"><i id="dt-potbar"></i></div>
+      <div class="k" style="margin-top:10px" id="dt-fees"></div>
       <div class="log" id="dt-log"></div>
     </div>
   </div>
@@ -196,6 +197,9 @@ async function load(){
     const dep=(t.invested_gbp||0),pot=(t.pot_gbp||20),pct=Math.min(100,Math.round(dep/pot*100));
     $('dt-potbar').style.width=pct+'%';
     $('dt-potlbl').textContent=gbp(dep)+' / '+gbp(pot)+'  ('+(t.tranches_open||0)+'/'+(t.tranches_total||4)+' slots)';
+    const p2=n=>(Number(n)*100).toFixed(2)+'%';
+    $('dt-fees').textContent=t.fee_rate!=null?'FEE '+p2(t.fee_rate)+'/SIDE · TP FLOOR '+p2(t.effective_tp)
+      +' · GROSS '+gbp(t.gross_pnl_gbp||0)+' · NET '+gbp(t.net_pnl_after_fees||0):'';
     $('dt-log').replaceChildren(...(t.journal&&t.journal.length?t.journal:['no trades yet']).slice(-8)
       .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
     enqueue(d.thoughts&&d.thoughts.length?d.thoughts:['awaiting first reasoning run…']);

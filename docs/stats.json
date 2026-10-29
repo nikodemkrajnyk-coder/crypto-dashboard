@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-29T12:53:10Z",
+  "updated": "2026-10-29T14:14:31Z",
   "daytrade": {
     "mode": "paper",
     "pair": "ETH-GBP",
@@ -12,13 +12,17 @@
     "wins": 0,
     "win_rate": 0,
     "realized_pnl_gbp": 0.0,
-    "last_price": 1742.24,
+    "gross_pnl_gbp": 0.0,
+    "net_pnl_after_fees": 0.0,
+    "fee_rate": 0.005,
+    "effective_tp": 0.016,
+    "last_price": 1745.75,
     "buy_dip_pct": 0.01,
     "take_profit_pct": 0.015,
     "journal": []
   },
   "accumulation": {
-    "mode": "offline",
+    "mode": "live",
     "weekly_gbp": 35,
     "assets": {
       "BTC-GBP": 20,
@@ -26,14 +30,15 @@
       "LINK-GBP": 5,
       "ZEC-GBP": 5
     },
-    "status": "Awaiting API keys"
+    "status": "Live — buying on schedule"
   },
   "thoughts": [
-    "12:53Z run start · PAPER mode · scanning ETH-GBP",
-    "12:53Z take-profit watch: no open tranches",
-    "12:53Z ETH-GBP £1741.79 | 6h high £1747.35 | drop 0.32% < 1.00% buy-threshold",
-    "12:53Z -> HOLD (no dip deep enough)",
-    "12:53Z slots 0/4 open · invested £0.00 · cash £20.00 · realized £0.00",
-    "12:53Z accumulation: awaiting API keys"
+    "14:14Z run start · PAPER mode · scanning ETH-GBP",
+    "14:14Z take-profit floor 1.60% (fees 0.50%x2 + 0.60% net) · target 1.50% -> using 1.60%",
+    "14:14Z take-profit watch: no open tranches",
+    "14:14Z ETH-GBP £1745.47 | 6h high £1747.68 | drop 0.13% < 1.00% buy-threshold",
+    "14:14Z -> HOLD (no dip deep enough)",
+    "14:14Z slots 0/4 open · invested £0.00 · cash £20.00 · realized £0.00",
+    "14:14Z accumulation: live — buying on schedule"
   ]
 }
