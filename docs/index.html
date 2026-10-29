@@ -83,6 +83,9 @@
   .pr span:first-child{text-align:left}
   .pr.h{border:none;padding:0 8px;color:var(--gd);font-size:.85em;letter-spacing:.08em}
   .pr.tot{border-color:var(--g);box-shadow:0 0 10px rgba(0,255,102,.15) inset}
+  .btchead{display:flex;align-items:baseline;justify-content:center;gap:.6em;flex-wrap:wrap;letter-spacing:.12em}
+  .btcpct{font-size:clamp(34px,4.5vw,64px);color:var(--g);text-shadow:0 0 14px var(--g);font-variant-numeric:tabular-nums}
+  #acc-open>.bar{margin:6px 0 14px}
   .pnote{margin:-2px 0 2px;padding:0 8px;font-size:.85em;color:var(--warn);letter-spacing:.04em}
   @container (max-width:600px){
     .grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -137,6 +140,8 @@
         <div class="lockerr" id="acc-lockerr"></div>
       </div>
       <div id="acc-open" hidden>
+        <div class="btchead"><div class="k">BITCOIN</div><div class="btcpct" id="acc-btc">—%</div><div class="k">OF PORTFOLIO</div></div>
+        <div class="bar"><i id="acc-btcbar"></i></div>
         <div class="grid four">
           <div class="cell"><div class="k">INVESTED</div><div class="v" id="acc-inv">£—</div></div>
           <div class="cell"><div class="k">VALUE NOW</div><div class="v" id="acc-val">£—</div></div>
@@ -269,6 +274,10 @@ function showPortfolio(p,prices,via){
   const costed=rows.filter(r=>r.inv!=null&&r.value!=null);
   const inv=costed.reduce((s,r)=>s+r.inv,0),pl=costed.reduce((s,r)=>s+r.value,0)-inv,pct=inv>0?pl/inv:null;
   const val=rows.filter(r=>r.value!=null).reduce((s,r)=>s+r.value,0);   // everything held, incl. ZEC
+  // headline: BTC share of everything held, at live prices (derived from decrypted holdings only)
+  const btc=rows.find(r=>r.pair.startsWith('BTC-')),btcPct=val>0&&btc&&btc.value!=null?btc.value/val*100:null;
+  $('acc-btc').textContent=btcPct!=null?btcPct.toFixed(1)+'%':'—%';
+  $('acc-btcbar').style.width=(btcPct??0)+'%';
   cell($('acc-inv'),gbp(inv));cell($('acc-val'),gbp(val));
   cell($('acc-pl'),sgbp(pl),pcls(pl));cell($('acc-plp'),pctf(pct),pcls(pct));
   const L=['COIN','AMOUNT','AVG BUY','NOW','VALUE','P/L £','P/L %','ALLOC'];
