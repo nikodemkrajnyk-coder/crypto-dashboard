@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-29T14:14:31Z",
+  "updated": "2026-10-29T14:28:43Z",
   "daytrade": {
     "mode": "paper",
     "pair": "ETH-GBP",
@@ -16,7 +16,11 @@
     "net_pnl_after_fees": 0.0,
     "fee_rate": 0.005,
     "effective_tp": 0.016,
-    "last_price": 1745.75,
+    "losing_streak": 0,
+    "max_losing_streak": 2,
+    "cooldown_active": false,
+    "cooldown_until": null,
+    "last_price": 1741.81,
     "buy_dip_pct": 0.01,
     "take_profit_pct": 0.015,
     "journal": []
@@ -33,12 +37,13 @@
     "status": "Live — buying on schedule"
   },
   "thoughts": [
-    "14:14Z run start · PAPER mode · scanning ETH-GBP",
-    "14:14Z take-profit floor 1.60% (fees 0.50%x2 + 0.60% net) · target 1.50% -> using 1.60%",
-    "14:14Z take-profit watch: no open tranches",
-    "14:14Z ETH-GBP £1745.47 | 6h high £1747.68 | drop 0.13% < 1.00% buy-threshold",
-    "14:14Z -> HOLD (no dip deep enough)",
-    "14:14Z slots 0/4 open · invested £0.00 · cash £20.00 · realized £0.00",
-    "14:14Z accumulation: live — buying on schedule"
+    "14:28Z run start · PAPER mode · scanning ETH-GBP",
+    "14:28Z streak 0/2 — trading normally",
+    "14:28Z take-profit floor 1.60% (fees 0.50%x2 + 0.60% net) · target 1.50% -> using 1.60%",
+    "14:28Z take-profit watch: no open tranches",
+    "14:28Z ETH-GBP £1740.40 | 6h high £1747.68 | drop 0.42% < 1.00% buy-threshold",
+    "14:28Z -> HOLD (no dip deep enough)",
+    "14:28Z slots 0/4 open · invested £0.00 · cash £20.00 · realized £0.00",
+    "14:28Z accumulation: live — buying on schedule"
   ]
 }

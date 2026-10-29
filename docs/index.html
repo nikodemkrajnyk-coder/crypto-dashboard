@@ -63,6 +63,9 @@
   .stream .ln{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--gd)}
   .stream .ln.new{color:var(--g);text-shadow:0 0 6px var(--g)}
   .stream .ln .p{color:var(--dim)}
+  .guard{margin-top:10px;padding:6px 10px;border:1px solid var(--dim);border-radius:4px;font-size:.78em;
+         letter-spacing:.1em;color:var(--gd)}
+  .guard.on{border-color:var(--warn);color:var(--warn);text-shadow:0 0 8px var(--warn);animation:b 1.4s steps(2) infinite}
   .cur{display:inline-block;width:.6em;height:1.1em;vertical-align:text-bottom;background:var(--g);
        box-shadow:0 0 8px var(--g);animation:b 1s steps(2) infinite}
   .foot{text-align:center;font-size:.7em;color:#073;letter-spacing:.12em}
@@ -108,6 +111,7 @@
       <div class="k" style="margin-top:12px">POT DEPLOYED <span id="dt-potlbl"></span></div>
       <div class="bar"><i id="dt-potbar"></i></div>
       <div class="k" style="margin-top:10px" id="dt-fees"></div>
+      <div class="guard" id="dt-guard" hidden></div>
       <div class="log" id="dt-log"></div>
     </div>
   </div>
@@ -200,6 +204,13 @@ async function load(){
     const p2=n=>(Number(n)*100).toFixed(2)+'%';
     $('dt-fees').textContent=t.fee_rate!=null?'FEE '+p2(t.fee_rate)+'/SIDE · TP FLOOR '+p2(t.effective_tp)
       +' · GROSS '+gbp(t.gross_pnl_gbp||0)+' · NET '+gbp(t.net_pnl_after_fees||0):'';
+    const g=$('dt-guard');
+    if(t.losing_streak!=null){
+      g.hidden=false;g.classList.toggle('on',!!t.cooldown_active);
+      g.textContent=t.cooldown_active
+        ?'⚠ COOLDOWN · '+t.losing_streak+' LOSING DAYS · NO NEW BUYS UNTIL '+String(t.cooldown_until).slice(5,16).replace('T',' ')+'Z'
+        :'SAFEGUARD OK · LOSING STREAK '+t.losing_streak+'/'+(t.max_losing_streak||2)+' · TRADING NORMALLY';
+    }
     $('dt-log').replaceChildren(...(t.journal&&t.journal.length?t.journal:['no trades yet']).slice(-8)
       .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
     enqueue(d.thoughts&&d.thoughts.length?d.thoughts:['awaiting first reasoning run…']);
