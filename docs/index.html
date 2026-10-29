@@ -218,8 +218,8 @@ let lastSync=null;
 const pad=n=>String(n).padStart(2,'0');
 function heartbeat(){
   const now=new Date();
-  // the day-trade bot runs on a */15 schedule (GitHub may start it a few minutes late)
-  const next=new Date(now);next.setUTCSeconds(0,0);next.setUTCMinutes(Math.floor(now.getUTCMinutes()/15)*15+15);
+  // everything runs in one */30 job (GitHub may start it a few minutes late)
+  const next=new Date(now);next.setUTCSeconds(0,0);next.setUTCMinutes(Math.floor(now.getUTCMinutes()/30)*30+30);
   const left=Math.max(0,Math.floor((next-now)/1000));
   $('hb-next').textContent=pad(Math.floor(left/60))+':'+pad(left%60);
   if(lastSync){
