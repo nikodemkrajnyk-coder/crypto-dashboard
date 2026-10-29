@@ -83,6 +83,7 @@
   .pr span:first-child{text-align:left}
   .pr.h{border:none;padding:0 8px;color:var(--gd);font-size:.85em;letter-spacing:.08em}
   .pr.tot{border-color:var(--g);box-shadow:0 0 10px rgba(0,255,102,.15) inset}
+  .pnote{margin:-2px 0 2px;padding:0 8px;font-size:.85em;color:var(--warn);letter-spacing:.04em}
   @container (max-width:600px){
     .grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
     .pr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:6px}
@@ -255,29 +256,41 @@ const amt=n=>Number(n).toLocaleString('en-GB',{maximumFractionDigits:8});
 function cell(el,text,cls){el.textContent=text;el.className='v'+(cls?' '+cls:'')}
 function prow(cells,cls){const r=document.createElement('div');r.className='pr'+(cls?' '+cls:'');
   for(const [t,l,c] of cells){const s=document.createElement('span');s.textContent=t;s.dataset.l=l;if(c)s.className=c;r.append(s)}return r}
-function showPortfolio(p,prices){
+function showPortfolio(p,prices,via){
   $('acc-locked').hidden=true;$('acc-open').hidden=false;$('acc-lock').hidden=false;
+  via=via||{};
   const rows=Object.entries(p.coins||{}).map(([pair,c])=>{
-    const qty=Number(c.qty||0),inv=Number(c.invested||0),price=prices[pair]??null;
-    const value=price!=null?qty*price:(qty?null:0),pl=value!=null?value-inv:null;
-    return {pair,qty,inv,avg:c.avg_price!=null?Number(c.avg_price):null,price,value,pl,pct:inv>0&&pl!=null?pl/inv:null,buys:c.buys||0,last:c.last_buy};
+    // invested is null for coins held outside the bot (e.g. ZEC): no cost basis, so no P/L
+    const qty=Number(c.qty||0),inv=c.invested!=null?Number(c.invested):null,price=prices[pair]??null;
+    const value=price!=null?qty*price:(qty?null:0),pl=value!=null&&inv!=null?value-inv:null;
+    return {pair,qty,inv,avg:c.avg_price!=null?Number(c.avg_price):null,price,value,pl,
+      pct:inv>0&&pl!=null?pl/inv:null,buys:c.buys||0,last:c.last_buy,note:c.note,via:via[pair]};
   });
-  const known=rows.filter(r=>r.value!=null),inv=known.reduce((s,r)=>s+r.inv,0),val=known.reduce((s,r)=>s+r.value,0);
-  const pl=val-inv,pct=inv>0?pl/inv:null;
+  const costed=rows.filter(r=>r.inv!=null&&r.value!=null);
+  const inv=costed.reduce((s,r)=>s+r.inv,0),pl=costed.reduce((s,r)=>s+r.value,0)-inv,pct=inv>0?pl/inv:null;
+  const val=rows.filter(r=>r.value!=null).reduce((s,r)=>s+r.value,0);   // everything held, incl. ZEC
   cell($('acc-inv'),gbp(inv));cell($('acc-val'),gbp(val));
   cell($('acc-pl'),sgbp(pl),pcls(pl));cell($('acc-plp'),pctf(pct),pcls(pct));
   const L=['COIN','AMOUNT','AVG BUY','NOW','VALUE','P/L £','P/L %','ALLOC'];
-  $('acc-table').replaceChildren(prow(L.map(l=>[l,'']),'h'),
-    ...rows.map(r=>prow([[r.pair.split('-')[0],L[0]],[r.qty?amt(r.qty):'0',L[1]],[r.avg!=null?pxf(r.avg):'—',L[2]],
-      [r.price!=null?pxf(r.price):'no market',L[3],r.price==null?'mute':''],[r.value!=null?gbp(r.value):'—',L[4]],
+  const body=[];
+  for(const r of rows){
+    const sym=r.pair.split('-')[0]+(r.note?'*':'');
+    body.push(prow([[sym,L[0]],[r.qty?amt(r.qty):'0',L[1]],[r.avg!=null?pxf(r.avg):'—',L[2]],
+      [r.price!=null?pxf(r.price)+(r.via?' ($)':''):'no market',L[3],r.price==null?'mute':''],[r.value!=null?gbp(r.value):'—',L[4]],
       [r.pl!=null&&r.inv?sgbp(r.pl):'—',L[5],pcls(r.inv?r.pl:null)],[pctf(r.pct),L[6],pcls(r.pct)],
-      [val>0&&r.value!=null?(r.value/val*100).toFixed(1)+'%':'—',L[7]]])),
+      [val>0&&r.value!=null?(r.value/val*100).toFixed(1)+'%':'—',L[7]]]));
+    if(r.note)body.push(Object.assign(document.createElement('div'),{className:'pnote',
+      textContent:'* '+r.pair.split('-')[0]+' ('+r.note+')'}));
+  }
+  $('acc-table').replaceChildren(prow(L.map(l=>[l,'']),'h'),...body,
     prow([['TOTAL',L[0]],['',L[1]],['',L[2]],['',L[3]],[gbp(val),L[4]],[sgbp(pl),L[5],pcls(pl)],[pctf(pct),L[6],pcls(pct)],['100%',L[7]]],'tot'));
   const lastBuy=rows.map(r=>r.last).filter(Boolean).sort().pop();
   const plan=p.plan?'plan '+gbp(Object.values(p.plan).reduce((s,v)=>s+Number(v),0))+'/wk':'';
+  const outside=rows.filter(r=>r.inv==null&&r.value).map(r=>r.pair.split('-')[0]);
   const missing=rows.filter(r=>r.qty&&r.value==null).map(r=>r.pair.split('-')[0]);
   $('acc-status').replaceChildren(...[lastAcc&&lastAcc.status||'',
     [plan,rows.reduce((s,r)=>s+r.buys,0)+' buys filled',lastBuy?'last buy '+String(lastBuy).slice(5,16).replace('T',' ')+'Z':'no fills yet'].filter(Boolean).join(' · '),
+    outside.length?outside.join(', ')+' held outside the bot — counted in VALUE NOW, not in INVESTED or P/L (no cost basis)':'',
     missing.length?'totals exclude '+missing.join(', ')+' (no live price)':''].filter(Boolean)
     .map(l=>Object.assign(document.createElement('div'),{textContent:l})));
 }
@@ -295,7 +308,7 @@ async function renderAcc(a,tryPass){
   try{
     const p=await decryptBlob(a.encrypted,pass);
     if(tryPass){store.set(pass);$('acc-pass').value=''}
-    showPortfolio(p,a.prices||{});
+    showPortfolio(p,a.prices||{},a.price_via);
   }catch(e){
     if(!tryPass)store.del();          // stale or changed passcode — ask again
     showLocked('🔒 LOCKED — ENTER PASSCODE',true,tryPass?'WRONG PASSCODE':'');status();
