@@ -10,31 +10,62 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>WMBOT // crypto</title>
 <style>
-  :root{ --g:#00ff66; --gd:#0a3; --dim:#063; --bg:#000; --warn:#ffb300; --red:#ff4455; }
+  :root{ --g:#00ff66; --gd:#0c4; --dim:#063; --bg:#000; --warn:#ffb300; --red:#ff4455;
+         --pad:clamp(10px,2.2vw,28px); --gap:clamp(10px,1.6vw,20px); }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{background:var(--bg);color:var(--g);font-family:"SFMono-Regular",Menlo,Consolas,monospace;
-       overflow-x:hidden;-webkit-font-smoothing:none}
-  canvas#rain{position:fixed;inset:0;z-index:0;opacity:.28}
-  .wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:18px 14px 48px}
-  .hdr{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--dim);padding-bottom:8px;margin-bottom:14px}
-  .hdr h1{font-size:15px;letter-spacing:3px;text-shadow:0 0 8px var(--g)}
-  .hdr .t{font-size:10px;color:var(--gd)}
+  html,body{min-height:100%;background:var(--bg)}
+  body{color:var(--g);font-family:"SFMono-Regular",Menlo,Consolas,monospace;overflow-x:hidden;
+       -webkit-font-smoothing:none;font-size:clamp(13px,1.15vw,17px)}
+  canvas#rain{position:fixed;inset:0;z-index:0;opacity:.28;width:100vw;height:100vh}
+
+  /* full-bleed shell: fills the viewport (incl. MacBook widths), caps at 1600px only on big external monitors */
+  .wrap{position:relative;z-index:1;width:100%;max-width:1600px;margin:0 auto;min-height:100vh;min-height:100dvh;
+        padding:calc(var(--pad) + env(safe-area-inset-top)) calc(var(--pad) + env(safe-area-inset-right))
+                calc(var(--pad) + env(safe-area-inset-bottom)) calc(var(--pad) + env(safe-area-inset-left));
+        display:flex;flex-direction:column;gap:var(--gap)}
+  .hdr{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px 16px;
+       border-bottom:1px solid var(--dim);padding-bottom:10px}
+  .hdr h1{font-size:clamp(17px,2.2vw,30px);letter-spacing:.2em;text-shadow:0 0 10px var(--g)}
+  .hdr .t{font-size:clamp(11px,1vw,14px);color:var(--gd)}
   .blink{animation:b 1.1s steps(2) infinite}@keyframes b{50%{opacity:0}}
-  .card{border:1px solid var(--dim);border-radius:6px;padding:12px 13px;margin-bottom:12px;
-        background:rgba(0,20,8,.55);box-shadow:0 0 14px rgba(0,255,102,.07) inset}
-  .card h2{font-size:11px;letter-spacing:2px;color:var(--g);margin-bottom:10px;text-shadow:0 0 6px var(--g)}
-  .card h2 .tag{float:right;font-size:9px;padding:1px 6px;border:1px solid var(--dim);border-radius:3px;color:var(--gd)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-  .cell{border:1px solid #052;border-radius:4px;padding:8px}
-  .cell .k{font-size:9px;color:var(--gd);letter-spacing:1px}
-  .cell .v{font-size:20px;margin-top:3px;text-shadow:0 0 8px var(--g)}
+
+  .main{flex:1;display:grid;gap:var(--gap);grid-template-columns:1fr;grid-template-areas:"feed" "acc" "dt";min-height:0}
+  @media (min-width:900px){
+    .main{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);grid-template-rows:auto 1fr;grid-template-areas:"acc feed" "dt feed"}
+  }
+  .card{border:1px solid var(--dim);border-radius:8px;padding:clamp(12px,1.4vw,20px);min-width:0;
+        background:rgba(0,20,8,.6);box-shadow:0 0 18px rgba(0,255,102,.08) inset;display:flex;flex-direction:column}
+  .card h2{font-size:clamp(12px,1.05vw,15px);letter-spacing:.18em;margin-bottom:12px;text-shadow:0 0 6px var(--g);
+           display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .tag{font-size:.75em;padding:2px 8px;border:1px solid var(--dim);border-radius:3px;color:var(--gd);letter-spacing:.1em}
+  #acc{grid-area:acc} #dt{grid-area:dt} #feed{grid-area:feed}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,1vw,14px)}
+  .cell{border:1px solid #052;border-radius:5px;padding:clamp(8px,1vw,14px)}
+  .cell .k{font-size:.72em;color:var(--gd);letter-spacing:.12em}
+  .cell .v{font-size:clamp(20px,2.3vw,34px);margin-top:4px;text-shadow:0 0 8px var(--g);overflow-wrap:anywhere}
   .v.pos{color:var(--g)} .v.neg{color:var(--red);text-shadow:0 0 8px var(--red)}
-  .bar{height:7px;border:1px solid var(--dim);border-radius:4px;margin-top:10px;overflow:hidden;background:#010}
-  .bar i{display:block;height:100%;background:var(--g);box-shadow:0 0 10px var(--g)}
-  .log{font-size:10px;line-height:1.6;color:var(--gd);margin-top:6px;max-height:150px;overflow:auto}
+  .k{font-size:.72em;color:var(--gd);letter-spacing:.12em}
+  .bar{height:9px;border:1px solid var(--dim);border-radius:5px;margin-top:8px;overflow:hidden;background:#010}
+  .bar i{display:block;height:100%;width:0;background:var(--g);box-shadow:0 0 10px var(--g);transition:width .8s}
+  .log{font-size:.8em;line-height:1.65;color:var(--gd);margin-top:10px;overflow:auto;max-height:12em}
   .log div:before{content:"> ";color:var(--g)}
-  .foot{text-align:center;font-size:9px;color:#042;margin-top:16px;letter-spacing:1px}
+
+  /* neural feed */
+  #feed{min-height:55vh}
+  @media (min-width:900px){#feed{min-height:0}}
+  .pulse{width:.6em;height:.6em;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g);display:inline-block;
+         margin-right:.5em;animation:p 1.6s ease-in-out infinite}
+  @keyframes p{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.7)}}
+  .hb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+  .hb .cell .v{font-size:clamp(15px,1.7vw,24px)}
+  .stream{flex:1;min-height:14em;overflow-y:auto;border:1px solid #052;border-radius:5px;padding:12px;
+          background:rgba(0,8,3,.75);font-size:clamp(12px,1.05vw,15px);line-height:1.7;scroll-behavior:smooth}
+  .stream .ln{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--gd)}
+  .stream .ln.new{color:var(--g);text-shadow:0 0 6px var(--g)}
+  .stream .ln .p{color:var(--dim)}
+  .cur{display:inline-block;width:.6em;height:1.1em;vertical-align:text-bottom;background:var(--g);
+       box-shadow:0 0 8px var(--g);animation:b 1s steps(2) infinite}
+  .foot{text-align:center;font-size:.7em;color:#073;letter-spacing:.12em}
   .err{color:var(--warn)}
 </style>
 </head>
@@ -46,29 +77,41 @@
     <div class="t" id="updated">SYNCING…</div>
   </div>
 
-  <div class="card">
-    <h2>ACCUMULATION ENGINE <span class="tag" id="acc-mode">—</span></h2>
-    <div class="grid">
-      <div class="cell"><div class="k">WEEKLY BUDGET</div><div class="v" id="acc-weekly">£—</div></div>
-      <div class="cell"><div class="k">COINS</div><div class="v" id="acc-coins" style="font-size:13px">—</div></div>
+  <div class="main">
+    <div class="card" id="feed">
+      <h2><span><span class="pulse"></span>NEURAL FEED // LIVE</span><span class="tag" id="feed-mode">PAPER</span></h2>
+      <div class="hb">
+        <div class="cell"><div class="k">LAST SYNC</div><div class="v" id="hb-sync">—</div></div>
+        <div class="cell"><div class="k">SYNC AGE</div><div class="v" id="hb-age">—</div></div>
+        <div class="cell"><div class="k">NEXT RUN IN</div><div class="v" id="hb-next">--:--</div></div>
+      </div>
+      <div class="stream" id="stream"><div class="ln" id="cursor-line"><span class="cur"></span></div></div>
     </div>
-    <div class="log" id="acc-status"></div>
+
+    <div class="card" id="acc">
+      <h2>ACCUMULATION ENGINE <span class="tag" id="acc-mode">—</span></h2>
+      <div class="grid">
+        <div class="cell"><div class="k">WEEKLY BUDGET</div><div class="v" id="acc-weekly">£—</div></div>
+        <div class="cell"><div class="k">COINS</div><div class="v" id="acc-coins" style="font-size:clamp(14px,1.4vw,20px)">—</div></div>
+      </div>
+      <div class="log" id="acc-status"></div>
+    </div>
+
+    <div class="card" id="dt">
+      <h2>DAY-TRADE SLEEVE <span class="tag" id="dt-mode">PAPER</span></h2>
+      <div class="grid">
+        <div class="cell"><div class="k">NET P/L (PAPER)</div><div class="v" id="dt-pnl">£—</div></div>
+        <div class="cell"><div class="k">WIN RATE</div><div class="v" id="dt-wr">—</div></div>
+        <div class="cell"><div class="k">TRADES</div><div class="v" id="dt-trades">—</div></div>
+        <div class="cell"><div class="k">ETH-GBP</div><div class="v" id="dt-price">£—</div></div>
+      </div>
+      <div class="k" style="margin-top:12px">POT DEPLOYED <span id="dt-potlbl"></span></div>
+      <div class="bar"><i id="dt-potbar"></i></div>
+      <div class="log" id="dt-log"></div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>DAY-TRADE SLEEVE <span class="tag" id="dt-mode">PAPER</span></h2>
-    <div class="grid">
-      <div class="cell"><div class="k">NET P/L (PAPER)</div><div class="v" id="dt-pnl">£—</div></div>
-      <div class="cell"><div class="k">WIN RATE</div><div class="v" id="dt-wr">—</div></div>
-      <div class="cell"><div class="k">TRADES</div><div class="v" id="dt-trades">—</div></div>
-      <div class="cell"><div class="k">ETH-GBP</div><div class="v" id="dt-price" style="font-size:16px">£—</div></div>
-    </div>
-    <div class="k" style="margin-top:10px">POT DEPLOYED <span id="dt-potlbl"></span></div>
-    <div class="bar"><i id="dt-potbar" style="width:0%"></i></div>
-    <div class="log" id="dt-log"></div>
-  </div>
-
-  <div class="foot" id="foot">WMBOT TERMINAL · PAPER MODE · NO REAL FUNDS AT RISK</div>
+  <div class="foot">WMBOT TERMINAL · PAPER MODE · NO REAL FUNDS AT RISK</div>
 </div>
 
 <script>
@@ -84,37 +127,85 @@ function draw(){x.fillStyle="rgba(0,0,0,.08)";x.fillRect(0,0,c.width,c.height);
     if(drops[i]*14>c.height&&Math.random()>.975)drops[i]=0;drops[i]++}}
 setInterval(draw,60);
 
+const $=id=>document.getElementById(id);
+const gbp=n=>(n<0?"-£":"£")+Math.abs(Number(n)).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// ---- neural feed: typewriter stream ----
+const stream=$('stream'),cursorLine=$('cursor-line');
+const shown=new Set(),queue=[];let typing=false;
+function enqueue(lines){
+  for(const l of lines){const s=String(l);if(!shown.has(s)){shown.add(s);queue.push(s)}}
+  if(!typing)typeNext();
+}
+function typeNext(){
+  const s=queue.shift();if(s===undefined){typing=false;return}
+  typing=true;
+  stream.querySelectorAll('.ln.new').forEach(e=>e.classList.remove('new'));
+  const ln=document.createElement('div');ln.className='ln new';
+  const pfx=document.createElement('span');pfx.className='p';pfx.textContent='> ';
+  const txt=document.createElement('span');ln.append(pfx,txt);
+  stream.insertBefore(ln,cursorLine);
+  const fast=queue.length>6;let i=0;          // catch up quickly on a big backlog
+  (function tick(){
+    i+=fast?3:1;txt.textContent=s.slice(0,i);stream.scrollTop=stream.scrollHeight;
+    if(i<s.length)setTimeout(tick,fast?6:18+Math.random()*30);
+    else setTimeout(typeNext,fast?60:280);
+  })();
+  while(stream.querySelectorAll('.ln:not(#cursor-line)').length>60)stream.querySelector('.ln').remove();
+}
+
+// ---- heartbeat ----
+let lastSync=null;
+const pad=n=>String(n).padStart(2,'0');
+function heartbeat(){
+  const now=new Date();
+  // the bot runs on a */15 schedule (GitHub may start it a few minutes late)
+  const next=new Date(now);next.setUTCSeconds(0,0);next.setUTCMinutes(Math.floor(now.getUTCMinutes()/15)*15+15);
+  const left=Math.max(0,Math.floor((next-now)/1000));
+  $('hb-next').textContent=pad(Math.floor(left/60))+':'+pad(left%60);
+  if(lastSync){
+    const a=Math.max(0,Math.floor((now-lastSync)/1000));
+    $('hb-age').textContent=a<3600?pad(Math.floor(a/60))+'m '+pad(a%60)+'s':Math.floor(a/3600)+'h '+pad(Math.floor(a%3600/60))+'m';
+  }
+}
+setInterval(heartbeat,1000);heartbeat();
+
 // ---- data ----
-const gbp=n=>(n<0?"-£":"£")+Math.abs(Number(n)).toLocaleString('en-GB',{maximumFractionDigits:2});
 async function load(){
   try{
     const r=await fetch('stats.json?ts='+Date.now(),{cache:'no-store'});
     if(!r.ok)throw 0; const d=await r.json();
-    const up=new Date(d.updated);
-    document.getElementById('updated').textContent='SYNC '+up.toISOString().slice(5,16).replace('T',' ')+'Z';
+    lastSync=new Date(d.updated);
+    const hm=lastSync.toISOString().slice(11,16)+'Z';
+    $('updated').textContent='SYNC '+lastSync.toISOString().slice(5,10)+' '+hm;
+    $('hb-sync').textContent=hm;
     // accumulation
     const a=d.accumulation||{};
-    document.getElementById('acc-mode').textContent=(a.mode||'offline').toUpperCase();
-    document.getElementById('acc-weekly').textContent=gbp(a.weekly_gbp||0);
-    document.getElementById('acc-coins').textContent=a.assets?Object.keys(a.assets).map(k=>k.split('-')[0]).join(' '):'—';
-    document.getElementById('acc-status').innerHTML='<div>'+(a.status||'standing by')+'</div>';
+    $('acc-mode').textContent=(a.mode||'offline').toUpperCase();
+    $('acc-weekly').textContent=gbp(a.weekly_gbp||0);
+    $('acc-coins').textContent=a.assets?Object.keys(a.assets).map(k=>k.split('-')[0]).join(' '):'—';
+    $('acc-status').replaceChildren(Object.assign(document.createElement('div'),{textContent:a.status||'standing by'}));
     // daytrade
     const t=d.daytrade||{};
-    document.getElementById('dt-mode').textContent=(t.mode||'paper').toUpperCase();
-    const pnl=document.getElementById('dt-pnl');pnl.textContent=gbp(t.realized_pnl_gbp||0);
+    $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
+    const pnl=$('dt-pnl');pnl.textContent=gbp(t.realized_pnl_gbp||0);
     pnl.className='v '+((t.realized_pnl_gbp||0)<0?'neg':'pos');
-    document.getElementById('dt-wr').textContent=t.trades?Math.round((t.win_rate||0)*100)+'%':'—';
-    document.getElementById('dt-trades').textContent=t.trades??'—';
-    document.getElementById('dt-price').textContent=t.last_price?gbp(t.last_price):'£—';
+    $('dt-wr').textContent=t.trades?Math.round((t.win_rate||0)*100)+'%':'—';
+    $('dt-trades').textContent=t.trades??'—';
+    $('dt-price').textContent=t.last_price?gbp(t.last_price):'£—';
     const dep=(t.invested_gbp||0),pot=(t.pot_gbp||20),pct=Math.min(100,Math.round(dep/pot*100));
-    document.getElementById('dt-potbar').style.width=pct+'%';
-    document.getElementById('dt-potlbl').textContent=gbp(dep)+' / '+gbp(pot)+'  ('+(t.tranches_open||0)+'/'+(t.tranches_total||4)+' slots)';
-    const log=document.getElementById('dt-log');
-    log.innerHTML=(t.journal&&t.journal.length?t.journal:['awaiting first run…']).slice(-8).map(l=>'<div>'+String(l).replace(/[<>]/g,'')+'</div>').join('');
+    $('dt-potbar').style.width=pct+'%';
+    $('dt-potlbl').textContent=gbp(dep)+' / '+gbp(pot)+'  ('+(t.tranches_open||0)+'/'+(t.tranches_total||4)+' slots)';
+    $('dt-log').replaceChildren(...(t.journal&&t.journal.length?t.journal:['no trades yet']).slice(-8)
+      .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
+    enqueue(d.thoughts&&d.thoughts.length?d.thoughts:['awaiting first reasoning run…']);
+    heartbeat();
   }catch(e){
-    document.getElementById('updated').innerHTML='<span class="err">NO SIGNAL — awaiting first bot run</span>';
+    $('updated').innerHTML='<span class="err">NO SIGNAL — awaiting first bot run</span>';
+    enqueue(['link down — retrying in 60s…']);
   }
 }
+enqueue(['boot sequence · WMBOT terminal online','establishing uplink to stats feed…']);
 load();setInterval(load,60000);
 </script>
 </body>
