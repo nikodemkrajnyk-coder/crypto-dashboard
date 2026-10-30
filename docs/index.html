@@ -322,6 +322,7 @@
             <div class="cell"><div class="k">PLAN vs ACTUAL</div><div class="v" id="acc-wp">—</div><div class="sgq" id="acc-wps"></div></div>
           </div>
           <div class="pt" id="acc-wtable"></div>
+          <div class="proj" id="acc-rsv" hidden></div>
           <div class="proj" id="acc-proj"></div>
           <div class="accord" id="acc-orders"></div>
           <details class="proj" id="acc-review" hidden><summary class="k" id="acc-rvsum"></summary><div id="acc-rvlist"></div></details>
@@ -537,6 +538,30 @@ function renderMoney(p,prices){
   const ok=behind<1;
   cell($('acc-wp'),ok?'ON TRACK':'BEHIND',ok?'pos':'neg');
   $('acc-wps').textContent=ok?'':'£'+behind.toFixed(2)+' due';
+  // dip reserve: diverted slice of the budget, rolled over until a measured BTC drop (numbers only)
+  const r=p.dip_reserve,rv0=$('acc-rsv');rv0.hidden=!r;
+  if(r){
+    const unit=Number(r.unit),per=unit*Number(r.divert),cred=Math.max(0,(Date.now()-Date.parse(r.start))/WK)*per;
+    let bal=Math.max(0,cred-Number(r.deployed)),free=bal,next=null;const RL=['TRIGGER','SIZE','DEPLOYS','STATE'],trs=[];
+    for(const t of r.tiers){
+      const size=unit*Number(t.weeks),fired=t.target!=null,left=fired?Math.max(0,Number(t.target)-Number(t.committed)):0;
+      const dep=fired?left:Math.min(size,free);free=Math.max(0,free-dep);
+      if(!fired&&!next&&(DIPNOW==null||DIPNOW<Number(t.drop)))next=[t,dep];
+      trs.push(wrow([['−'+Math.round(Number(t.drop)*100)+'%','',RL[0]],[Number(t.weeks)+'× '+gbp(size),'r',RL[1]],
+        [gbp(fired?Number(t.target):dep),'r',RL[2]],
+        [fired?(left>0.005?'DEPLOYING '+gbp(Number(t.committed))+'/'+gbp(Number(t.target)):'FIRED '+t.fired.slice(5,10)+' · '+gbp(Number(t.committed)))
+          :DIPNOW!=null&&DIPNOW>=Number(t.drop)?'TRIGGERED':'ARMED',
+         'tag2 wnote '+(fired||DIPNOW>=Number(t.drop)?'park':'ok'),RL[3]]],'p4'));
+    }
+    const full=Object.values(w.full_budget||{}).reduce((s,v)=>s+Number(v),0);
+    $('acc-rsv').replaceChildren(
+      Object.assign(document.createElement('div'),{className:'k',textContent:'DIP RESERVE '+gbp(bal)+' · +'+gbp(per)+'/WK ('+Math.round(Number(r.divert)*100)+'% of '+gbp(full)+') · DRIP '+gbp(budget)+'/WK'
+        +' · '+(r.pair||'BTC').split('-')[0]+(DIPNOW!=null?' −'+(DIPNOW*100).toFixed(1)+'% vs 7D HIGH':'')
+        +(next?' · NEXT −'+Math.round(Number(next[0].drop)*100)+'% = '+gbp(next[1]):'')}),
+      wrow(RL.map(l=>[l,l==='TRIGGER'||l==='STATE'?'':'r']),'h p4'),...trs,
+      Object.assign(document.createElement('div'),{className:'sgq',textContent:'deployed to date '+gbp(Number(r.deployed))+' · 1× = '+gbp(unit)+' = '
+        +(per?Math.ceil(unit/per):'—')+' wk of saving · one fire per tier per '+r.debounce_days+'d dip'}));
+  }
   // potential coins added if the plan runs clean, at today's price
   const now=Date.now(),mEnd=Date.UTC(new Date(now).getUTCFullYear(),new Date(now).getUTCMonth()+1,1),dLeft=Math.max(0,(mEnd-now)/864e5);
   const prow2=[],bq=w.bought_qty||{},mq=(p.month||{}).bought_qty||{},monthName=new Date(now).toUTCString().slice(8,11).toUpperCase();
@@ -670,8 +695,9 @@ addEventListener('hashchange',()=>showTab(location.hash.slice(1)));
 showTab(location.hash.slice(1)||(()=>{try{return localStorage.getItem('wmbot.tab')}catch(e){return null}})());
 
 // ---- big-dip top-up alert (public BTC price vs its 7-day high; advice only, never auto-spends) ----
+var DIPNOW=null;  // public BTC drop from its 7-day high (fraction) — the dip reserve's trigger reading
 function renderDip(a){
-  const el=$('dip');
+  const el=$('dip');DIPNOW=a?Number(a.drop_pct)/100:null;
   if(a)$('ov-btcpx').textContent=pxf(a.price),
     $('ov-btcdrop').textContent='-'+Number(a.drop_pct).toFixed(2)+'% from 7-day high '+pxf(a.high);
   if(!a||a.level==='none'){el.hidden=true;return}
