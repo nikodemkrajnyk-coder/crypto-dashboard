@@ -29,20 +29,39 @@
   .hdr .t{font-size:clamp(11px,1vw,14px);color:var(--gd)}
   .blink{animation:b 1.1s steps(2) infinite}@keyframes b{50%{opacity:0}}
 
-  .main{flex:1;display:grid;gap:var(--gap);grid-template-columns:1fr;grid-template-areas:"feed" "acc" "dt";min-height:0}
-  @media (min-width:900px){
-    .main{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);grid-template-rows:auto 1fr;grid-template-areas:"acc feed" "dt feed"}
-  }
+  /* tabs */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--dim);padding-bottom:8px}
+  .tabs button{font-size:clamp(11px,.95vw,14px);padding:8px 14px;letter-spacing:.16em;color:var(--gd);background:rgba(0,12,4,.8)}
+  .tabs button[aria-selected="true"]{color:#000;background:var(--g);border-color:var(--g);box-shadow:0 0 14px var(--g);font-weight:700}
+  .panel{flex:1;display:flex;flex-direction:column;gap:var(--gap);min-height:0}
+  .panel[hidden]{display:none}
+
+  /* big-dip top-up alert */
+  .dip{border:2px solid var(--warn);border-radius:8px;padding:12px 16px;background:rgba(40,25,0,.85);color:var(--warn);
+       font-weight:700;font-size:clamp(14px,1.5vw,21px);letter-spacing:.06em;text-shadow:0 0 10px var(--warn)}
+  .dip.strong{border-color:var(--red);color:var(--red);background:rgba(45,0,6,.88);text-shadow:0 0 12px var(--red);
+              animation:flash 1s steps(2) infinite}
+  @keyframes flash{50%{background:rgba(110,0,15,.92);box-shadow:0 0 28px var(--red)}}
+  .dip small{display:block;margin-top:4px;font-weight:400;font-size:.62em;letter-spacing:.08em;opacity:.85;text-shadow:none}
+
+  /* overview heroes: the numbers that matter, big and bold */
+  .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15em),1fr));gap:var(--gap)}
+  .hero .cell{padding:clamp(12px,1.6vw,22px);background:rgba(0,20,8,.6)}
+  .hero .v{font-size:clamp(30px,4vw,58px);font-weight:800}
+  .hero .sub{font-size:.8em;color:var(--gd);margin-top:4px;letter-spacing:.06em}
+  .hero .cell.key{border-color:var(--g);box-shadow:0 0 18px rgba(0,255,102,.18) inset}
+  .linkbtn{margin-top:8px;font-size:.72em;padding:3px 10px}
+  .ovstat{font-size:.82em;color:var(--gd);line-height:1.8}
+  .ovstat b{color:var(--g)}
   .card{border:1px solid var(--dim);border-radius:8px;padding:clamp(12px,1.4vw,20px);min-width:0;
         background:rgba(0,20,8,.6);box-shadow:0 0 18px rgba(0,255,102,.08) inset;display:flex;flex-direction:column}
   .card h2{font-size:clamp(12px,1.05vw,15px);letter-spacing:.18em;margin-bottom:12px;text-shadow:0 0 6px var(--g);
            display:flex;justify-content:space-between;align-items:center;gap:8px}
   .tag{font-size:.75em;padding:2px 8px;border:1px solid var(--dim);border-radius:3px;color:var(--gd);letter-spacing:.1em}
-  #acc{grid-area:acc} #dt{grid-area:dt} #feed{grid-area:feed}
   .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,1vw,14px)}
   .cell{border:1px solid #052;border-radius:5px;padding:clamp(8px,1vw,14px)}
   .cell .k{font-size:.72em;color:var(--gd);letter-spacing:.12em}
-  .cell .v{font-size:clamp(20px,2.3vw,34px);margin-top:4px;text-shadow:0 0 8px var(--g);overflow-wrap:anywhere}
+  .cell .v{font-size:clamp(20px,2.3vw,34px);margin-top:4px;text-shadow:0 0 8px var(--g);overflow-wrap:anywhere;font-weight:700}
   .v.pos{color:var(--g)} .v.neg{color:var(--red);text-shadow:0 0 8px var(--red)}
   .k{font-size:.72em;color:var(--gd);letter-spacing:.12em}
   .bar{height:9px;border:1px solid var(--dim);border-radius:5px;margin-top:8px;overflow:hidden;background:#010}
@@ -51,8 +70,9 @@
   .log div:before{content:"> ";color:var(--g)}
 
   /* neural feed */
-  #feed{min-height:55vh}
-  @media (min-width:900px){#feed{min-height:0}}
+  #feed{flex:1;min-height:60vh}
+  #feed .stream{font-size:clamp(11px,.85vw,13px);line-height:1.55}
+  #feed .hb .v{font-size:clamp(13px,1.2vw,17px)}
   .pulse{width:.6em;height:.6em;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g);display:inline-block;
          margin-right:.5em;animation:p 1.6s ease-in-out infinite}
   @keyframes p{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.7)}}
@@ -118,17 +138,41 @@
     <div class="t" id="updated">SYNCING…</div>
   </div>
 
-  <div class="main">
+  <div class="dip" id="dip" role="alert" hidden></div>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="overview">OVERVIEW</button>
+    <button type="button" role="tab" data-tab="btc">BITCOIN / ACCUMULATION</button>
+    <button type="button" role="tab" data-tab="daytrade">DAY-TRADE</button>
+    <button type="button" role="tab" data-tab="feed">FEED</button>
+  </nav>
+
+  <section class="panel" id="tab-overview" role="tabpanel">
+    <div class="hero">
+      <div class="cell key"><div class="k">BITCOIN % OF PORTFOLIO</div><div class="v" id="ov-btc">🔒</div>
+        <div class="sub" id="ov-btcsub">encrypted — unlock to view</div>
+        <button class="linkbtn" id="ov-unlock" data-goto="btc" type="button">UNLOCK →</button></div>
+      <div class="cell key"><div class="k">ACCUMULATION P/L</div><div class="v" id="ov-pl">🔒</div><div class="sub" id="ov-plsub">encrypted</div></div>
+      <div class="cell"><div class="k">PORTFOLIO VALUE</div><div class="v" id="ov-val">🔒</div><div class="sub" id="ov-valsub">encrypted</div></div>
+      <div class="cell key"><div class="k">DAY-TRADE NET (PAPER)</div><div class="v" id="ov-dt">£—</div><div class="sub" id="ov-dtsub">—</div></div>
+      <div class="cell"><div class="k">BTC PRICE</div><div class="v" id="ov-btcpx">£—</div><div class="sub" id="ov-btcdrop">—</div></div>
+    </div>
+    <div class="card"><h2>SYSTEM STATUS</h2><div class="ovstat" id="ov-status">syncing…</div></div>
+  </section>
+
+  <section class="panel" id="tab-feed" role="tabpanel" hidden>
     <div class="card" id="feed">
       <h2><span><span class="pulse"></span>NEURAL FEED // LIVE</span><span class="tag" id="feed-mode">PAPER</span></h2>
       <div class="hb">
         <div class="cell"><div class="k">LAST SYNC</div><div class="v" id="hb-sync">—</div></div>
         <div class="cell"><div class="k">SYNC AGE</div><div class="v" id="hb-age">—</div></div>
-        <div class="cell"><div class="k">NEXT RUN IN</div><div class="v" id="hb-next">--:--</div></div>
+        <div class="cell"><div class="k">NEXT REFRESH ≤</div><div class="v" id="hb-next">--:--</div></div>
       </div>
       <div class="stream" id="stream"><div class="ln" id="cursor-line"><span class="cur"></span></div></div>
     </div>
+  </section>
 
+  <section class="panel" id="tab-btc" role="tabpanel" hidden>
     <div class="card" id="acc">
       <h2>ACCUMULATION ENGINE <span><span class="tag" id="acc-mode">—</span><button class="lockbtn" id="acc-lock" type="button" hidden>LOCK</button></span></h2>
       <div class="lockbox" id="acc-locked">
@@ -152,7 +196,9 @@
       </div>
       <div class="log" id="acc-status"></div>
     </div>
+  </section>
 
+  <section class="panel" id="tab-daytrade" role="tabpanel" hidden>
     <div class="card" id="dt">
       <h2>DAY-TRADE SLEEVE <span class="tag" id="dt-mode">PAPER</span></h2>
       <div class="grid">
@@ -168,7 +214,7 @@
       <div class="guard" id="dt-guard" hidden></div>
       <div class="log" id="dt-log"></div>
     </div>
-  </div>
+  </section>
 
   <div class="foot" id="foot">WMBOT TERMINAL</div>
 </div>
@@ -223,11 +269,10 @@ let lastSync=null;
 const pad=n=>String(n).padStart(2,'0');
 function heartbeat(){
   const now=new Date();
-  // everything runs in one */30 job (GitHub may start it a few minutes late)
-  const next=new Date(now);next.setUTCSeconds(0,0);next.setUTCMinutes(Math.floor(now.getUTCMinutes()/30)*30+30);
-  const left=Math.max(0,Math.floor((next-now)/1000));
-  $('hb-next').textContent=pad(Math.floor(left/60))+':'+pad(left%60);
+  // the Mac runner works every 2 min; this page is republished on any change, else at least every 15 min
   if(lastSync){
+    const left=Math.floor((lastSync.getTime()+15*60000-now)/1000);
+    $('hb-next').textContent=left>0?pad(Math.floor(left/60))+':'+pad(left%60):'due';
     const a=Math.max(0,Math.floor((now-lastSync)/1000));
     $('hb-age').textContent=a<3600?pad(Math.floor(a/60))+'m '+pad(a%60)+'s':Math.floor(a/3600)+'h '+pad(Math.floor(a%3600/60))+'m';
   }
@@ -252,7 +297,14 @@ async function decryptBlob(blob,pass){
   const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(blob.iv)},keyCache.key,b64(blob.ct));
   return JSON.parse(new TextDecoder().decode(pt));
 }
+// overview heroes for the encrypted figures: placeholders until unlocked
+function ovLocked(){
+  for(const id of ['ov-btc','ov-pl','ov-val'])cell($(id),'🔒');
+  $('ov-btcsub').textContent='encrypted — unlock to view';$('ov-plsub').textContent=$('ov-valsub').textContent='encrypted';
+  $('ov-unlock').hidden=false;
+}
 function showLocked(msg,canUnlock,err){
+  ovLocked();
   $('acc-open').hidden=true;$('acc-locked').hidden=false;$('acc-lock').hidden=true;
   $('acc-lockmsg').textContent=msg;$('acc-form').hidden=!canUnlock;$('acc-lockerr').textContent=err||'';
 }
@@ -280,6 +332,11 @@ function showPortfolio(p,prices,via){
   $('acc-btcbar').style.width=(btcPct??0)+'%';
   cell($('acc-inv'),gbp(inv));cell($('acc-val'),gbp(val));
   cell($('acc-pl'),sgbp(pl),pcls(pl));cell($('acc-plp'),pctf(pct),pcls(pct));
+  cell($('ov-btc'),btcPct!=null?btcPct.toFixed(1)+'%':'—%');
+  $('ov-btcsub').textContent=btc&&btc.value!=null?gbp(btc.value)+' of '+gbp(val)+' held':'no BTC priced';
+  cell($('ov-pl'),sgbp(pl),pcls(pl));$('ov-plsub').textContent=pctf(pct)+' on '+gbp(inv)+' invested';
+  cell($('ov-val'),gbp(val));$('ov-valsub').textContent=rows.length+' coins · incl. ZEC';
+  $('ov-unlock').hidden=true;
   const L=['COIN','AMOUNT','AVG BUY','NOW','VALUE','P/L £','P/L %','ALLOC'];
   const body=[];
   for(const r of rows){
@@ -326,6 +383,37 @@ async function renderAcc(a,tryPass){
 $('acc-form').addEventListener('submit',e=>{e.preventDefault();const v=$('acc-pass').value;if(v&&lastAcc)renderAcc(lastAcc,v)});
 $('acc-lock').addEventListener('click',()=>{store.del();keyCache={id:null,key:null};if(lastAcc)renderAcc(lastAcc)});
 
+// ---- tabs ----
+const TABS=['overview','btc','daytrade','feed'];
+function showTab(t){
+  if(!TABS.includes(t))t='overview';
+  for(const n of TABS)$('tab-'+n).hidden=n!==t;
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  try{localStorage.setItem('wmbot.tab',t)}catch(e){}
+  if(location.hash.slice(1)!==t)history.replaceState(null,'','#'+t);
+  if(t==='feed')stream.scrollTop=stream.scrollHeight;
+  if(t==='btc'&&!$('acc-form').hidden)$('acc-pass').focus();
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.goto)));
+addEventListener('hashchange',()=>showTab(location.hash.slice(1)));
+showTab(location.hash.slice(1)||(()=>{try{return localStorage.getItem('wmbot.tab')}catch(e){return null}})());
+
+// ---- big-dip top-up alert (public BTC price vs its 7-day high; advice only, never auto-spends) ----
+function renderDip(a){
+  const el=$('dip');
+  if(a)$('ov-btcpx').textContent=pxf(a.price),
+    $('ov-btcdrop').textContent='-'+Number(a.drop_pct).toFixed(2)+'% from 7-day high '+pxf(a.high);
+  if(!a||a.level==='none'){el.hidden=true;return}
+  const d=Number(a.drop_pct).toFixed(1);
+  el.className='dip'+(a.level==='strong'?' strong':'');
+  el.replaceChildren(a.level==='strong'
+    ?'🚨 MAJOR DIP: '+a.coin+' -'+d+'% from its 7-day high — strong top-up opportunity'
+    :'⚡ BIG DIP: '+a.coin+' -'+d+'% from its 7-day high — consider topping up Coinbase to buy the dip',
+    Object.assign(document.createElement('small'),{textContent:'rule-based alert, not financial advice · the bot still spends only its normal weekly budget'}));
+  el.hidden=false;
+}
+
 // ---- data ----
 async function load(){
   try{
@@ -370,6 +458,17 @@ async function load(){
     }
     $('dt-log').replaceChildren(...(t.journal&&t.journal.length?t.journal:['no trades yet']).slice(-8)
       .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
+    cell($('ov-dt'),gbp(net),net<0?'neg':'pos');
+    $('ov-dtsub').textContent=(t.trades?t.trades+' trades · '+Math.round((t.win_rate||0)*100)+'% wins':'no closed trades yet')
+      +' · '+(t.tranches_open||0)+'/'+(t.tranches_total||4)+' slots';
+    renderDip(d.dip_alert);
+    const st=[['ACCUMULATION',(a.mode||'offline').toUpperCase()+' — '+(a.status||'')],
+      ['DAY-TRADE',(t.mode||'paper').toUpperCase()+' · '+(t.pair||'ETH-GBP')+' '+(t.last_price?pxf(t.last_price):'')
+        +(t.cooldown_active?' · COOLDOWN':'')],
+      ['DIP ALERT',d.dip_alert?d.dip_alert.level.toUpperCase()+' (warn ≥7%, strong ≥12% below 7-day high)':'unavailable'],
+      ['LAST SYNC',lastSync.toISOString().slice(0,16).replace('T',' ')+'Z · runner every 2 min, page refresh ≤15 min']];
+    $('ov-status').replaceChildren(...st.map(([k,v])=>{const e=document.createElement('div'),b=document.createElement('b');
+      b.textContent=k+' ';e.append(b,v);return e}));
     $('foot').textContent='WMBOT TERMINAL · ACCUMULATION '+(a.mode||'offline').toUpperCase()
       +' · DAY-TRADE '+(t.mode||'paper').toUpperCase()+' · REAL PORTFOLIO ENCRYPTED';
     enqueue(d.thoughts&&d.thoughts.length?d.thoughts:['awaiting first reasoning run…']);
