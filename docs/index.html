@@ -809,7 +809,7 @@ async function load(){
         [g.support?pxf(g.support)+(g.resistance?'–'+pxf(g.resistance):''):'—','','ZONE'],
         [g.step_pct!=null?pc(g.step_pct)+' / +'+pc(g.take_profit_pct):'+'+pc(g.take_profit_pct),'r','STEP / TP'],
         [gbp(g.in_lots_gbp)+' + '+gbp(g.resting_gbp)+(g.cap_gbp!=null?' / '+gbp(g.cap_gbp):''),'r','£ WORKING'],
-        [String(g.orders.length),'r','BUYS'],[String(g.lots.length),'r','LOTS'],
+        [g.orders.length+(g.max_rungs?'/'+g.max_rungs:''),'r','BUYS'],[String(g.lots.length),'r','LOTS'],
         [g.bought_today+' / '+g.sold_today,'r','TODAY B/S'],[gbp4(g.realized_gbp),'r '+(g.realized_gbp>0?'up':''),'REALIZED']],'L-'+g.name)),
       ly([['TOTAL'],['pot '+gbp(t.pot_gbp||50)],['','r'],[gbp(tot.lots)+' + '+gbp(tot.rest),'r','£ WORKING'],[String(tot.b),'r','BUYS'],
         [String(tot.l),'r','LOTS'],[tot.bt+' / '+tot.st,'r','TODAY B/S'],[gbp4(LY.reduce((a,g)=>a+g.realized_gbp,0)),'r up','REALIZED']],'tot'));
