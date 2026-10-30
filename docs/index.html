@@ -193,13 +193,24 @@
         padding:6px 8px;border:1px solid #052;border-radius:4px;align-items:baseline;font-variant-numeric:tabular-nums}
   .orow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .orow .r{text-align:right}
   .orow.h{border:none;padding:0 8px;color:var(--gd);font-size:.78em;letter-spacing:.1em}
-  .orow.buy{border-left:3px solid #7dffb0} .orow.reserve{border-left:3px solid #4fc3ff} .orow.sell{border-left:3px solid var(--warn)}
+  .orow.buy{border-left:3px solid #7dffb0} .orow.medium{border-left-color:#c39bff} .orow.slow{border-left-color:#4fc3ff} .orow.reserve{border-left:3px solid #4fc3ff} .orow.sell{border-left:3px solid var(--warn)}
   .side{font-weight:800;letter-spacing:.08em} .side.buy{color:#7dffb0} .side.reserve{color:#4fc3ff} .side.sell{color:var(--warn)}
   .badge.open{color:var(--gd);border-color:var(--dim)} .badge.filling{color:var(--warn);border-color:var(--warn)}
   .evlog{margin-top:8px;font-size:.78em;line-height:1.6;max-height:14em;overflow:auto;border:1px solid #052;border-radius:4px;
          padding:8px 10px;background:rgba(0,8,3,.75);font-variant-numeric:tabular-nums}
   .evlog div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ev-placed{color:#7dffb0} .ev-cancelled{color:var(--dim)} .ev-filled{color:var(--g);font-weight:700} .ev-sold{color:var(--warn);font-weight:700}
+  .bookbar{margin-top:8px;padding:7px 12px;border:1px solid var(--dim);border-radius:5px;font-size:.85em;letter-spacing:.06em}
+  .bookbar b{font-size:1.1em} .bookbar .buyers{color:var(--g)} .bookbar .sellers{color:var(--red)} .bookbar .neutral{color:var(--gd)}
+  .lyrow{display:grid;grid-template-columns:8.5em minmax(0,1.4fr) minmax(0,1fr) minmax(0,1.3fr) 4em 4em minmax(0,.9fr) minmax(0,1fr);
+    gap:8px;padding:7px 8px;border:1px solid #052;border-left:3px solid var(--dim);border-radius:4px;align-items:baseline}
+  .lyrow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .lyrow .r{text-align:right}
+  .lyrow.h{border:none;padding:0 8px 0 11px;color:var(--gd);font-size:.75em;letter-spacing:.1em}
+  .lyrow.tot{border-color:var(--g);font-weight:800}
+  .L-fast{border-left-color:#7dffb0!important} .L-medium{border-left-color:#c39bff!important} .L-slow{border-left-color:#4fc3ff!important}
+  .L-reserve{border-left-color:#5a7dff!important} .L-legacy{border-left-color:var(--warn)!important}
+  .lblock{margin-top:14px;border:1px solid #052;border-left:3px solid var(--dim);border-radius:5px;padding:8px 10px}
+  .lblock h3{margin:0 0 4px;font-size:.95em;letter-spacing:.1em} .lblock h3 small{color:var(--gd);font-weight:400;letter-spacing:.04em}
   .lsum{margin-top:12px;font-size:.85em;letter-spacing:.08em;color:var(--gd)} .lsum b{font-size:1.25em}
   .sizing{margin-top:10px}
   @media (max-width:700px){
@@ -210,6 +221,9 @@
     .lrow .r{text-align:left}
     .orow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:4px}
     .orow.h{display:none}
+    .lyrow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:4px} .lyrow.h{display:none}
+    .lyrow span{white-space:normal} .lyrow .r{text-align:left}
+    .lyrow span::before{content:attr(data-l);display:block;font-size:.72em;color:var(--gd);letter-spacing:.08em}
     .orow span{white-space:normal}
     .orow span::before{content:attr(data-l);display:block;font-size:.72em;color:var(--gd);letter-spacing:.08em}
     .orow .r{text-align:left}
@@ -328,29 +342,24 @@
 
   <section class="panel" id="tab-daytrade" role="tabpanel" hidden>
     <div class="card" id="dt">
-      <h2>DAY-TRADE GRID // <span id="dt-pair">ETH-GBP</span> <span class="tag" id="dt-mode">PAPER</span></h2>
+      <h2>DAY-TRADE LAYERS // <span id="dt-pair">ETH-GBP</span> <span class="tag" id="dt-mode">PAPER</span></h2>
       <div class="dthero">
         <div class="cell"><div class="k">REALIZED PROFIT (NET OF FEES)</div><div class="v" id="dt-pnl">£—</div><div class="sub" id="dt-pnlsub">—</div></div>
         <div class="cell"><div class="k">OPEN LOTS (INVENTORY)</div><div class="v" id="dt-lots">—</div><div class="sub" id="dt-lotsub">—</div></div>
-        <div class="cell"><div class="k">GRID BUYS RESTING</div><div class="v" id="dt-orders">—</div><div class="sub" id="dt-gridsub">—</div></div>
+        <div class="cell"><div class="k">BUYS RESTING</div><div class="v" id="dt-orders">—</div><div class="sub" id="dt-gridsub">—</div></div>
         <div class="cell"><div class="k">ETH PRICE</div><div class="v" id="dt-price">£—</div><div class="sub" id="dt-unreal">—</div></div>
       </div>
-      <div class="regime" id="dt-regime">REGIME —</div>
-      <div class="grid four sizing">
-        <div class="cell"><div class="k">GRID STEP</div><div class="v" id="dt-step">—</div><div class="sub k" id="dt-stepsub"></div></div>
-        <div class="cell"><div class="k">GRID DEPTH</div><div class="v" id="dt-depth">—</div><div class="sub k" id="dt-depthsub"></div></div>
-        <div class="cell"><div class="k">DEPLOYED (GRID)</div><div class="v" id="dt-deploy">—</div><div class="sub k" id="dt-deploysub"></div></div>
-        <div class="cell"><div class="k">RESERVE</div><div class="v" id="dt-reserve">—</div><div class="sub k" id="dt-reservesub"></div></div>
-      </div>
+      <div class="regime" id="dt-regime">—</div>
+      <div class="bookbar" id="dt-book">BOOK —</div>
+      <div class="rows" id="dt-layers"></div>
       <div class="proj" id="dt-proj"></div>
-      <div class="strategy" id="dt-strategy"></div>
       <div class="chart" id="dt-chart">loading chart…</div>
       <div class="legend">
-        <span><i style="border-color:#00ff66;border-top-width:6px;opacity:.5"></i>RANGE BOX (24H)</span>
-        <span><i style="border-color:#2a8a55;border-top-style:dashed"></i>7-DAY BAND</span>
-        <span><i style="border-color:#7dffb0;border-top-style:dashed"></i>▲ OPEN BUY (GRID)</span>
-        <span><i style="border-color:#4fc3ff;border-top-style:dashed"></i>▲ OPEN BUY (RESERVE)</span>
-        <span><i style="border-color:#ffb300;border-top-style:dashed"></i>▼ OPEN SELL (LOT TARGET)</span>
+        <span><i style="border-color:#7dffb0;border-top-style:dashed"></i>▲ F FAST BUY</span>
+        <span><i style="border-color:#c39bff;border-top-style:dashed"></i>▲ M MEDIUM BUY</span>
+        <span><i style="border-color:#4fc3ff;border-top-style:dashed"></i>▲ S SLOW BUY</span>
+        <span><i style="border-color:#5a7dff;border-top-style:dashed"></i>▲ R RESERVE</span>
+        <span><i style="border-color:#ffb300;border-top-style:dashed"></i>▼ SELL (LOT TARGET · LAYER)</span>
         <span><i style="border-color:#ff4455;border-top-style:dotted"></i>LOT ENTRY (RECOVERING)</span>
         <span><i style="border-color:#00ff66;border-top-style:dotted"></i>LOT ENTRY (IN PROFIT)</span><span>▲▼ FILLS</span>
         <span id="dt-lvlat"></span>
@@ -358,12 +367,10 @@
       <div class="k" style="margin-top:12px" id="dt-potlbl"></div>
       <div class="bar"><i id="dt-potbar"></i></div>
       <div class="k" style="margin-top:10px" id="dt-fees"></div>
-      <div class="lsum" id="dt-osum">OPEN ORDERS</div>
-      <div class="rows lots" id="dt-orows"></div>
+      <div id="dt-blocks"></div>
       <div class="lsum">ORDER ACTIVITY <span class="k">· placed · cancelled / repriced · filled · sold — newest first</span></div>
       <div class="evlog" id="dt-ev"></div>
-      <div class="lsum" id="dt-lsum">OPEN-LOT LEDGER</div>
-      <div class="rows lots" id="dt-rows"></div>
+      
       <div class="guard" id="dt-guard" hidden></div>
       <div class="log" id="dt-log"></div>
     </div>
@@ -720,14 +727,10 @@ function renderChart(t){
   let lo=Math.min(...cs.map(c=>c.l)),hi=Math.max(...cs.map(c=>c.h));
   const ri=(t.range||{}).intraday,rw=(t.range||{}).wide,rm=(t.range||{}).macro;
   if(ri){lo=Math.min(lo,ri.support);hi=Math.max(hi,ri.resistance)}
-  const go=(t.orders||[]).filter(o=>o.tier!=='reserve').map(o=>o.price).sort((a,b)=>b-a);
-  const ro=(t.orders||[]).filter(o=>o.tier==='reserve').map(o=>o.price).sort((a,b)=>b-a),lots=t.lots||[];
+  const LC={fast:'#7dffb0',medium:'#c39bff',slow:'#4fc3ff',reserve:'#5a7dff',legacy:'#ffb300'},lots=t.lots||[];
   const lines=[
-    ...(rw?[{price:rw.support,color:'#2a8a55',style:2,title:'7D S',w:1},{price:rw.resistance,color:'#2a8a55',style:2,title:'7D R',w:1}]:[]),
-    ...(rm?[{price:rm.support,color:'#00ff66',style:0,title:'60D FLOOR',w:2,keep:true}]:[]),
-    ...go.map(p=>({price:p,color:'#7dffb0',style:2,w:2,title:'▲ BUY'})),
-    ...ro.map((p,i)=>({price:p,color:'#4fc3ff',style:2,w:2,title:'▲ RESERVE',keep:i===0})),
-    ...lots.map(x=>({price:x.target,color:'#ffb300',style:2,w:2,title:'▼ SELL'})),
+    ...(t.orders||[]).map(o=>({price:o.price,color:LC[o.tier]||'#7dffb0',style:2,w:2,title:'▲ '+LTR(o.tier)})),
+    ...lots.map(x=>({price:x.target,color:'#ffb300',style:2,w:2,title:'▼ '+LTR(x.tier)})),
     ...lots.map(x=>({price:x.entry,color:x.status==='recovering'?'#ff4455':'#00ff66',style:1,title:'',w:1,noLabel:true}))];
   for(const l of lines)if(l.keep||Math.abs(l.price-last)/last<=NEAR){lo=Math.min(lo,l.price);hi=Math.max(hi,l.price)}   // the first reserve rung always shows
   const pad=(hi-lo)*.04;band=[lo-pad,hi+pad];
@@ -752,6 +755,7 @@ function renderChart(t){
     +(off.length||offN?' · off-chart: '+off.concat(offN?[offN+' more lot lines']:[]).join(', '):'');
 }
 const gridOn=t=>t.grid_active??((t.regime||'range')==='range');
+const LTR=x=>({fast:'F',medium:'M',slow:'S',reserve:'R',legacy:'OLD'})[x]||String(x||'?').toUpperCase();
 function fitChart(){if(chart&&!$('tab-daytrade').hidden)requestAnimationFrame(()=>{chart.timeScale().fitContent();requestAnimationFrame(placeBox)})}
 addEventListener('resize',()=>{if(lastDT)renderChart(lastDT)});   // phone rotation: re-pick the candle count
 
@@ -773,92 +777,99 @@ async function load(){
     $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
     const net=t.net_pnl_after_fees??t.realized_pnl_gbp??0;
     cell($('dt-pnl'),gbp4(net),net<0?'neg':'pos');
-    $('dt-pnlsub').textContent='TODAY '+gbp4(t.net_today||0)+' · '+(t.trades_today||0)+' sold today · '+(t.trades||0)+' all-time';
+    $('dt-pnlsub').textContent='TODAY '+gbp4(t.net_today||0)+' · '+(t.buys_today||0)+' bought · '+(t.trades_today||0)+' sold · '+(t.trades||0)+' sold all-time';
     const lots=t.lots||[];
     $('dt-lots').textContent=t.lots_open??lots.length;
     $('dt-lotsub').textContent=(t.lots_recovering||0)+' waiting to recover · '+(t.lots_in_profit||0)+' in profit · '
       +gbp(t.invested_gbp||0)+' cost';
     $('dt-orders').textContent=t.orders_resting??0;
-    const zz=t.sizing||{},p1=n=>n==null?'—':(Number(n)*100).toFixed(1)+'%';
-    $('dt-gridsub').textContent=t.orders_resting?(t.orders||[]).filter(o=>o.tier!=='reserve').length+' grid · '
-      +(t.orders||[]).filter(o=>o.tier==='reserve').length+' reserve':'no buys resting';
-    $('dt-step').textContent=zz.step_pct!=null?(zz.step_pct*100).toFixed(2)+'%':'—';
-    $('dt-stepsub').textContent=zz.step_pct!=null?(zz.step_pct>zz.step_config_pct?'fee floor '+p1(zz.fee_floor_pct)+' overrides '+p1(zz.step_config_pct)
-      :'configured '+p1(zz.step_config_pct)+' · fee floor '+p1(zz.fee_floor_pct)):'';
-    $('dt-depth').textContent=zz.depth_pct!=null&&gridOn(t)?p1(zz.depth_pct):'—';
-    $('dt-depthsub').textContent=zz.rungs!=null?(t.grid?'£'+t.grid.top.toFixed(0)+' → £'+t.grid.bottom.toFixed(0)+' · ':'')+zz.rungs+' rungs to 60d floor':'grid not built';
-    $('dt-deploy').textContent=zz.deploy_pct!=null?Math.round(zz.deploy_pct*100)+'%':'—';
-    $('dt-deploysub').textContent=zz.grid_cap_gbp!=null?gbp(zz.grid_in_lots_gbp)+' in lots + '+gbp(zz.grid_resting_gbp)+' resting / '+gbp(zz.grid_cap_gbp):'';
-    $('dt-reserve').textContent=zz.reserve_gbp!=null?gbp(zz.reserve_gbp):'—';
-    $('dt-reservesub').textContent=zz.reserve_gbp!=null?gbp(zz.reserve_in_lots_gbp)+' in lots + '+gbp(zz.reserve_resting_gbp)+' resting under support':'';
+    const LY=t.layers||[];
+    $('dt-gridsub').textContent=LY.filter(g=>g.orders.length).map(g=>g.orders.length+' '+g.label.toLowerCase()).join(' · ')||'no buys resting';
     $('dt-pair').textContent=t.pair||'ETH-GBP';
     $('dt-price').textContent=t.last_price?pxf(t.last_price):'£—';
     $('dt-unreal').textContent=t.unrealised_gbp!=null?'open lots '+(t.unrealised_gbp>=0?'+':'')+gbp4(t.unrealised_gbp)+' unrealised (not sold)':'—';
-    const rg=$('dt-regime'),ranging=gridOn(t)&&!t.cooldown_active,rm=(t.range||{}).macro||(t.range||{}).intraday;
+    const rg=$('dt-regime'),ranging=gridOn(t)&&!t.cooldown_active;
     rg.className='regime'+(ranging?'':' paused');
-    rg.replaceChildren((ranging?'▣ GRID ACTIVE — '+String(t.regime_raw||t.regime).replace('_',' ').toUpperCase():t.cooldown_active?'⏸ COOLDOWN — NO NEW GRID BUYS'
-      :'⏸ GUARD: '+String(t.regime).replace('_',' ').toUpperCase()+' — GRID PAUSED, LOTS HELD')
-      +(rm?' · 60D £'+rm.support.toFixed(0)+'–£'+rm.resistance.toFixed(0):''),
-      Object.assign(document.createElement('small'),{textContent:t.regime_why||''}));
+    rg.replaceChildren(ranging?'▣ ALL LAYERS BUYING · '+LY.filter(g=>g.timeframes).map(g=>g.label+' '+g.timeframes.join('/')).join(' · ')
+      :t.cooldown_active?'⏸ COOLDOWN — NO NEW BUYS, LOTS HELD':'⏸ CRASH GUARD — NEW BUYS PAUSED, LOTS HELD',
+      Object.assign(document.createElement('small'),{textContent:ranging?'':t.guard_why||''}));
+    const bk=t.book,bkEl=$('dt-book'),mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+    if(bk){
+      const bw=(bk.bid_walls||[])[0],aw=(bk.ask_walls||[])[0];
+      bkEl.replaceChildren('BOOK · BID WALL ',mk('b',{className:'up',textContent:bw?pxf(bw.price)+' ('+Number(bw.size).toFixed(1)+' ETH)':'—'}),
+        ' · ASK WALL ',mk('b',{className:'dn',textContent:aw?pxf(aw.price)+' ('+Number(aw.size).toFixed(1)+' ETH)':'—'}),
+        ' · SPREAD '+pxf(bk.spread)+' · PRESSURE ',mk('b',{className:bk.lean,textContent:(bk.pressure>=0?'+':'')+Number(bk.pressure).toFixed(2)+' '+String(bk.lean).toUpperCase()}));
+    }else bkEl.textContent='BOOK — not read yet';
+    const ly=(cells,cls)=>{const r=mk('div',{className:'lyrow'+(cls?' '+cls:'')});
+      for(const [txt,c,lbl] of cells){const e=mk('span',{textContent:txt});if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
+    const pc=n=>n==null?'—':(n*100).toFixed(2)+'%',tot=LY.reduce((a,g)=>({lots:a.lots+g.in_lots_gbp,rest:a.rest+g.resting_gbp,
+      b:a.b+g.orders.length,l:a.l+g.lots.length,bt:a.bt+g.bought_today,st:a.st+g.sold_today}),{lots:0,rest:0,b:0,l:0,bt:0,st:0});
+    $('dt-layers').replaceChildren(ly([['LAYER'],['ZONE (SUPPORT–RES.)'],['STEP / TP','r'],['IN LOTS + RESTING / CAP','r'],['BUYS','r'],['LOTS','r'],['TODAY B/S','r'],['REALIZED','r']],'h'),
+      ...LY.map(g=>ly([[g.label+(g.timeframes?' '+g.timeframes.join('/'):''),'','LAYER'],
+        [g.support?pxf(g.support)+(g.resistance?'–'+pxf(g.resistance):''):'—','','ZONE'],
+        [g.step_pct!=null?pc(g.step_pct)+' / +'+pc(g.take_profit_pct):'+'+pc(g.take_profit_pct),'r','STEP / TP'],
+        [gbp(g.in_lots_gbp)+' + '+gbp(g.resting_gbp)+(g.cap_gbp!=null?' / '+gbp(g.cap_gbp):''),'r','£ WORKING'],
+        [String(g.orders.length),'r','BUYS'],[String(g.lots.length),'r','LOTS'],
+        [g.bought_today+' / '+g.sold_today,'r','TODAY B/S'],[gbp4(g.realized_gbp),'r '+(g.realized_gbp>0?'up':''),'REALIZED']],'L-'+g.name)),
+      ly([['TOTAL'],['pot '+gbp(t.pot_gbp||50)],['','r'],[gbp(tot.lots)+' + '+gbp(tot.rest),'r','£ WORKING'],[String(tot.b),'r','BUYS'],
+        [String(tot.l),'r','LOTS'],[tot.bt+' / '+tot.st,'r','TODAY B/S'],[gbp4(t.net_pnl_after_fees||0),'r up','REALIZED']],'tot'));
     const dep=(t.invested_gbp||0),pot=(t.pot_gbp||50),pct=Math.min(100,Math.round(dep/pot*100));
     $('dt-potbar').style.width=pct+'%';
     $('dt-potlbl').textContent='POT '+gbp(pot)+' · IN LOTS '+gbp(dep)+' · CASH '+gbp(t.cash_gbp??pot-dep)
       +(t.median_time_to_profit_min!=null?' · MEDIAN TIME-TO-PROFIT '+dur(t.median_time_to_profit_min):'');
     const p2=n=>(Number(n)*100).toFixed(2)+'%';
-    $('dt-fees').textContent='MAKER FEE '+p2(t.fee_rate||0)+'/SIDE · EVERY LOT SELLS AT +'+p2(t.effective_tp||0)
-      +' · NO STOP-LOSS · NEVER SOLD AT A LOSS'+(t.grid_stats?' · TODAY: '+t.grid_stats.reprices+' REPRICES, '
-      +t.grid_stats.cancelled+' BUYS CANCELLED':'');
+    const gs=t.grid_stats;
+    $('dt-fees').textContent='MAKER FEE '+p2(t.fee_rate||0)+'/SIDE · NO STOP-LOSS · NEVER SOLD AT A LOSS'
+      +(gs?' · TODAY '+gs.placed+' PLACED · '+gs.cancelled+' CANCELLED · '+(gs.filled||0)+' FILLED · '+(gs.sold||0)+' SOLD · '+gs.reprices+' REPRICES':'');
     const pj=t.projection,pa=t.plan_vs_actual;
     if(pj){
-      const el=$('dt-proj'),mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+      const el=$('dt-proj');
       const good=pa&&/ON TRACK|AHEAD/.test(pa.status),aside=pa&&/STANDING|EARLY/.test(pa.status);
       const sc=mk('div',{className:'scen'});
-      for(const x of pj.scenarios)sc.append(mk('span',{textContent:x.per_day+'/day → '+gbp(x.potential)}));
+      for(const x of pj.scenarios)sc.append(mk('span',{textContent:x.per_day+'/day each → '+gbp(x.potential)}));
       el.replaceChildren(mk('div',{className:'k',innerHTML:'POTENTIAL THIS WEEK · <b>estimate, not a promise</b>'}),
         mk('div',{className:'projv',textContent:pj.ranging?gbp(pj.base_potential_week):'£0.00'}),
-        mk('div',{className:'k',textContent:(pj.ranging?pj.base_round_trips_week+' round trips':'grid paused')+' · '+pj.rungs+' × '+gbp(pj.lot_gbp)
-          +' · '+gbp4(pj.net_per_round_trip)+'/round trip · '+pj.swings_24h+' swing/24h'}),sc,
+        mk('div',{className:'k',textContent:(pj.ranging?'≈'+pj.round_trips_per_day+' round trips/day · ':'buys paused · ')
+          +LY.filter(g=>g.potential_week!=null).map(g=>g.label+' '+gbp(g.potential_week)).join(' · ')}),sc,
         pa?mk('div',{style:'margin-top:8px;font-size:.85em'}):'');
       if(pa)el.lastChild.append(mk('span',{className:'pva '+(good?'ok':aside?'mute':'bad'),
-        textContent:'PLAN vs ACTUAL: '+(aside?'STANDING ASIDE':pa.status)}),
-        ' '+pa.actual_round_trips+' / '+pa.planned_round_trips_so_far+' round trips · '+gbp4(pa.actual_net)+' / '+gbp(pa.planned_potential_so_far));
+        textContent:'PLAN vs ACTUAL: '+pa.status}),
+        ' '+pa.actual_round_trips+' / '+pa.planned_round_trips_so_far+' round trips · '+gbp4(pa.actual_net));
     }
-    const sb=document.createElement('b');sb.textContent='STRATEGY ';
-    $('dt-strategy').replaceChildren(sb,t.strategy||'range grid');
+
     renderChart(t);
-    const oo=t.open_orders||[],nb=oo.filter(o=>o.side==='buy').length,ns=oo.length-nb;
     const or=(cells,cls)=>{const r=document.createElement('div');r.className='orow'+(cls?' '+cls:'');
       for(const [txt,c,lbl] of cells){const e=document.createElement('span');e.textContent=txt;if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
-    $('dt-osum').replaceChildren('OPEN ORDERS · ',Object.assign(document.createElement('b'),{style:'color:#7dffb0',textContent:nb}),
-      ' BUY ▲ waiting for a dip · ',Object.assign(document.createElement('b'),{style:'color:var(--warn)',textContent:ns}),' SELL ▼ waiting for a rise');
-    const kindOf=o=>o.side==='sell'?'sell':o.tier==='reserve'?'reserve':'buy';
-    $('dt-orows').replaceChildren(...(oo.length?[or([['SIDE'],['PRICE','r'],['SIZE £ / QTY','r'],['DISTANCE','r'],['PLACED','r'],['STATUS','r']],'h'),
-      ...oo.map(o=>or([[o.side==='sell'?'▼ SELL':o.tier==='reserve'?'▲ RESERVE':'▲ BUY','side '+kindOf(o),'SIDE'],
-        [pxf(o.price),'r','PRICE'],
-        [gbp(o.gbp||0)+' / '+(o.qty!=null?Number(o.qty).toFixed(6):'—')+' ETH','r','SIZE'],
-        [o.away_pct==null?'—':(o.away_pct>0?'+':'')+(o.away_pct*100).toFixed(2)+'%','r','DISTANCE'],
-        [o.placed?String(o.placed).slice(5,16).replace('T',' ')+'Z':'—','r','PLACED'],
-        [o.status==='filling'?'FILLING':'OPEN · WAITING','badge '+o.status,'STATUS']],kindOf(o)))]
-      :[or([['no open orders — the grid is paused and nothing is held','mute full']])]));
+    const ST={recovering:'RECOVERING',in_profit:'IN PROFIT',selling:'SELLING'};
+    const lr=(cells,cls)=>{const r=document.createElement('div');r.className='lrow'+(cls?' '+cls:'');
+      for(const [txt,c,lbl] of cells){const e=document.createElement('span');e.textContent=txt;if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
+    const away=v=>v==null?'—':(v>0?'+':'')+(v*100).toFixed(2)+'%';
+    $('dt-blocks').replaceChildren(...LY.filter(g=>g.orders.length||g.lots.length||g.timeframes).map(g=>{
+      const b=mk('div',{className:'lblock L-'+g.name});
+      b.append(mk('h3',{textContent:g.label+(g.timeframes?' · '+g.timeframes.join('/'):'')+' '}),
+        mk('div',{className:'k',textContent:g.orders.length+' BUYS · '+g.lots.length+' LOTS ('+g.lots_recovering+' recovering) · '
+          +gbp(g.in_lots_gbp)+' in lots · REALIZED '+gbp4(g.realized_gbp)+' · '+g.sold+' sold'+(g.lots.length?' · UNREALISED '+gbp4(g.unrealised_gbp):'')}));
+      b.firstChild.append(mk('small',{textContent:g.support?'zone '+pxf(g.support)+(g.resistance?'–'+pxf(g.resistance):'')
+        +(g.swings_per_day!=null?' · '+g.swings_per_day+' swings/day':''):''}));
+      if(g.orders.length){const r=mk('div',{className:'rows lots'});b.append(r);
+        r.append(or([['BUY'],['PRICE','r'],['£ / QTY','r'],['AWAY','r'],['PLACED','r'],['BOOK','r']],'h'),
+        ...g.orders.map(o=>or([['▲ BUY '+LTR(g.name),'side buy','SIDE'],[pxf(o.price),'r','PRICE'],
+          [gbp(o.gbp||0)+' / '+(o.qty!=null?Number(o.qty).toFixed(6):'—'),'r','£ / QTY'],[away(o.away_pct),'r','AWAY'],
+          [o.placed?String(o.placed).slice(11,16)+'Z':'—','r','PLACED'],[o.wall?'above wall '+pxf(o.wall):'candle level','r k','BOOK']],'buy '+g.name)))}
+      if(g.lots.length){const r=mk('div',{className:'rows lots'});b.append(r);
+        r.append(lr([['LOT · QTY'],['ENTRY','r'],['UNREALISED','r'],['SELL TARGET','r'],['AGE','r'],['STATUS','r']],'h'),
+        ...g.lots.map(x=>lr([[Number(x.qty).toFixed(6)+' ETH · '+gbp(x.gbp),'','LOT'],[pxf(x.entry),'r','ENTRY'],
+          [x.unrealised_gbp!=null?(x.unrealised_gbp>=0?'+':'')+gbp4(x.unrealised_gbp)+' '+pctf(x.unrealised_pct):'—','r '+pcls(x.unrealised_pct),'UNREALISED'],
+          [pxf(x.target)+' ('+away(x.to_target_pct)+')'+(x.ask_wall?' · under ask wall':''),'r','TARGET'],
+          [x.held_minutes!=null?dur(x.held_minutes):'—','r','AGE'],[ST[x.status]||'—','badge '+(x.status||''),'STATUS']],x.status)))}
+      if(!g.orders.length&&!g.lots.length)b.append(mk('div',{className:'k mute',textContent:'nothing resting or held'}));
+      return b}));
     const ev=(t.order_events||[]).slice().reverse(),EVL={placed:'PLACED',cancelled:'CANCELLED',filled:'FILLED',sold:'SOLD'};
     $('dt-ev').replaceChildren(...(ev.length?ev.map(e=>Object.assign(document.createElement('div'),{className:'ev-'+e.kind,
       textContent:String(e.t).slice(11,19)+'Z  '+(EVL[e.kind]||e.kind).padEnd(9)+' '+(e.side==='sell'?'▼ SELL':'▲ BUY')
-        +(e.tier==='reserve'?' (reserve)':'')+' @ '+pxf(e.price)+' · '+gbp(e.gbp)+(e.note?' — '+e.note:'')}))
+        +' '+LTR(e.tier)+' @ '+pxf(e.price)+' · '+gbp(e.gbp)+(e.note?' — '+e.note:'')}))
       :[Object.assign(document.createElement('div'),{className:'mute',textContent:'no order activity yet today'})]));
-    const ST={recovering:'WAITING TO RECOVER',in_profit:'IN PROFIT · TARGET SET',selling:'AT TARGET · SELLING'};
-    const lr=(cells,cls)=>{const r=document.createElement('div');r.className='lrow'+(cls?' '+cls:'');
-      for(const [txt,c,lbl] of cells){const e=document.createElement('span');e.textContent=txt;if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
-    $('dt-lsum').replaceChildren('OPEN-LOT LEDGER · ',Object.assign(document.createElement('b'),{className:'dn',textContent:t.lots_recovering||0}),
-      ' WAITING TO RECOVER · ',Object.assign(document.createElement('b'),{className:'up',textContent:t.lots_in_profit||0}),
-      ' IN PROFIT / TARGET SET · nothing is ever sold below its buy price');
-    $('dt-rows').replaceChildren(...(lots.length?[lr([['LOT (COIN · QTY)'],['BUY PRICE','r'],['NOW / UNREALISED','r'],['SELL TARGET','r'],['HELD','r'],['STATUS','r']],'h'),
-      ...lots.map(x=>lr([[(x.coin||'ETH')+' '+Number(x.qty).toFixed(6)+' · '+gbp(x.gbp)+(x.tier!=='grid'?' ('+(x.tier==='legacy'?'old':x.tier)+')':''),'','LOT'],
-        [pxf(x.entry),'r','BUY'],
-        [x.unrealised_gbp!=null?(x.unrealised_gbp>=0?'+':'')+gbp4(x.unrealised_gbp)+' '+pctf(x.unrealised_pct):'—','r '+pcls(x.unrealised_pct),'UNREALISED'],
-        [pxf(x.target)+(x.to_target_pct>0?' (+'+(x.to_target_pct*100).toFixed(2)+'%)':''),'r','TARGET'],
-        [x.held_minutes!=null?dur(x.held_minutes):'—','r','HELD'],
-        [ST[x.status]||'—','badge '+(x.status||''),'STATUS']],x.status))]
-      :[lr([['no open lots — the grid buys when price dips into its rungs','mute full']])]));
+
     const g=$('dt-guard');
     if(t.losing_streak!=null){
       g.hidden=false;g.classList.toggle('on',!!t.cooldown_active);
@@ -870,11 +881,11 @@ async function load(){
       .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
     cell($('ov-dt'),gbp4(net),net<0?'neg':'pos');
     $('ov-dtsub').textContent=(t.trades?t.trades+' lots sold':'no lots sold yet')+' · '+(t.lots_open||0)+' waiting · '
-      +(t.orders_resting||0)+' buys resting · '+(gridOn(t)?'grid active':'paused');
+      +(t.orders_resting||0)+' buys resting · '+(gridOn(t)?'layers buying':'paused');
     renderDip(d.dip_alert);
     const st=[['ACCUMULATION',(a.mode||'offline').toUpperCase()+' — '+(a.status||'')],
       ['DAY-TRADE',(t.mode||'paper').toUpperCase()+' · '+(t.pair||'ETH-GBP')+' '+(t.last_price?pxf(t.last_price):'')
-        +' · GRID '+(gridOn(t)?'ACTIVE':'PAUSED ('+String(t.regime).replace('_',' ')+')')
+        +' · LAYERS '+(gridOn(t)?'BUYING':'PAUSED (crash guard)')
         +(t.cooldown_active?' · COOLDOWN':'')+' · ticks every 30s'],
       ['DIP ALERT',d.dip_alert?d.dip_alert.level.toUpperCase()+' (warn ≥7%, strong ≥12% below 7-day high)':'unavailable'],
       ['LAST SYNC',lastSync.toISOString().slice(0,16).replace('T',' ')+'Z · runner every 2 min, page refresh ≤15 min']];
