@@ -718,12 +718,13 @@ function renderChart(t){
   const cs=all.slice(innerWidth<600?-56:-96);   // 15-min candles: 14h on a phone, the full 24h on desktop
   const last=cs[cs.length-1].c;
   let lo=Math.min(...cs.map(c=>c.l)),hi=Math.max(...cs.map(c=>c.h));
-  const ri=(t.range||{}).intraday,rw=(t.range||{}).wide;
+  const ri=(t.range||{}).intraday,rw=(t.range||{}).wide,rm=(t.range||{}).macro;
   if(ri){lo=Math.min(lo,ri.support);hi=Math.max(hi,ri.resistance)}
   const go=(t.orders||[]).filter(o=>o.tier!=='reserve').map(o=>o.price).sort((a,b)=>b-a);
   const ro=(t.orders||[]).filter(o=>o.tier==='reserve').map(o=>o.price).sort((a,b)=>b-a),lots=t.lots||[];
   const lines=[
     ...(rw?[{price:rw.support,color:'#2a8a55',style:2,title:'7D S',w:1},{price:rw.resistance,color:'#2a8a55',style:2,title:'7D R',w:1}]:[]),
+    ...(rm?[{price:rm.support,color:'#00ff66',style:0,title:'60D FLOOR',w:2,keep:true}]:[]),
     ...go.map(p=>({price:p,color:'#7dffb0',style:2,w:2,title:'▲ BUY'})),
     ...ro.map((p,i)=>({price:p,color:'#4fc3ff',style:2,w:2,title:'▲ RESERVE',keep:i===0})),
     ...lots.map(x=>({price:x.target,color:'#ffb300',style:2,w:2,title:'▼ SELL'})),
@@ -750,6 +751,7 @@ function renderChart(t){
   $('dt-lvlat').textContent=(t.levels_at?'grid @ '+String(t.levels_at).slice(11,16)+'Z':'')
     +(off.length||offN?' · off-chart: '+off.concat(offN?[offN+' more lot lines']:[]).join(', '):'');
 }
+const gridOn=t=>t.grid_active??((t.regime||'range')==='range');
 function fitChart(){if(chart&&!$('tab-daytrade').hidden)requestAnimationFrame(()=>{chart.timeScale().fitContent();requestAnimationFrame(placeBox)})}
 addEventListener('resize',()=>{if(lastDT)renderChart(lastDT)});   // phone rotation: re-pick the candle count
 
@@ -783,8 +785,8 @@ async function load(){
     $('dt-step').textContent=zz.step_pct!=null?(zz.step_pct*100).toFixed(2)+'%':'—';
     $('dt-stepsub').textContent=zz.step_pct!=null?(zz.step_pct>zz.step_config_pct?'fee floor '+p1(zz.fee_floor_pct)+' overrides '+p1(zz.step_config_pct)
       :'configured '+p1(zz.step_config_pct)+' · fee floor '+p1(zz.fee_floor_pct)):'';
-    $('dt-depth').textContent=zz.depth_pct!=null&&(t.regime||'range')==='range'?p1(zz.depth_pct):'—';
-    $('dt-depthsub').textContent=zz.rungs!=null?(t.grid?'£'+t.grid.top.toFixed(0)+' → £'+t.grid.bottom.toFixed(0)+' · ':'')+zz.rungs+' rungs to support':'grid not built';
+    $('dt-depth').textContent=zz.depth_pct!=null&&gridOn(t)?p1(zz.depth_pct):'—';
+    $('dt-depthsub').textContent=zz.rungs!=null?(t.grid?'£'+t.grid.top.toFixed(0)+' → £'+t.grid.bottom.toFixed(0)+' · ':'')+zz.rungs+' rungs to 60d floor':'grid not built';
     $('dt-deploy').textContent=zz.deploy_pct!=null?Math.round(zz.deploy_pct*100)+'%':'—';
     $('dt-deploysub').textContent=zz.grid_cap_gbp!=null?gbp(zz.grid_in_lots_gbp)+' in lots + '+gbp(zz.grid_resting_gbp)+' resting / '+gbp(zz.grid_cap_gbp):'';
     $('dt-reserve').textContent=zz.reserve_gbp!=null?gbp(zz.reserve_gbp):'—';
@@ -792,11 +794,11 @@ async function load(){
     $('dt-pair').textContent=t.pair||'ETH-GBP';
     $('dt-price').textContent=t.last_price?pxf(t.last_price):'£—';
     $('dt-unreal').textContent=t.unrealised_gbp!=null?'open lots '+(t.unrealised_gbp>=0?'+':'')+gbp4(t.unrealised_gbp)+' unrealised (not sold)':'—';
-    const rg=$('dt-regime'),ranging=(t.regime||'range')==='range'&&!t.cooldown_active,ri=(t.range||{}).intraday;
+    const rg=$('dt-regime'),ranging=gridOn(t)&&!t.cooldown_active,rm=(t.range||{}).macro||(t.range||{}).intraday;
     rg.className='regime'+(ranging?'':' paused');
-    rg.replaceChildren((ranging?'▣ RANGE-BOUND — GRID ACTIVE':t.cooldown_active?'⏸ COOLDOWN — NO NEW GRID BUYS'
-      :'⏸ '+String(t.regime).replace('_',' ').toUpperCase()+' — GRID PAUSED, LOTS HELD')
-      +(ri?' · £'+ri.support.toFixed(2)+'–£'+ri.resistance.toFixed(2)+' ('+(ri.width_pct*100).toFixed(1)+'% band)':''),
+    rg.replaceChildren((ranging?'▣ GRID ACTIVE — '+String(t.regime_raw||t.regime).replace('_',' ').toUpperCase():t.cooldown_active?'⏸ COOLDOWN — NO NEW GRID BUYS'
+      :'⏸ GUARD: '+String(t.regime).replace('_',' ').toUpperCase()+' — GRID PAUSED, LOTS HELD')
+      +(rm?' · 60D £'+rm.support.toFixed(0)+'–£'+rm.resistance.toFixed(0):''),
       Object.assign(document.createElement('small'),{textContent:t.regime_why||''}));
     const dep=(t.invested_gbp||0),pot=(t.pot_gbp||50),pct=Math.min(100,Math.round(dep/pot*100));
     $('dt-potbar').style.width=pct+'%';
@@ -856,7 +858,7 @@ async function load(){
         [pxf(x.target)+(x.to_target_pct>0?' (+'+(x.to_target_pct*100).toFixed(2)+'%)':''),'r','TARGET'],
         [x.held_minutes!=null?dur(x.held_minutes):'—','r','HELD'],
         [ST[x.status]||'—','badge '+(x.status||''),'STATUS']],x.status))]
-      :[lr([['no open lots — the grid buys only when price dips into its rungs in an oscillating range','mute full']])]));
+      :[lr([['no open lots — the grid buys when price dips into its rungs','mute full']])]));
     const g=$('dt-guard');
     if(t.losing_streak!=null){
       g.hidden=false;g.classList.toggle('on',!!t.cooldown_active);
@@ -868,11 +870,11 @@ async function load(){
       .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
     cell($('ov-dt'),gbp4(net),net<0?'neg':'pos');
     $('ov-dtsub').textContent=(t.trades?t.trades+' lots sold':'no lots sold yet')+' · '+(t.lots_open||0)+' waiting · '
-      +(t.orders_resting||0)+' grid buys · '+((t.regime||'range')==='range'?'range':'paused');
+      +(t.orders_resting||0)+' buys resting · '+(gridOn(t)?'grid active':'paused');
     renderDip(d.dip_alert);
     const st=[['ACCUMULATION',(a.mode||'offline').toUpperCase()+' — '+(a.status||'')],
       ['DAY-TRADE',(t.mode||'paper').toUpperCase()+' · '+(t.pair||'ETH-GBP')+' '+(t.last_price?pxf(t.last_price):'')
-        +' · GRID '+((t.regime||'range')==='range'?'ACTIVE':'PAUSED ('+String(t.regime).replace('_',' ')+')')
+        +' · GRID '+(gridOn(t)?'ACTIVE':'PAUSED ('+String(t.regime).replace('_',' ')+')')
         +(t.cooldown_active?' · COOLDOWN':'')+' · ticks every 30s'],
       ['DIP ALERT',d.dip_alert?d.dip_alert.level.toUpperCase()+' (warn ≥7%, strong ≥12% below 7-day high)':'unavailable'],
       ['LAST SYNC',lastSync.toISOString().slice(0,16).replace('T',' ')+'Z · runner every 2 min, page refresh ≤15 min']];
