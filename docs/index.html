@@ -58,7 +58,18 @@
 
   /* day-trade chart */
   .chart{height:clamp(440px,66vh,960px);margin-top:12px;border:1px solid #052;border-radius:5px;overflow:hidden;
-         color:var(--dim);display:flex;align-items:center;justify-content:center}
+         color:var(--dim);display:flex;align-items:center;justify-content:center;position:relative}
+  .rbox{position:absolute;left:0;pointer-events:none;z-index:2;border-top:2px solid rgba(255,68,85,.75);
+        border-bottom:2px solid rgba(0,255,102,.85);background:rgba(0,255,102,.06)}
+  .rbox span{position:absolute;left:6px;font-size:11px;letter-spacing:.1em;padding:1px 5px;background:rgba(0,10,4,.8)}
+  .rbox .rt{top:2px;color:#ff4455} .rbox .rb{bottom:2px;color:#00ff66}
+  .dthero{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,11em),1fr));gap:clamp(8px,1vw,14px)}
+  .dthero .v{font-size:clamp(24px,3vw,44px);font-weight:800}
+  .dthero .sub{font-size:.74em;color:var(--gd);margin-top:4px;letter-spacing:.05em}
+  .regime{margin-top:10px;padding:8px 12px;border:1px solid var(--g);border-radius:5px;font-weight:700;letter-spacing:.1em;
+          font-size:clamp(13px,1.2vw,17px)}
+  .regime small{display:block;font-weight:400;font-size:.72em;color:var(--gd);letter-spacing:.04em;margin-top:3px}
+  .regime.paused{border-color:var(--warn);color:var(--warn);text-shadow:0 0 8px var(--warn)}
   .legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:.72em;color:var(--gd);letter-spacing:.06em}
   .legend i{display:inline-block;width:1.6em;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
   .strategy{font-size:.8em;color:var(--gd);line-height:1.5;margin-top:10px;padding:8px 10px;border-left:2px solid var(--g)}
@@ -139,7 +150,8 @@
   }
   .row{display:grid;grid-template-columns:3.6em minmax(0,1fr) minmax(0,1fr) 5.2em 3.4em;gap:8px;padding:6px 8px;
        border:1px solid #052;border-radius:4px;align-items:baseline;font-variant-numeric:tabular-nums}
-  .row.dt{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 5.2em minmax(0,1fr)}
+  .row.dt{grid-template-columns:minmax(0,1fr) 5.6em minmax(0,1fr) 5.6em}
+  .rows.lots{max-height:22em;overflow:auto}
   .row.h{border:none;padding:0 8px;color:var(--gd);font-size:.78em;letter-spacing:.1em}
   .row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .row .r{text-align:right} .row .full{grid-column:1/-1}
@@ -235,26 +247,28 @@
 
   <section class="panel" id="tab-daytrade" role="tabpanel" hidden>
     <div class="card" id="dt">
-      <h2>DAY-TRADE SLEEVE <span class="tag" id="dt-mode">PAPER</span></h2>
-      <div class="grid">
-        <div class="cell"><div class="k">NET P/L AFTER FEES</div><div class="v" id="dt-pnl">£—</div></div>
-        <div class="cell"><div class="k">GROSS P/L</div><div class="v" id="dt-gross">£—</div></div>
-        <div class="cell"><div class="k">WIN RATE</div><div class="v" id="dt-wr">—</div></div>
-        <div class="cell"><div class="k">TRADES CLOSED</div><div class="v" id="dt-trades">—</div></div>
+      <h2>DAY-TRADE GRID // <span id="dt-pair">ETH-GBP</span> <span class="tag" id="dt-mode">PAPER</span></h2>
+      <div class="dthero">
+        <div class="cell"><div class="k">REALIZED PROFIT (NET OF FEES)</div><div class="v" id="dt-pnl">£—</div><div class="sub" id="dt-pnlsub">—</div></div>
+        <div class="cell"><div class="k">LOTS WAITING TO SELL</div><div class="v" id="dt-lots">—</div><div class="sub" id="dt-lotsub">—</div></div>
+        <div class="cell"><div class="k">GRID BUYS RESTING</div><div class="v" id="dt-orders">—</div><div class="sub" id="dt-gridsub">—</div></div>
+        <div class="cell"><div class="k">ETH PRICE</div><div class="v" id="dt-price">£—</div><div class="sub" id="dt-unreal">—</div></div>
       </div>
+      <div class="regime" id="dt-regime">REGIME —</div>
       <div class="strategy" id="dt-strategy"></div>
       <div class="chart" id="dt-chart">loading chart…</div>
       <div class="legend">
-        <span><i style="border-color:#00ff66"></i>SUPPORT</span><span><i style="border-color:#ff4455"></i>RESISTANCE</span>
-        <span><i style="border-color:#7dffb0;border-top-style:dashed"></i>BUY LIMIT (LADDER)</span>
-        <span><i style="border-color:#ffb300;border-top-style:dashed"></i>SELL TARGET</span>
-        <span><i style="border-color:#2a8a55;border-top-style:dotted"></i>OPEN ENTRY</span><span>▲▼ FILLS</span>
+        <span><i style="border-color:#00ff66;border-top-width:6px;opacity:.5"></i>RANGE BOX (24H)</span>
+        <span><i style="border-color:#2a8a55;border-top-style:dashed"></i>7-DAY BAND</span>
+        <span><i style="border-color:#7dffb0;border-top-style:dashed"></i>GRID BUY £1</span>
+        <span><i style="border-color:#ffb300;border-top-style:dashed"></i>LOT SELL TARGET</span>
+        <span><i style="border-color:#2a8a55;border-top-style:dotted"></i>LOT ENTRY</span><span>▲▼ FILLS</span>
         <span id="dt-lvlat"></span>
       </div>
-      <div class="k" style="margin-top:12px"><span id="dt-pair">ETH-GBP</span> <span id="dt-price">£—</span> · <span id="dt-potlbl"></span></div>
+      <div class="k" style="margin-top:12px" id="dt-potlbl"></div>
       <div class="bar"><i id="dt-potbar"></i></div>
       <div class="k" style="margin-top:10px" id="dt-fees"></div>
-      <div class="rows" id="dt-rows"></div>
+      <div class="rows lots" id="dt-rows"></div>
       <div class="guard" id="dt-guard" hidden></div>
       <div class="log" id="dt-log"></div>
     </div>
@@ -278,6 +292,7 @@ setInterval(draw,60);
 
 const $=id=>document.getElementById(id);
 const gbp=n=>(n<0?"-£":"£")+Math.abs(Number(n)).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const gbp4=n=>Math.abs(Number(n))<10?(n<0?"-£":"£")+Math.abs(Number(n)).toFixed(4):gbp(n);   // grid lots are £1: show pennies' fractions
 const pctf=n=>n==null?'—':(n>0?'+':'')+(n*100).toFixed(2)+'%';
 const pcls=n=>n==null?'mute':n>0?'up':n<0?'dn':'';
 const pxf=n=>n==null?'—':'£'+Number(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:n<100?5:2});
@@ -478,10 +493,21 @@ function renderDip(a){
 }
 
 // ---- day-trade candle chart: support / resistance / the bot's ladder (TradingView lightweight-charts) ----
-var chart=null,series=null,priceLines=[],band=null,lastDT=null;   // var: showTab() may run before this line
-// focus the price axis on the visible candles plus the levels near them, so far-away
-// support/resistance can't squash the candles; levels outside that band are listed, not drawn
-const NEAR=0.025;   // a level within 2.5% of the last price stays on the chart even if candles haven't reached it
+var chart=null,series=null,priceLines=[],band=null,lastDT=null,rbox=null;   // var: showTab() may run before this line
+// focus the price axis on the visible candles, the range box and the grid/lots near them, so
+// far-away levels can't squash the candles; lines outside that band are listed, not drawn
+const NEAR=0.03;
+function placeBox(){
+  const r=lastDT&&lastDT.range&&lastDT.range.intraday;
+  if(!rbox||!series||!r){if(rbox)rbox.hidden=true;return}
+  const y1=series.priceToCoordinate(r.resistance),y2=series.priceToCoordinate(r.support);
+  if(y1==null||y2==null){rbox.hidden=true;return}
+  const h=$('dt-chart').clientHeight-chart.timeScale().height();
+  const top=Math.max(0,Math.min(y1,y2)),bot=Math.min(h,Math.max(y1,y2));
+  Object.assign(rbox.style,{top:top+'px',height:Math.max(0,bot-top)+'px',
+    width:($('dt-chart').clientWidth-chart.priceScale('right').width())+'px'});
+  rbox.hidden=false;
+}
 function renderChart(t){
   const el=$('dt-chart'),all=t.candles||[];
   lastDT=t;
@@ -498,38 +524,46 @@ function renderChart(t){
     series=chart.addCandlestickSeries({upColor:'#00ff66',downColor:'#ff4455',borderUpColor:'#00ff66',borderDownColor:'#ff4455',
       wickUpColor:'#0c4',wickDownColor:'#ff4455',priceFormat:{type:'price',precision:2,minMove:.01},
       autoscaleInfoProvider:()=>band&&{priceRange:{minValue:band[0],maxValue:band[1]}}});
+    rbox=document.createElement('div');rbox.className='rbox';rbox.hidden=true;
+    rbox.innerHTML='<span class="rt"></span><span class="rb"></span>';el.appendChild(rbox);
+    const later=()=>requestAnimationFrame(placeBox);
+    chart.timeScale().subscribeVisibleLogicalRangeChange(later);chart.subscribeCrosshairMove(later);
+    new ResizeObserver(later).observe(el);
   }
-  const cs=all.slice(innerWidth<600?-48:-72);   // ~2-3 days of hourly candles: wide enough to read
+  const cs=all.slice(innerWidth<600?-56:-96);   // 15-min candles: 14h on a phone, the full 24h on desktop
   const last=cs[cs.length-1].c;
   let lo=Math.min(...cs.map(c=>c.l)),hi=Math.max(...cs.map(c=>c.h));
+  const ri=(t.range||{}).intraday,rw=(t.range||{}).wide;
+  if(ri){lo=Math.min(lo,ri.support);hi=Math.max(hi,ri.resistance)}
+  const ords=(t.orders||[]).map(o=>o.price).sort((a,b)=>b-a),lots=t.lots||[];
   const lines=[
-    ...(t.support||[]).map(s=>({price:s.price,color:'#00ff66',style:0,title:'S×'+s.touches,w:2})),
-    ...(t.resistance||[]).map(r=>({price:r.price,color:'#ff4455',style:0,title:'R×'+r.touches,w:2})),
-    ...(t.orders||[]).map(o=>o.side==='buy'?{price:o.price,color:'#7dffb0',style:2,title:'BUY',w:2}
-                                           :{price:o.price,color:'#ffb300',style:2,title:'SELL',w:2}),
-    ...(t.open_tranches||[]).map(x=>({price:x.entry,color:'#2a8a55',style:1,title:'',w:1,noLabel:true}))];
+    ...(rw?[{price:rw.support,color:'#2a8a55',style:2,title:'7D S',w:1},{price:rw.resistance,color:'#2a8a55',style:2,title:'7D R',w:1}]:[]),
+    ...ords.map((p,i)=>({price:p,color:'#7dffb0',style:2,w:1,title:i===0?'GRID TOP':i===ords.length-1?'GRID LOW':'',noLabel:i>0&&i<ords.length-1})),
+    ...lots.map((x,i)=>({price:x.target,color:'#ffb300',style:2,w:1,title:i===0?'NEXT SELL':'',noLabel:i>0})),
+    ...lots.map(x=>({price:x.entry,color:'#2a8a55',style:1,title:'',w:1,noLabel:true}))];
   for(const l of lines)if(Math.abs(l.price-last)/last<=NEAR){lo=Math.min(lo,l.price);hi=Math.max(hi,l.price)}
   const pad=(hi-lo)*.04;band=[lo-pad,hi+pad];
   series.setData(cs.map(c=>({time:c.t,open:c.o,high:c.h,low:c.l,close:c.c})));
   priceLines.forEach(l=>series.removePriceLine(l));priceLines=[];
-  const seen=new Set(),off=[];
+  let offN=0;const off=[];
   for(const l of lines){
-    const k=l.title+l.price;if(seen.has(k))continue;seen.add(k);
-    if(l.price<band[0]||l.price>band[1]){if(l.title)off.push(l.title+' £'+Number(l.price).toFixed(0));continue}
+    if(l.price<band[0]||l.price>band[1]){if(l.title)off.push(l.title+' £'+Number(l.price).toFixed(0));else offN++;continue}
     priceLines.push(series.createPriceLine({price:l.price,color:l.color,lineWidth:l.w,lineStyle:l.style,
       axisLabelVisible:!l.noLabel,title:l.title}));
   }
+  if(ri){rbox.querySelector('.rt').textContent='RESISTANCE £'+ri.resistance.toFixed(2)+(ri.resistance_touches?' ×'+ri.resistance_touches:'');
+         rbox.querySelector('.rb').textContent='SUPPORT £'+ri.support.toFixed(2)+(ri.support_touches?' ×'+ri.support_touches:'')}
   // fills as arrows on the candle they happened in
-  const step=cs.length>1?cs[1].t-cs[0].t:3600,t0=cs[0].t;
+  const step=cs.length>1?cs[1].t-cs[0].t:900,t0=cs[0].t;
   series.setMarkers((t.fills||[]).filter(f=>f.t>=t0).map(f=>({time:t0+Math.floor((f.t-t0)/step)*step,
     position:f.side==='buy'?'belowBar':'aboveBar',color:f.side==='buy'?'#00ff66':'#ffb300',
-    shape:f.side==='buy'?'arrowUp':'arrowDown',text:(f.side==='buy'?'B ':'S ')+Number(f.price).toFixed(0)}))
+    shape:f.side==='buy'?'arrowUp':'arrowDown',text:f.side==='buy'?'B':'S'}))
     .sort((a,b)=>a.time-b.time));
   fitChart();
-  $('dt-lvlat').textContent=(t.levels_at?'levels @ '+String(t.levels_at).slice(11,16)+'Z':'')
-    +(off.length?' · off-chart: '+off.join(', '):'');
+  $('dt-lvlat').textContent=(t.levels_at?'grid @ '+String(t.levels_at).slice(11,16)+'Z':'')
+    +(off.length||offN?' · off-chart: '+off.concat(offN?[offN+' more lot lines']:[]).join(', '):'');
 }
-function fitChart(){if(chart&&!$('tab-daytrade').hidden)requestAnimationFrame(()=>chart.timeScale().fitContent())}
+function fitChart(){if(chart&&!$('tab-daytrade').hidden)requestAnimationFrame(()=>{chart.timeScale().fitContent();requestAnimationFrame(placeBox)})}
 addEventListener('resize',()=>{if(lastDT)renderChart(lastDT)});   // phone rotation: re-pick the candle count
 
 // ---- data ----
@@ -548,44 +582,56 @@ async function load(){
     // daytrade
     const t=d.daytrade||{};
     $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
-    const net=t.net_pnl_after_fees??t.realized_pnl_gbp??0,gr=t.gross_pnl_gbp??0;
-    const pnl=$('dt-pnl');pnl.textContent=gbp(net);pnl.className='v '+(net<0?'neg':'pos');
-    const gp=$('dt-gross');gp.textContent=gbp(gr);gp.className='v '+(gr<0?'neg':'pos');
-    $('dt-wr').textContent=t.trades?Math.round((t.win_rate||0)*100)+'% ('+(t.wins||0)+'/'+t.trades+')':'—';
-    $('dt-trades').textContent=t.trades??'—';
+    const net=t.net_pnl_after_fees??t.realized_pnl_gbp??0;
+    cell($('dt-pnl'),gbp4(net),net<0?'neg':'pos');
+    $('dt-pnlsub').textContent='TODAY '+gbp4(t.net_today||0)+' · '+(t.trades_today||0)+' sold today · '+(t.trades||0)+' all-time';
+    const lots=t.lots||[];
+    $('dt-lots').textContent=t.lots_open??lots.length;
+    $('dt-lotsub').textContent=gbp(t.invested_gbp||0)+' in lots · each sells only at its own target';
+    $('dt-orders').textContent=t.orders_resting??0;
+    $('dt-gridsub').textContent=t.grid&&t.orders_resting?'£'+t.grid.top.toFixed(2)+' → £'+t.grid.bottom.toFixed(2)
+      +' · step '+(t.grid.spacing_pct*100).toFixed(2)+'%':'no buys resting';
     $('dt-pair').textContent=t.pair||'ETH-GBP';
     $('dt-price').textContent=t.last_price?pxf(t.last_price):'£—';
-    const dep=(t.invested_gbp||0),pot=(t.pot_gbp||20),pct=Math.min(100,Math.round(dep/pot*100));
+    $('dt-unreal').textContent=t.unrealised_gbp!=null?'open lots '+(t.unrealised_gbp>=0?'+':'')+gbp4(t.unrealised_gbp)+' unrealised (not sold)':'—';
+    const rg=$('dt-regime'),ranging=(t.regime||'range')==='range'&&!t.cooldown_active,ri=(t.range||{}).intraday;
+    rg.className='regime'+(ranging?'':' paused');
+    rg.replaceChildren((ranging?'▣ RANGE-BOUND — GRID ACTIVE':t.cooldown_active?'⏸ COOLDOWN — NO NEW GRID BUYS'
+      :'⏸ '+String(t.regime).replace('_',' ').toUpperCase()+' — GRID PAUSED, LOTS HELD')
+      +(ri?' · £'+ri.support.toFixed(2)+'–£'+ri.resistance.toFixed(2)+' ('+(ri.width_pct*100).toFixed(1)+'% band)':''),
+      Object.assign(document.createElement('small'),{textContent:t.regime_why||''}));
+    const dep=(t.invested_gbp||0),pot=(t.pot_gbp||50),pct=Math.min(100,Math.round(dep/pot*100));
     $('dt-potbar').style.width=pct+'%';
-    $('dt-potlbl').textContent='POT '+gbp(pot)+' · DEPLOYED '+gbp(dep)+' · CASH '+gbp(t.cash_gbp??pot-dep)
-      +' · '+(t.tranches_open||0)+'/'+(t.tranches_total||4)+' SLOTS';
+    $('dt-potlbl').textContent='POT '+gbp(pot)+' · IN LOTS '+gbp(dep)+' · CASH '+gbp(t.cash_gbp??pot-dep)
+      +' · GRID '+(t.grid_levels||'—')+' × '+gbp(t.order_gbp||1);
     const p2=n=>(Number(n)*100).toFixed(2)+'%';
-    $('dt-fees').textContent=t.fee_rate!=null?'MAKER FEE '+p2(t.fee_rate)+'/SIDE · FEE FLOOR '+p2(t.effective_tp)
-      +' · LADDER SPACING '+p2(t.buy_dip_pct||0):'';
+    $('dt-fees').textContent='MAKER FEE '+p2(t.fee_rate||0)+'/SIDE · EVERY LOT SELLS AT +'+p2(t.effective_tp||0)
+      +' · NO STOP-LOSS · NEVER SOLD AT A LOSS'+(t.grid_stats?' · TODAY: '+t.grid_stats.reprices+' REPRICES, '
+      +t.grid_stats.cancelled+' BUYS CANCELLED':'');
     const sb=document.createElement('b');sb.textContent='STRATEGY ';
-    $('dt-strategy').replaceChildren(sb,t.strategy||'grid on dips');
+    $('dt-strategy').replaceChildren(sb,t.strategy||'range grid');
     renderChart(t);
-    const tr=t.open_tranches||[];
-    $('dt-rows').replaceChildren(...(tr.length?[row([['ENTRY'],['NOW','r'],['UNREAL.','r'],['SELL @','r']],'dt h'),
-      ...tr.map(x=>row([[pxf(x.entry)+(x.status!=='held'?' ·'+x.status.replace('_',' '):'')],[pxf(t.last_price),'r'],
-        [pctf(x.unrealised_pct),'r '+pcls(x.unrealised_pct)],[pxf(x.target)+(x.target_kind==='resistance'?' (R)':' (floor)'),'r']],'dt'))]
-      :[row([['no open tranches — waiting for a dip','mute full']],'dt')]));
+    $('dt-rows').replaceChildren(...(lots.length?[row([['LOT ENTRY'],['NOW','r'],['SELL TARGET','r'],['TO GO','r']],'dt h'),
+      ...lots.map(x=>row([[pxf(x.entry)+' · '+gbp(x.gbp)+(x.legacy?' (old)':'')],[pctf(x.unrealised_pct),'r '+pcls(x.unrealised_pct)],
+        [pxf(x.target),'r'],[x.to_target_pct!=null?(x.to_target_pct<=0?'due':'+'+(x.to_target_pct*100).toFixed(2)+'%'):'—','r']],'dt'))]
+      :[row([['no open lots — the grid buys when price dips into its levels','mute full']],'dt')]));
     const g=$('dt-guard');
     if(t.losing_streak!=null){
       g.hidden=false;g.classList.toggle('on',!!t.cooldown_active);
       g.textContent=t.cooldown_active
-        ?'⚠ COOLDOWN · '+t.losing_streak+' LOSING DAYS · NO NEW BUYS UNTIL '+String(t.cooldown_until).slice(5,16).replace('T',' ')+'Z'
-        :'SAFEGUARD OK · LOSING STREAK '+t.losing_streak+'/'+(t.max_losing_streak||2)+' · TRADING NORMALLY';
+        ?'⚠ COOLDOWN · '+t.losing_streak+' BAD DAYS · NO NEW GRID BUYS UNTIL '+String(t.cooldown_until).slice(5,16).replace('T',' ')+'Z'
+        :'SAFEGUARD OK · BAD-DAY STREAK '+t.losing_streak+'/'+(t.max_losing_streak||2)+' · NEW BUYS ALLOWED';
     }
     $('dt-log').replaceChildren(...(t.journal&&t.journal.length?t.journal:['no trades yet']).slice(-8)
       .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
-    cell($('ov-dt'),gbp(net),net<0?'neg':'pos');
-    $('ov-dtsub').textContent=(t.trades?t.trades+' trades · '+Math.round((t.win_rate||0)*100)+'% wins':'no closed trades yet')
-      +' · '+(t.tranches_open||0)+'/'+(t.tranches_total||4)+' slots';
+    cell($('ov-dt'),gbp4(net),net<0?'neg':'pos');
+    $('ov-dtsub').textContent=(t.trades?t.trades+' lots sold':'no lots sold yet')+' · '+(t.lots_open||0)+' waiting · '
+      +(t.orders_resting||0)+' grid buys · '+((t.regime||'range')==='range'?'range':'paused');
     renderDip(d.dip_alert);
     const st=[['ACCUMULATION',(a.mode||'offline').toUpperCase()+' — '+(a.status||'')],
       ['DAY-TRADE',(t.mode||'paper').toUpperCase()+' · '+(t.pair||'ETH-GBP')+' '+(t.last_price?pxf(t.last_price):'')
-        +(t.cooldown_active?' · COOLDOWN':'')],
+        +' · GRID '+((t.regime||'range')==='range'?'ACTIVE':'PAUSED ('+String(t.regime).replace('_',' ')+')')
+        +(t.cooldown_active?' · COOLDOWN':'')+' · ticks every 30s'],
       ['DIP ALERT',d.dip_alert?d.dip_alert.level.toUpperCase()+' (warn ≥7%, strong ≥12% below 7-day high)':'unavailable'],
       ['LAST SYNC',lastSync.toISOString().slice(0,16).replace('T',' ')+'Z · runner every 2 min, page refresh ≤15 min']];
     $('ov-status').replaceChildren(...st.map(([k,v])=>{const e=document.createElement('div'),b=document.createElement('b');
