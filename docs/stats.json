@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T15:37:32Z",
+  "updated": "2026-10-30T15:43:56Z",
   "daytrade": {
     "mode": "paper",
     "strategy_kind": "grid",
@@ -13,19 +13,19 @@
       "rungs": 2,
       "deploy_pct": 0.65,
       "grid_cap_gbp": 32.5,
-      "grid_in_lots_gbp": 20.0,
+      "grid_in_lots_gbp": 26.25,
       "reserve_gbp": 17.5,
       "reserve_in_lots_gbp": 0,
-      "grid_resting_gbp": 12.5,
+      "grid_resting_gbp": 6.25,
       "reserve_resting_gbp": 17.49
     },
-    "lots_open": 4,
+    "lots_open": 5,
     "lots_recovering": 4,
-    "lots_in_profit": 0,
+    "lots_in_profit": 1,
     "median_time_to_profit_min": null,
-    "orders_resting": 5,
-    "invested_gbp": 20.0,
-    "cash_gbp": 30.0,
+    "orders_resting": 4,
+    "invested_gbp": 26.25,
+    "cash_gbp": 23.75,
     "trades": 0,
     "trades_today": 0,
     "net_today": 0,
@@ -34,14 +34,14 @@
     "realized_pnl_gbp": 0.0,
     "gross_pnl_gbp": 0,
     "net_pnl_after_fees": 0,
-    "unrealised_gbp": -0.7704,
+    "unrealised_gbp": -0.7669,
     "fee_rate": 0.005,
     "effective_tp": 0.016,
     "losing_streak": 0,
     "max_losing_streak": 2,
     "cooldown_active": false,
     "cooldown_until": null,
-    "last_price": 1661.38,
+    "last_price": 1661.4,
     "regime": "drift",
     "grid_active": true,
     "regime_raw": "drift",
@@ -80,12 +80,6 @@
     "orders": [
       {
         "side": "buy",
-        "price": 1660.54,
-        "gbp": 6.25,
-        "tier": "grid"
-      },
-      {
-        "side": "buy",
         "price": 1618.05,
         "gbp": 6.25,
         "tier": "grid"
@@ -112,16 +106,31 @@
     "lots": [
       {
         "coin": "ETH",
+        "qty": 0.00376384,
+        "entry": 1660.54,
+        "gbp": 6.25,
+        "value": 6.2532,
+        "unrealised_gbp": 0.0032,
+        "unrealised_pct": 0.0005,
+        "target": 1687.25,
+        "to_target_pct": 0.0156,
+        "opened": "2026-10-30T15:42:38.148237Z",
+        "held_minutes": 1,
+        "tier": "grid",
+        "status": "in_profit"
+      },
+      {
+        "coin": "ETH",
         "qty": 0.00294641,
         "entry": 1696.98,
         "gbp": 5.0,
-        "value": 4.8951,
-        "unrealised_gbp": -0.1049,
+        "value": 4.8952,
+        "unrealised_gbp": -0.1048,
         "unrealised_pct": -0.021,
         "target": 1724.27,
-        "to_target_pct": 0.0379,
+        "to_target_pct": 0.0378,
         "opened": "2026-10-29T20:41:37.117332Z",
-        "held_minutes": 1135,
+        "held_minutes": 1142,
         "tier": "legacy",
         "status": "recovering"
       },
@@ -134,9 +143,9 @@
         "unrealised_gbp": -0.1709,
         "unrealised_pct": -0.0342,
         "target": 1747.86,
-        "to_target_pct": 0.0521,
+        "to_target_pct": 0.052,
         "opened": "2026-10-29T20:33:08.832947Z",
-        "held_minutes": 1144,
+        "held_minutes": 1150,
         "tier": "legacy",
         "status": "recovering"
       },
@@ -145,13 +154,13 @@
         "qty": 0.00287546,
         "entry": 1738.85,
         "gbp": 5.0,
-        "value": 4.7772,
-        "unrealised_gbp": -0.2228,
-        "unrealised_pct": -0.0446,
+        "value": 4.7773,
+        "unrealised_gbp": -0.2227,
+        "unrealised_pct": -0.0445,
         "target": 1766.82,
         "to_target_pct": 0.0635,
         "opened": "2026-10-29T18:39:40.544959Z",
-        "held_minutes": 1257,
+        "held_minutes": 1264,
         "tier": "legacy",
         "status": "recovering"
       },
@@ -160,13 +169,13 @@
         "qty": 0.00284595,
         "entry": 1756.88,
         "gbp": 5.0,
-        "value": 4.7282,
-        "unrealised_gbp": -0.2718,
-        "unrealised_pct": -0.0544,
+        "value": 4.7283,
+        "unrealised_gbp": -0.2717,
+        "unrealised_pct": -0.0543,
         "target": 1785.14,
         "to_target_pct": 0.0745,
         "opened": "2026-10-29T17:02:30.888475Z",
-        "held_minutes": 1355,
+        "held_minutes": 1361,
         "tier": "legacy",
         "status": "recovering"
       }
@@ -174,12 +183,12 @@
     "projection": {
       "label": "POTENTIAL — an estimate if price keeps swinging, not a promise",
       "lot_gbp": 6.25,
-      "rungs": 2,
+      "rungs": 1,
       "net_per_round_trip": 0.0375,
       "swings_24h": 1,
       "ranging": true,
-      "base_round_trips_week": 14,
-      "base_potential_week": 0.53,
+      "base_round_trips_week": 7,
+      "base_potential_week": 0.26,
       "scenarios": [
         {
           "per_day": 1,
@@ -199,7 +208,7 @@
       ],
       "assumptions": [
         "price keeps swinging above the 60-day support all week (grid active now)",
-        "each swing across the band completes one round trip per grid rung (2 rungs of ~£6.25)",
+        "each swing across the band completes one round trip per grid rung (1 rung of ~£6.25)",
         "swings continue at the last 24h rate (1/day)",
         "every round trip nets +0.60% of its lot after 0.50% fees each way",
         "lots bought before a breakdown can wait days or weeks to recover — they earn nothing meanwhile"
@@ -207,24 +216,14 @@
     },
     "plan_vs_actual": {
       "week_start": "2026-10-26T00:00:00Z",
-      "planned_round_trips_so_far": 9.3,
+      "planned_round_trips_so_far": 4.7,
       "actual_round_trips": 0,
-      "planned_potential_so_far": 0.35,
+      "planned_potential_so_far": 0.17,
       "actual_net": 0,
       "status": "BEHIND",
       "basis": "planned = the base estimate above, pro rata for the week so far (at the current swing rate)"
     },
     "open_orders": [
-      {
-        "side": "buy",
-        "price": 1660.54,
-        "gbp": 6.25,
-        "qty": 0.00376384,
-        "tier": "grid",
-        "placed": "2026-10-30T15:36:07.109908Z",
-        "away_pct": -0.0005,
-        "status": "open"
-      },
       {
         "side": "buy",
         "price": 1618.05,
@@ -267,13 +266,24 @@
       },
       {
         "side": "sell",
+        "price": 1687.25,
+        "gbp": 6.35,
+        "qty": 0.00376384,
+        "tier": "grid",
+        "placed": "2026-10-30T15:42:38.148237Z",
+        "entry": 1660.54,
+        "away_pct": 0.0156,
+        "status": "open"
+      },
+      {
+        "side": "sell",
         "price": 1724.27,
         "gbp": 5.08,
         "qty": 0.00294641,
         "tier": "legacy",
         "placed": "2026-10-29T20:41:37.117332Z",
         "entry": 1696.98,
-        "away_pct": 0.0379,
+        "away_pct": 0.0378,
         "status": "open"
       },
       {
@@ -284,7 +294,7 @@
         "tier": "legacy",
         "placed": "2026-10-29T20:33:08.832947Z",
         "entry": 1720.19,
-        "away_pct": 0.0521,
+        "away_pct": 0.052,
         "status": "open"
       },
       {
@@ -364,6 +374,15 @@
         "gbp": 6.25,
         "tier": "grid",
         "note": "re-arm"
+      },
+      {
+        "t": "2026-10-30T15:42:38.148237Z",
+        "kind": "filled",
+        "side": "buy",
+        "price": 1660.54,
+        "gbp": 6.25,
+        "tier": "grid",
+        "note": "new lot, sell target set"
       }
     ],
     "grid_stats": {
@@ -372,14 +391,15 @@
       "cancelled": 19,
       "placed": 24
     },
-    "levels_at": "2026-10-30T15:37:07.273768Z",
+    "levels_at": "2026-10-30T15:43:38.348858Z",
     "journal": [
       "10-29 17:02Z BUY @ £1,756.88 (£5.00)",
       "10-29 18:39Z BUY @ £1,738.85 (£5.00)",
       "10-29 20:33Z BUY @ £1,720.19 (£5.00)",
       "10-29 20:41Z BUY @ £1,696.98 (£5.00)",
       "10-30 09:39Z MIGRATE",
-      "10-30 09:52Z GRID PAUSED"
+      "10-30 09:52Z GRID PAUSED",
+      "10-30 15:42Z BUY @ £1,660.54 (£6.25)"
     ],
     "strategy": "Active grid on the wide range: rungs ≥ 1.60% apart from just under the price down to the 60-day support, clustered toward support, using 65% of the £50 pot; the other 35% is a reserve of deep-discount buys under that support. Every fill is a lot (coin, buy price, quantity) with its own sell at +1.60% — only lots that hit their own target sell, the rest ride; a lot is never sold below its buy price, it waits to recover. No stop-loss. Guards only: a crash, an upside breakout or a too-volatile band withdraw the buys, lots held.",
     "candles": [
@@ -1052,8 +1072,8 @@
         "t": 1793374200,
         "o": 1668.67,
         "h": 1668.9,
-        "l": 1661.38,
-        "c": 1661.38
+        "l": 1660.14,
+        "c": 1661.4
       }
     ],
     "fills": [
@@ -1076,6 +1096,11 @@
         "t": 1793306497,
         "side": "buy",
         "price": 1696.98
+      },
+      {
+        "t": 1793374958,
+        "side": "buy",
+        "price": 1660.54
       }
     ]
   },
@@ -1089,12 +1114,12 @@
       "ZEC-GBP"
     ],
     "prices": {
-      "BTC-GBP": 57725.47,
-      "ETH-GBP": 1661.38,
-      "LINK-GBP": 8.31434,
-      "ZEC-GBP": 921.72,
-      "ZEC-USDC": 1234.06,
-      "USDC-GBP": 0.7463
+      "BTC-GBP": 57758.29,
+      "ETH-GBP": 1661.4,
+      "LINK-GBP": 8.23496,
+      "ZEC-GBP": 920.94,
+      "ZEC-USDC": 1233.51,
+      "USDC-GBP": 0.7466
     },
     "price_via": {
       "ZEC-GBP": "USD"
@@ -1115,18 +1140,19 @@
     "earlier: 10-29 20:41Z BUY @ £1,696.98 (£5.00)",
     "earlier: 10-30 09:39Z MIGRATE",
     "earlier: 10-30 09:52Z GRID PAUSED",
-    "15:37Z ETH-GBP £1661.98 · 60d £1,621.29–£2,101.55 · 24h £1,631.36–£1,744.09 · 7d £1,645.25–£1,798.72",
-    "15:37Z regime DRIFT: only 1 swing across the band in 96 candles (need 2) — no clear oscillation · grid ACTIVE",
-    "15:37Z step 1.60% (fee floor 1.60%) · lot targets +1.60% · grid £20.00/£32.50 · reserve £0.00/£17.50 · 5 buys resting · 4 lots (4 waiting to recover) · realized £0.0000",
-    "15:37Z next sell: ETH lot @ £1696.98 -> £1724.27 (3.75% away)",
-    "15:37Z accumulation: live — buying on schedule",
-    "15:37Z BTC -5.96% vs 7d high · no big dip"
+    "earlier: 10-30 15:42Z BUY @ £1,660.54 (£6.25)",
+    "15:43Z ETH-GBP £1661.62 · 60d £1,621.29–£2,101.55 · 24h £1,631.36–£1,744.09 · 7d £1,645.25–£1,798.72",
+    "15:43Z regime DRIFT: only 1 swing across the band in 96 candles (need 2) — no clear oscillation · grid ACTIVE",
+    "15:43Z step 1.60% (fee floor 1.60%) · lot targets +1.60% · grid £26.25/£32.50 · reserve £0.00/£17.50 · 4 buys resting · 5 lots (4 waiting to recover) · realized £0.0000",
+    "15:43Z next sell: ETH lot @ £1660.54 -> £1687.25 (1.54% away)",
+    "15:43Z accumulation: live — buying on schedule",
+    "15:43Z BTC -5.90% vs 7d high · no big dip"
   ],
   "dip_alert": {
     "level": "none",
     "coin": "BTC",
-    "drop_pct": 5.96,
+    "drop_pct": 5.9,
     "high": 61385.58,
-    "price": 57725.47
+    "price": 57763.49
   }
 }
