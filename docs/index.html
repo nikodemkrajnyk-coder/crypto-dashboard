@@ -208,9 +208,7 @@
   .lyrow.h{border:none;padding:0 8px 0 11px;color:var(--gd);font-size:.75em;letter-spacing:.1em}
   .lyrow.tot{border-color:var(--g);font-weight:800}
   .L-fast{border-left-color:#7dffb0!important} .L-medium{border-left-color:#c39bff!important} .L-slow{border-left-color:#4fc3ff!important}
-  .L-reserve{border-left-color:#5a7dff!important} .L-legacy{border-left-color:var(--warn)!important}
-  .legacy{margin-top:8px;padding:6px 10px;border:1px dashed var(--warn);border-radius:4px;font-size:.8em;color:var(--gd);line-height:1.6}
-  .legacy b{color:var(--warn);letter-spacing:.08em}
+  .L-reserve{border-left-color:#5a7dff!important}
   .lblock{margin-top:14px;border:1px solid #052;border-left:3px solid var(--dim);border-radius:5px;padding:8px 10px}
   .lblock h3{margin:0 0 4px;font-size:.95em;letter-spacing:.1em} .lblock h3 small{color:var(--gd);font-weight:400;letter-spacing:.04em}
   .lsum{margin-top:12px;font-size:.85em;letter-spacing:.08em;color:var(--gd)} .lsum b{font-size:1.25em}
@@ -354,7 +352,6 @@
       <div class="regime" id="dt-regime">—</div>
       <div class="bookbar" id="dt-book">BOOK —</div>
       <div class="rows" id="dt-layers"></div>
-      <div class="legacy" id="dt-legacy" hidden></div>
       <div class="proj" id="dt-proj"></div>
       <div class="chart" id="dt-chart">loading chart…</div>
       <div class="legend">
@@ -730,7 +727,7 @@ function renderChart(t){
   let lo=Math.min(...cs.map(c=>c.l)),hi=Math.max(...cs.map(c=>c.h));
   const ri=(t.range||{}).intraday,rw=(t.range||{}).wide,rm=(t.range||{}).macro;
   if(ri){lo=Math.min(lo,ri.support);hi=Math.max(hi,ri.resistance)}
-  const LC={fast:'#7dffb0',medium:'#c39bff',slow:'#4fc3ff',reserve:'#5a7dff',legacy:'#ffb300'},lots=t.lots||[];
+  const LC={fast:'#7dffb0',medium:'#c39bff',slow:'#4fc3ff',reserve:'#5a7dff'},lots=t.lots||[];
   const lines=[
     ...(t.orders||[]).map(o=>({price:o.price,color:LC[o.tier]||'#7dffb0',style:2,w:2,title:'▲ '+LTR(o.tier)})),
     ...lots.map(x=>({price:x.target,color:'#ffb300',style:2,w:2,title:'▼ '+LTR(x.tier)})),
@@ -758,7 +755,7 @@ function renderChart(t){
     +(off.length||offN?' · off-chart: '+off.concat(offN?[offN+' more lot lines']:[]).join(', '):'');
 }
 const gridOn=t=>t.grid_active??((t.regime||'range')==='range');
-const LTR=x=>({fast:'F',medium:'M',slow:'S',reserve:'R',legacy:'OLD'})[x]||String(x||'?').toUpperCase();
+const LTR=x=>({fast:'F',medium:'M',slow:'S',reserve:'R'})[x]||String(x||'?').toUpperCase();
 function fitChart(){if(chart&&!$('tab-daytrade').hidden)requestAnimationFrame(()=>{chart.timeScale().fitContent();requestAnimationFrame(placeBox)})}
 addEventListener('resize',()=>{if(lastDT)renderChart(lastDT)});   // phone rotation: re-pick the candle count
 
@@ -816,12 +813,6 @@ async function load(){
         [g.bought_today+' / '+g.sold_today,'r','TODAY B/S'],[gbp4(g.realized_gbp),'r '+(g.realized_gbp>0?'up':''),'REALIZED']],'L-'+g.name)),
       ly([['TOTAL'],['pot '+gbp(t.pot_gbp||50)],['','r'],[gbp(tot.lots)+' + '+gbp(tot.rest),'r','£ WORKING'],[String(tot.b),'r','BUYS'],
         [String(tot.l),'r','LOTS'],[tot.bt+' / '+tot.st,'r','TODAY B/S'],[gbp4(LY.reduce((a,g)=>a+g.realized_gbp,0)),'r up','REALIZED']],'tot'));
-    const lg=t.legacy,lgEl=$('dt-legacy');lgEl.hidden=!lg;
-    if(lg)lgEl.replaceChildren(mk('b',{textContent:'LEGACY LOTS · OUTSIDE THE £'+(t.pot_gbp||50)+' POT'}),
-      ' · '+lg.lots.length+' held · '+gbp(lg.in_lots_gbp)+' cost · realized '+gbp4(lg.realized_gbp)+' · never sold at a loss, proceeds not recycled',
-      ...lg.lots.map(x=>mk('div',{textContent:pxf(x.entry)+' → '+pxf(x.target)
-        +' ('+(x.to_target_pct>0?'+':'')+(x.to_target_pct*100).toFixed(2)+'%) · '+Number(x.qty).toFixed(6)+' ETH · '
-        +(x.unrealised_gbp>=0?'+':'')+gbp4(x.unrealised_gbp)+' · '+(x.held_minutes!=null?dur(x.held_minutes):'—')})));
     const dep=(t.invested_gbp||0),pot=(t.pot_gbp||50),pct=Math.min(100,Math.round(dep/pot*100));
     $('dt-potbar').style.width=pct+'%';
     $('dt-potlbl').textContent='POT '+gbp(pot)+' · IN LOTS '+gbp(dep)+' · CASH '+gbp(t.cash_gbp??pot-dep)
