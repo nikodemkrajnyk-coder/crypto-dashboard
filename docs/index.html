@@ -9,6 +9,8 @@
 <meta name="theme-color" content="#000000">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>WMBOT // crypto</title>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"
+        integrity="sha384-JZigAjwiaZtkUbA44CWkPaT3iBb/mU5pO6QOANp+OqHd4q+1+7MG1kzp2OOP9ZfP" crossorigin="anonymous"></script>
 <style>
   :root{ --g:#00ff66; --gd:#0c4; --dim:#063; --bg:#000; --warn:#ffb300; --red:#ff4455;
          --pad:clamp(10px,2.2vw,28px); --gap:clamp(10px,1.6vw,20px); }
@@ -53,6 +55,15 @@
   .linkbtn{margin-top:8px;font-size:.72em;padding:3px 10px}
   .ovstat{font-size:.82em;color:var(--gd);line-height:1.8}
   .ovstat b{color:var(--g)}
+
+  /* day-trade chart */
+  .chart{height:clamp(300px,46vh,520px);margin-top:12px;border:1px solid #052;border-radius:5px;overflow:hidden;
+         color:var(--dim);display:flex;align-items:center;justify-content:center}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:.72em;color:var(--gd);letter-spacing:.06em}
+  .legend i{display:inline-block;width:1.6em;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
+  .strategy{font-size:.8em;color:var(--gd);line-height:1.5;margin-top:10px;padding:8px 10px;border-left:2px solid var(--g)}
+  .strategy b{color:var(--g)}
+  #dt-pnl{font-size:clamp(26px,3.2vw,46px);font-weight:800}
   .card{border:1px solid var(--dim);border-radius:8px;padding:clamp(12px,1.4vw,20px);min-width:0;
         background:rgba(0,20,8,.6);box-shadow:0 0 18px rgba(0,255,102,.08) inset;display:flex;flex-direction:column}
   .card h2{font-size:clamp(12px,1.05vw,15px);letter-spacing:.18em;margin-bottom:12px;text-shadow:0 0 6px var(--g);
@@ -206,6 +217,15 @@
         <div class="cell"><div class="k">GROSS P/L</div><div class="v" id="dt-gross">£—</div></div>
         <div class="cell"><div class="k">WIN RATE</div><div class="v" id="dt-wr">—</div></div>
         <div class="cell"><div class="k">TRADES CLOSED</div><div class="v" id="dt-trades">—</div></div>
+      </div>
+      <div class="strategy" id="dt-strategy"></div>
+      <div class="chart" id="dt-chart">loading chart…</div>
+      <div class="legend">
+        <span><i style="border-color:#00ff66"></i>SUPPORT</span><span><i style="border-color:#ff4455"></i>RESISTANCE</span>
+        <span><i style="border-color:#7dffb0;border-top-style:dashed"></i>BUY LIMIT (LADDER)</span>
+        <span><i style="border-color:#ffb300;border-top-style:dashed"></i>SELL TARGET</span>
+        <span><i style="border-color:#2a8a55;border-top-style:dotted"></i>OPEN ENTRY</span><span>▲▼ FILLS</span>
+        <span id="dt-lvlat"></span>
       </div>
       <div class="k" style="margin-top:12px"><span id="dt-pair">ETH-GBP</span> <span id="dt-price">£—</span> · <span id="dt-potlbl"></span></div>
       <div class="bar"><i id="dt-potbar"></i></div>
@@ -414,6 +434,41 @@ function renderDip(a){
   el.hidden=false;
 }
 
+// ---- day-trade candle chart: support / resistance / the bot's ladder (TradingView lightweight-charts) ----
+let chart=null,series=null,priceLines=[];
+function renderChart(t){
+  const el=$('dt-chart'),cs=t.candles||[];
+  if(!window.LightweightCharts){el.textContent='chart library unavailable';return}
+  if(!cs.length){if(!chart)el.textContent='no candle data yet';return}
+  if(!chart){
+    el.textContent='';
+    chart=LightweightCharts.createChart(el,{autoSize:true,
+      layout:{background:{type:'solid',color:'#000a04'},textColor:'#0c4',fontFamily:'Menlo,Consolas,monospace',fontSize:11},
+      grid:{vertLines:{color:'rgba(0,102,51,.22)'},horzLines:{color:'rgba(0,102,51,.22)'}},
+      rightPriceScale:{borderColor:'#063'},timeScale:{borderColor:'#063',timeVisible:true,secondsVisible:false},
+      crosshair:{mode:0}});
+    series=chart.addCandlestickSeries({upColor:'#00ff66',downColor:'#ff4455',borderUpColor:'#00ff66',borderDownColor:'#ff4455',
+      wickUpColor:'#0c4',wickDownColor:'#c33',priceFormat:{type:'price',precision:2,minMove:.01}});
+  }
+  series.setData(cs.map(c=>({time:c.t,open:c.o,high:c.h,low:c.l,close:c.c})));
+  priceLines.forEach(l=>series.removePriceLine(l));priceLines=[];
+  const seen=new Set();
+  const add=(price,color,style,title,width,label=true)=>{const k=title+price;if(seen.has(k))return;seen.add(k);
+    priceLines.push(series.createPriceLine({price,color,lineWidth:width||1,lineStyle:style,axisLabelVisible:label,title}))};
+  (t.support||[]).forEach(s=>add(s.price,'#00ff66',0,'S×'+s.touches,1));
+  (t.resistance||[]).forEach(r=>add(r.price,'#ff4455',0,'R×'+r.touches,1));
+  (t.open_tranches||[]).forEach(x=>add(x.entry,'#2a8a55',1,'ENTRY',1,false));
+  (t.orders||[]).forEach(o=>o.side==='buy'?add(o.price,'#7dffb0',2,'BUY LMT',2):add(o.price,'#ffb300',2,'SELL TGT',2));
+  // fills as arrows on the candle they happened in
+  const step=cs.length>1?cs[1].t-cs[0].t:3600,t0=cs[0].t;
+  series.setMarkers((t.fills||[]).filter(f=>f.t>=t0).map(f=>({time:t0+Math.floor((f.t-t0)/step)*step,
+    position:f.side==='buy'?'belowBar':'aboveBar',color:f.side==='buy'?'#00ff66':'#ffb300',
+    shape:f.side==='buy'?'arrowUp':'arrowDown',text:(f.side==='buy'?'BUY ':'SELL ')+Number(f.price).toFixed(0)}))
+    .sort((a,b)=>a.time-b.time));
+  if(!chart._fitted){chart.timeScale().fitContent();chart._fitted=true}
+  $('dt-lvlat').textContent=t.levels_at?'levels @ '+String(t.levels_at).slice(11,16)+'Z':'';
+}
+
 // ---- data ----
 async function load(){
   try{
@@ -442,12 +497,15 @@ async function load(){
     $('dt-potlbl').textContent='POT '+gbp(pot)+' · DEPLOYED '+gbp(dep)+' · CASH '+gbp(t.cash_gbp??pot-dep)
       +' · '+(t.tranches_open||0)+'/'+(t.tranches_total||4)+' SLOTS';
     const p2=n=>(Number(n)*100).toFixed(2)+'%';
-    $('dt-fees').textContent=t.fee_rate!=null?'MAKER FEE '+p2(t.fee_rate)+'/SIDE · TP FLOOR '+p2(t.effective_tp)
-      +' · BUY ON -'+p2(t.buy_dip_pct||0)+' DIP':'';
+    $('dt-fees').textContent=t.fee_rate!=null?'MAKER FEE '+p2(t.fee_rate)+'/SIDE · FEE FLOOR '+p2(t.effective_tp)
+      +' · LADDER SPACING '+p2(t.buy_dip_pct||0):'';
+    const sb=document.createElement('b');sb.textContent='STRATEGY ';
+    $('dt-strategy').replaceChildren(sb,t.strategy||'grid on dips');
+    renderChart(t);
     const tr=t.open_tranches||[];
-    $('dt-rows').replaceChildren(...(tr.length?[row([['ENTRY'],['NOW','r'],['UNREAL.','r'],['SELL ≥','r']],'dt h'),
+    $('dt-rows').replaceChildren(...(tr.length?[row([['ENTRY'],['NOW','r'],['UNREAL.','r'],['SELL @','r']],'dt h'),
       ...tr.map(x=>row([[pxf(x.entry)+(x.status!=='held'?' ·'+x.status.replace('_',' '):'')],[pxf(t.last_price),'r'],
-        [pctf(x.unrealised_pct),'r '+pcls(x.unrealised_pct)],[pxf(x.target),'r']],'dt'))]
+        [pctf(x.unrealised_pct),'r '+pcls(x.unrealised_pct)],[pxf(x.target)+(x.target_kind==='resistance'?' (R)':' (floor)'),'r']],'dt'))]
       :[row([['no open tranches — waiting for a dip','mute full']],'dt')]));
     const g=$('dt-guard');
     if(t.losing_streak!=null){
