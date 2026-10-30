@@ -147,6 +147,14 @@
   .wrow.h{border:none;padding:0 8px;color:var(--gd);font-size:.72em;letter-spacing:.08em}
   .wnote{color:var(--gd);white-space:normal!important} .wnote.park{color:var(--warn)} .wnote.ok{color:var(--g)} .wnote.no{color:var(--dim)}
   .accord{margin-top:10px;font-size:.82em}
+  .pva{display:inline-block;margin-left:8px;padding:2px 8px;border:1px solid;border-radius:3px;font-size:.78em;letter-spacing:.1em;font-weight:700}
+  .pva.ok{color:var(--g);border-color:var(--g)} .pva.bad{color:var(--warn);border-color:var(--warn)} .pva.mute{color:var(--gd);border-color:var(--dim)}
+  .proj{margin-top:12px;border:1px dashed var(--dim);border-radius:6px;padding:10px 12px}
+  .proj .k b{color:var(--warn)}
+  .projv{font-size:clamp(22px,2.6vw,36px);font-weight:800;margin:4px 0;color:var(--g)}
+  .proj ul{margin:6px 0 0 1.2em;font-size:.78em;color:var(--gd);line-height:1.5}
+  .scen{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82em;margin-top:6px}
+  .scen span{border:1px solid #052;border-radius:4px;padding:3px 8px}
   @container (max-width:600px){
     .wrow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:4px}
     .wrow.h{display:none}
@@ -293,7 +301,9 @@
           </div>
           <div class="weekline" id="acc-week">this week's plan —</div>
           <div class="pt" id="acc-wtable"></div>
+          <div class="proj" id="acc-proj"></div>
           <div class="accord" id="acc-orders"></div>
+          <div class="proj" id="acc-review" hidden></div>
         </div>
         <div class="btchead"><div class="k">BITCOIN</div><div class="btcpct" id="acc-btc">—%</div><div class="k">OF PORTFOLIO</div></div>
         <div class="bar"><i id="acc-btcbar"></i></div>
@@ -325,6 +335,7 @@
         <div class="cell"><div class="k">DEPLOYED (GRID)</div><div class="v" id="dt-deploy">—</div><div class="sub k" id="dt-deploysub"></div></div>
         <div class="cell"><div class="k">RESERVE</div><div class="v" id="dt-reserve">—</div><div class="sub k" id="dt-reservesub"></div></div>
       </div>
+      <div class="proj" id="dt-proj"></div>
       <div class="strategy" id="dt-strategy"></div>
       <div class="chart" id="dt-chart">loading chart…</div>
       <div class="legend">
@@ -484,8 +495,10 @@ function renderMoney(p,prices){
   $('acc-totalsub').textContent='cash + stablecoins + every coin in the account at live prices'+(unpriced.length?' (excl. '+unpriced.join(', ')+': no price)':'');
   // the week: same rule as bot.py — budget ramps evenly Mon 00:00 → Sun 24:00, plus the dip-tilt pull-forward
   const w=p.week,start=Date.parse(w.start),WK=7*864e5,frac=Math.min(1,Math.max(0,(Date.now()-start)/WK));
-  const tcfg=w.tilt_cfg||{},sym=pr=>pr.split('-')[0],openBy={};
-  for(const o of p.open_orders||[])(openBy[o.product]=openBy[o.product]||[]).push(o);
+  const tcfg=w.tilt_cfg||{},sym=pr=>pr.split('-')[0],openBy={},routes=w.routes||{};
+  const toPair={};for(const [pr,r] of Object.entries(routes)){toPair[r.market]=pr;toPair[r.fund]=pr}
+  for(const o of p.open_orders||[]){const k=toPair[o.product]||o.product;(openBy[k]=openBy[k]||[]).push(o)}
+  let behind=0;
   let budget=0,spent=0,toGo=0,buyable=0;const rows=[],parts=[];
   const L=['COIN','WEEKLY','DEPLOYED','DUE BY NOW','TO GO','STATUS'];
   for(const [pr,b] of Object.entries(w.budget||{})){
@@ -498,24 +511,51 @@ function renderMoney(p,prices){
     else if(left<=0.005){note='week complete';cls='ok'}
     else if(short<=0.005){note='on schedule — next slice as the week ramps';cls='ok'}
     else if(short<min){note='parked: £'+short.toFixed(2)+' due, below the £'+min.toFixed(0)+' min — buys once it reaches £'+min.toFixed(0);cls='park'}
-    else{note='£'+short.toFixed(2)+' due — buys on the next run (≤15 min)';cls=''}
+    else{note='£'+short.toFixed(2)+' due — buys on the next run (≤15 min)';cls='';behind+=short}
+    if(routes[pr])note+=' · via '+routes[pr].fund+' → '+routes[pr].market+' (£ budget, coin bought in $)';
     rows.push(wrow([[sym(pr),'',L[0]],[gbp(B),'r',L[1]],[gbp(S),'r',L[2]],[noMkt?'—':gbp(due),'r',L[3]],[gbp(left),'r',L[4]],[note,'wnote '+cls,L[5]]]));
   }
   $('acc-wtable').replaceChildren(wrow(L.map(l=>[l,l==='COIN'||l==='STATUS'?'':'r']),'h'),...rows);
+  // projection: coins added if the plan runs clean, at TODAY's price (an estimate, not a forecast)
+  const now=Date.now(),mEnd=Date.UTC(new Date(now).getUTCFullYear(),new Date(now).getUTCMonth()+1,1),dLeft=Math.max(0,(mEnd-now)/864e5);
+  const prow2=[],bq=w.bought_qty||{},mq=(p.month||{}).bought_qty||{},monthName=new Date(now).toUTCString().slice(8,11);
+  for(const [pr,b] of Object.entries(w.budget||{})){
+    const B=Number(b),S=Number((w.spent||{})[pr]||0),px=prices[pr];if(!px)continue;
+    const due=Math.min(B,B*frac),fmtq=q=>'+'+(q<1?q.toFixed(pr.startsWith('BTC')?6:5):q.toFixed(2))+' '+sym(pr);
+    const wk=Number(bq[pr]||0)+Math.max(0,B-S)/px,mo=Number(mq[pr]||0)+(Math.max(0,due-S)+B/7*dLeft)/px,n30=B/7*30/px;
+    prow2.push(wrow([[sym(pr),'','COIN'],[fmtq(wk),'r','THIS WEEK'],[fmtq(mo),'r','THIS MONTH ('+monthName+')'],[fmtq(n30),'r','NEXT 30 DAYS'],
+      ['@ '+(routes[pr]?'£'+px.toFixed(2)+' (via $)':pxf(px)),'r','PRICE USED'],['bought so far this week: '+(Number(bq[pr]||0)?amt(Number(bq[pr])):'none'),'wnote','']]));
+  }
+  const ok=behind<1;
+  $('acc-proj').replaceChildren(Object.assign(document.createElement('div'),{className:'k',innerHTML:''}),
+    wrow([['COIN'],['THIS WEEK','r'],['THIS MONTH ('+monthName+')','r'],['NEXT 30 DAYS','r'],['PRICE USED','r'],['']],'h'),...prow2);
+  const ph=$('acc-proj').firstChild;ph.textContent='PROJECTION — estimate at today\'s price if the plan runs clean (budget ÷ price; prices will move, so actual coin amounts will differ)';
+  const pv=Object.assign(document.createElement('span'),{className:'pva '+(ok?'ok':'bad'),
+    textContent:ok?'PLAN vs ACTUAL: ON TRACK':'PLAN vs ACTUAL: BEHIND £'+behind.toFixed(2)});
   const d0=new Date(start),d1=new Date(start+WK-1),fmt=d=>d.toUTCString().slice(0,11);
   const noM=(w.no_market||[]).map(pr=>sym(pr)+' £'+Number(w.budget[pr]));
   const tilted=Object.entries(w.tilt||{}).filter(([,v])=>v).map(([pr])=>sym(pr));
   const beyond=Math.max(0,gbpCash-buyable);
   $('acc-week').replaceChildren('THIS WEEK ('+fmt(d0)+' → '+fmt(d1)+'): '+gbp(budget)+' budget ('+parts.join(' / ')+') · '
-    +gbp(spent)+' deployed · '+gbp(toGo)+' to go'+(noM.length?' (incl. '+noM.join(', ')+' that can\'t be bought — no GBP market)':'')+'.',
-    Object.assign(document.createElement('small'),{textContent:'How: small post-only limit buys (≥ £1) every 15 min, spread evenly Monday → Sunday. '
+    +gbp(spent)+' deployed · '+gbp(toGo)+' to go'+(noM.length?' (incl. '+noM.join(', ')+' that can\'t be bought — no GBP market)':'')+'.',pv,
+    Object.assign(document.createElement('small'),{textContent:'How: small post-only limit buys (≥ £1) every 15 min, spread evenly Monday → Sunday'
+      +(Object.keys(routes).length?' ('+Object.entries(routes).map(([pr,r])=>sym(pr)+': GBP → '+r.fund.split('-')[0]+' → '+r.market+', maker').join('; ')+')':'')+'. '
       +'Dip tilt pulls '+Math.round((tcfg.pull_forward||0)*100)+'% of the week forward when a coin is ≥ '+Math.round((tcfg.drop||0)*100)+'% under its 7-day high'
       +(Object.keys(w.tilt||{}).length?' (on now: '+(tilted.join(', ')||'none')+')':'')+'. No dip-waiting, no carry-over: it never spends more than the week\'s budget.'}),
     Object.assign(document.createElement('small'),{textContent:'GBP cash '+gbp(gbpCash)+' = '+gbp(Math.min(gbpCash,buyable))+' still to be bought this week + '
       +gbp(beyond)+' beyond the weekly budget (the bot won\'t touch it).'}));
+  const rv=p.review,rb=$('acc-review');rb.hidden=!rv;
+  if(rv){const IC={fix:['✗','dn'],watch:['!','park'],ok:['✓','up'],info:['·','mute']};
+    rb.replaceChildren(Object.assign(document.createElement('div'),{className:'k',
+        textContent:'BOT REVIEW — '+rv.date+' ('+rv.kind+') · operational checks only, never changes the strategy or budget'}),
+      Object.assign(document.createElement('div'),{style:'margin:4px 0 6px;font-size:.88em',textContent:rv.summary}),
+      ...rv.findings.slice().sort((a,b)=>['fix','watch','info','ok'].indexOf(a.level)-['fix','watch','info','ok'].indexOf(b.level)).map(f=>{
+        const d=document.createElement('div'),i=IC[f.level]||['·',''];d.style.cssText='font-size:.8em;line-height:1.55';
+        d.append(Object.assign(document.createElement('span'),{className:i[1],textContent:i[0]+' '}),f.text);return d}))}
   const oo=p.open_orders||[];
   $('acc-orders').replaceChildren(Object.assign(document.createElement('div'),{className:'k',textContent:'OPEN ACCUMULATION ORDERS'}),
-    ...(oo.length?oo.map(o=>wrow([[sym(o.product),'','COIN'],[o.side==='BUY'?'▲ BUY':'▼ SELL','','SIDE'],[pxf(Number(o.price)),'r','PRICE'],
+    ...(oo.length?oo.map(o=>wrow([[o.product,'','MARKET'],[o.side==='BUY'?'▲ BUY':'▼ SELL','','SIDE'],
+      [(/-(USDC|USD|USDT)$/.test(o.product)?'$':'£')+Number(o.price).toLocaleString('en-GB',{maximumFractionDigits:5}),'r','PRICE'],
       [amt(Number(o.size)),'r','SIZE'],[gbp(o.gbp),'r','£'],['open since '+String(o.created).slice(5).replace('T',' ')+'Z'+(Number(o.filled)>0?' · £'+o.filled+' filled':''),'wnote','STATUS']]))
       :[Object.assign(document.createElement('div'),{className:'mute',textContent:'none open — every buy this week has filled'})]));
   return total;
@@ -529,8 +569,15 @@ function showPortfolio(p,prices,via){
     // invested is null for coins held outside the bot (e.g. ZEC): no cost basis, so no P/L
     const qty=Number(c.qty||0),inv=c.invested!=null?Number(c.invested):null,price=prices[pair]??null;
     const value=price!=null?qty*price:(qty?null:0),pl=value!=null&&inv!=null?value-inv:null;
-    return {pair,qty,inv,avg:c.avg_price!=null?Number(c.avg_price):null,price,value,pl,
+    const r={pair,qty,inv,avg:c.avg_price!=null?Number(c.avg_price):null,price,value,pl,
       pct:inv>0&&pl!=null?pl/inv:null,buys:c.buys||0,last:c.last_buy,note:c.note,via:via[pair]};
+    if(c.currency==='USD'){   // bought in dollars (ZEC): cost basis, price, value and P/L shown in $
+      const mk=((p.week||{}).routes||{})[pair],upx=mk?prices[mk.market]:null,inU=Number(c.invested_usd||0),bq=Number(c.bought_qty||0);
+      const vU=upx!=null?qty*upx:null,costU=bq?inU*Math.min(1,qty/bq):null;
+      Object.assign(r,{usd:true,upx,avgU:c.avg_price_usd!=null?Number(c.avg_price_usd):null,valU:vU,
+        plU:vU!=null&&costU?vU-costU:null,pctU:vU!=null&&costU?vU/costU-1:null,route:c.route});
+    }
+    return r;
   });
   const costed=rows.filter(r=>r.inv!=null&&r.value!=null);
   const inv=costed.reduce((s,r)=>s+r.inv,0),pl=costed.reduce((s,r)=>s+r.value,0)-inv,pct=inv>0?pl/inv:null;
@@ -553,11 +600,21 @@ function showPortfolio(p,prices,via){
   const body=[];
   for(const r of rows){
     const sym=r.pair.split('-')[0]+(r.note?'*':'');
+    const usd=n=>n==null?'—':(n<0?'-$':'$')+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+    if(r.usd){
+      body.push(prow([[sym,L[0]],[r.qty?amt(r.qty):'0',L[1]],[usd(r.avgU),L[2]],[usd(r.upx),L[3]],
+        [usd(r.valU)+(r.value!=null?' ('+gbp(r.value)+')':''),L[4]],[r.plU!=null?(r.plU>=0?'+':'')+usd(r.plU):'—',L[5],pcls(r.plU)],
+        [pctf(r.pctU),L[6],pcls(r.pctU)],[val>0&&r.value!=null?(r.value/val*100).toFixed(1)+'%':'—',L[7]]]));
+      body.push(Object.assign(document.createElement('div'),{className:'pnote',
+        textContent:'* '+r.pair.split('-')[0]+' in US$ — '+(r.route||'bought in dollars')+'; cost basis from every '+r.pair.split('-')[0]
+          +' buy in the account. £ figure and totals use Coinbase USDC-GBP '+(prices['USDC-GBP']?prices['USDC-GBP'].toFixed(4):'—')+' (FX).'}));
+      continue;
+    }
     body.push(prow([[sym,L[0]],[r.qty?amt(r.qty):'0',L[1]],[r.avg!=null?pxf(r.avg):'—',L[2]],
       [r.price!=null?pxf(r.price)+(r.via?' ($)':''):'no market',L[3],r.price==null?'mute':''],[r.value!=null?gbp(r.value):'—',L[4]],
       [r.pl!=null&&r.inv?sgbp(r.pl):'—',L[5],pcls(r.inv?r.pl:null)],[pctf(r.pct),L[6],pcls(r.pct)],
       [val>0&&r.value!=null?(r.value/val*100).toFixed(1)+'%':'—',L[7]]]));
-    if(r.note)body.push(Object.assign(document.createElement('div'),{className:'pnote',
+    if(r.note&&!r.usd)body.push(Object.assign(document.createElement('div'),{className:'pnote',
       textContent:'* '+r.pair.split('-')[0]+' ('+r.note+')'}));
   }
   $('acc-table').replaceChildren(prow(L.map(l=>[l,'']),'h'),...body,
@@ -568,7 +625,7 @@ function showPortfolio(p,prices,via){
   const missing=rows.filter(r=>r.qty&&r.value==null).map(r=>r.pair.split('-')[0]);
   $('acc-status').replaceChildren(...[lastAcc&&lastAcc.status||'',
     [plan,rows.reduce((s,r)=>s+r.buys,0)+' buys filled',lastBuy?'last buy '+String(lastBuy).slice(5,16).replace('T',' ')+'Z':'no fills yet'].filter(Boolean).join(' · '),
-    outside.length?outside.join(', ')+' held outside the bot — counted in VALUE NOW, not in INVESTED or P/L (no cost basis)':'',
+    outside.length?outside.join(', ')+' counted in VALUE NOW, not in the £ INVESTED or P/L'+(rows.some(r=>r.usd)?' (tracked in $ in its own row)':' (no cost basis)'):'',
     missing.length?'totals exclude '+missing.join(', ')+' (no live price)':''].filter(Boolean)
     .map(l=>Object.assign(document.createElement('div'),{textContent:l})));
 }
@@ -756,6 +813,23 @@ async function load(){
     $('dt-fees').textContent='MAKER FEE '+p2(t.fee_rate||0)+'/SIDE · EVERY LOT SELLS AT +'+p2(t.effective_tp||0)
       +' · NO STOP-LOSS · NEVER SOLD AT A LOSS'+(t.grid_stats?' · TODAY: '+t.grid_stats.reprices+' REPRICES, '
       +t.grid_stats.cancelled+' BUYS CANCELLED':'');
+    const pj=t.projection,pa=t.plan_vs_actual;
+    if(pj){
+      const el=$('dt-proj'),mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+      const sc=mk('div',{className:'scen'});
+      for(const x of pj.scenarios)sc.append(mk('span',{textContent:'if '+x.per_day+' round trip'+(x.per_day>1?'s':'')+'/day → ≈ '+gbp(x.potential)+'/week'}));
+      const ul=mk('ul',{});for(const a of pj.assumptions)ul.append(mk('li',{textContent:a}));
+      const good=pa&&/ON TRACK|AHEAD/.test(pa.status),aside=pa&&/STANDING|EARLY/.test(pa.status);
+      el.replaceChildren(mk('div',{className:'k',innerHTML:'<b>POTENTIAL PROFIT THIS WEEK — ESTIMATE, NOT A PROMISE</b> (paper)'}),
+        mk('div',{className:'projv',textContent:pj.ranging?'≈ '+gbp(pj.base_potential_week)+' this week':'≈ £0.00 while the grid stands aside'}),
+        mk('div',{className:'k',textContent:pj.ranging?'base case: '+pj.base_round_trips_week+' round trips × '+gbp4(pj.net_per_round_trip)+' net each (~'+gbp(pj.lot_gbp)+' lots)'
+          :'no oscillating range right now, so no round trips are planned; if a range forms, each round trip nets ≈ '+gbp4(pj.net_per_round_trip)}),
+        sc,mk('div',{className:'k',style:'margin-top:8px',textContent:'ASSUMPTIONS'}),ul,
+        pa?mk('div',{style:'margin-top:8px;font-size:.85em'}):'');
+      if(pa){el.lastChild.append(mk('span',{className:'pva '+(good?'ok':aside?'mute':'bad'),textContent:'PLAN vs ACTUAL: '+pa.status}),
+        ' this week: '+pa.actual_round_trips+' round trip'+(pa.actual_round_trips!==1?'s':'')+' / '+gbp4(pa.actual_net)+' realized vs ≈ '
+        +pa.planned_round_trips_so_far+' planned so far ('+gbp(pa.planned_potential_so_far)+')')}
+    }
     const sb=document.createElement('b');sb.textContent='STRATEGY ';
     $('dt-strategy').replaceChildren(sb,t.strategy||'range grid');
     renderChart(t);
