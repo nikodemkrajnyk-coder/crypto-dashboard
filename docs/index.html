@@ -137,6 +137,23 @@
   .sgq{font-size:.78em;color:var(--gd);margin-top:3px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
   .stacknote{font-size:.72em;color:var(--gd);margin-top:10px;line-height:1.5;text-align:left}
   @container (max-width:600px){.grid.three{grid-template-columns:1fr}}
+  .money{border:1px solid var(--dim);border-radius:6px;padding:clamp(12px,1.4vw,18px);margin-bottom:14px}
+  .money h3{font-size:.8em;letter-spacing:.16em;margin:0 0 10px;color:var(--g)}
+  .weekline{font-size:.88em;line-height:1.6;margin:12px 0 4px;padding:8px 10px;border-left:2px solid var(--g);color:var(--g)}
+  .weekline small{display:block;color:var(--gd);font-size:.88em;margin-top:4px}
+  .wrow{display:grid;grid-template-columns:4em repeat(4,minmax(0,1fr)) minmax(0,2.6fr);gap:6px;padding:6px 8px;
+        border:1px solid #052;border-radius:4px;font-variant-numeric:tabular-nums;align-items:baseline;font-size:.82em}
+  .wrow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .wrow .r{text-align:right}
+  .wrow.h{border:none;padding:0 8px;color:var(--gd);font-size:.72em;letter-spacing:.08em}
+  .wnote{color:var(--gd);white-space:normal!important} .wnote.park{color:var(--warn)} .wnote.ok{color:var(--g)} .wnote.no{color:var(--dim)}
+  .accord{margin-top:10px;font-size:.82em}
+  @container (max-width:600px){
+    .wrow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:4px}
+    .wrow.h{display:none}
+    .wrow span{white-space:normal}
+    .wrow span::before{content:attr(data-l);display:block;font-size:.72em;color:var(--gd);letter-spacing:.08em}
+    .wrow .r{text-align:left} .wrow .wnote{grid-column:1/-1}
+  }
   .btchead{display:flex;align-items:baseline;justify-content:center;gap:.6em;flex-wrap:wrap;letter-spacing:.12em}
   .btcpct{font-size:clamp(34px,4.5vw,64px);color:var(--g);text-shadow:0 0 14px var(--g);font-variant-numeric:tabular-nums}
   #acc-open>.bar{margin:6px 0 14px}
@@ -266,6 +283,17 @@
           <div class="stacknote">Measured in coins, not £: stack growth = (BTC now − BTC then) ÷ BTC then. Total BTC in the account is
             recorded once a day inside the encrypted snapshot; earlier days were back-filled from the bot's own BTC buys.
             TODAY / WEEK / MONTH fill in as history builds (first full day, week and month).</div>
+        </div>
+        <div class="money" id="acc-money">
+          <h3>MONEY VIEW — WHOLE ACCOUNT</h3>
+          <div class="grid three">
+            <div class="cell"><div class="k">GBP CASH (UNSPENT)</div><div class="v" id="acc-cash">£—</div><div class="sgq" id="acc-cashsub"></div></div>
+            <div class="cell"><div class="k">STABLECOINS</div><div class="v" id="acc-stable">£—</div><div class="sgq" id="acc-stablesub"></div></div>
+            <div class="cell"><div class="k">OVERALL PORTFOLIO VALUE</div><div class="v" id="acc-total">£—</div><div class="sgq" id="acc-totalsub"></div></div>
+          </div>
+          <div class="weekline" id="acc-week">this week's plan —</div>
+          <div class="pt" id="acc-wtable"></div>
+          <div class="accord" id="acc-orders"></div>
         </div>
         <div class="btchead"><div class="k">BITCOIN</div><div class="btcpct" id="acc-btc">—%</div><div class="k">OF PORTFOLIO</div></div>
         <div class="bar"><i id="acc-btcbar"></i></div>
@@ -439,6 +467,61 @@ function renderStack(h){
     s.textContent=(add<0?'−':'+')+Math.abs(add).toFixed(8)+' ₿';
   }
 }
+// ---- money view + this week's plan (REAL money: only ever from the decrypted snapshot) ----
+function renderMoney(p,prices){
+  const box=$('acc-money');
+  if(!p.week||!p.cash){box.hidden=true;return null}
+  box.hidden=false;
+  const fx=prices['USDC-GBP']??null,cash=p.cash||{},gbpCash=Number(cash.GBP||0);
+  const st=Object.entries(cash).filter(([c])=>c!=='GBP');
+  const stVal=fx!=null?st.reduce((s,[,q])=>s+Number(q)*fx,0):null;
+  let total=gbpCash+(stVal||0);const unpriced=[];
+  for(const [c,q] of Object.entries(p.holdings||{})){const px=prices[c+'-GBP'];if(px!=null)total+=Number(q)*px;else unpriced.push(c)}
+  cell($('acc-cash'),gbp(gbpCash));
+  cell($('acc-stable'),stVal!=null?gbp(stVal):'£—');
+  $('acc-stablesub').textContent=st.length?st.map(([c,q])=>c+' '+Number(q).toFixed(4)).join(' · '):'none held';
+  cell($('acc-total'),gbp(total));
+  $('acc-totalsub').textContent='cash + stablecoins + every coin in the account at live prices'+(unpriced.length?' (excl. '+unpriced.join(', ')+': no price)':'');
+  // the week: same rule as bot.py — budget ramps evenly Mon 00:00 → Sun 24:00, plus the dip-tilt pull-forward
+  const w=p.week,start=Date.parse(w.start),WK=7*864e5,frac=Math.min(1,Math.max(0,(Date.now()-start)/WK));
+  const tcfg=w.tilt_cfg||{},sym=pr=>pr.split('-')[0],openBy={};
+  for(const o of p.open_orders||[])(openBy[o.product]=openBy[o.product]||[]).push(o);
+  let budget=0,spent=0,toGo=0,buyable=0;const rows=[],parts=[];
+  const L=['COIN','WEEKLY','DEPLOYED','DUE BY NOW','TO GO','STATUS'];
+  for(const [pr,b] of Object.entries(w.budget||{})){
+    const B=Number(b),S=Number((w.spent||{})[pr]||0),noMkt=(w.no_market||[]).includes(pr),tilt=(w.tilt||{})[pr];
+    const due=Math.min(B,B*frac+(tilt?B*(tcfg.pull_forward||0):0)),short=due-S,min=Number((w.min_order||{})[pr]||1),left=Math.max(0,B-S);
+    budget+=B;spent+=S;toGo+=left;if(!noMkt)buyable+=left;parts.push(sym(pr)+' £'+B);
+    let note,cls;
+    if(noMkt){note='no '+pr+' market on Coinbase — can\'t buy; its £'+B+' stays in GBP';cls='no'}
+    else if(openBy[pr]){note=openBy[pr].length+' order(s) open — waiting to fill';cls=''}
+    else if(left<=0.005){note='week complete';cls='ok'}
+    else if(short<=0.005){note='on schedule — next slice as the week ramps';cls='ok'}
+    else if(short<min){note='parked: £'+short.toFixed(2)+' due, below the £'+min.toFixed(0)+' min — buys once it reaches £'+min.toFixed(0);cls='park'}
+    else{note='£'+short.toFixed(2)+' due — buys on the next run (≤15 min)';cls=''}
+    rows.push(wrow([[sym(pr),'',L[0]],[gbp(B),'r',L[1]],[gbp(S),'r',L[2]],[noMkt?'—':gbp(due),'r',L[3]],[gbp(left),'r',L[4]],[note,'wnote '+cls,L[5]]]));
+  }
+  $('acc-wtable').replaceChildren(wrow(L.map(l=>[l,l==='COIN'||l==='STATUS'?'':'r']),'h'),...rows);
+  const d0=new Date(start),d1=new Date(start+WK-1),fmt=d=>d.toUTCString().slice(0,11);
+  const noM=(w.no_market||[]).map(pr=>sym(pr)+' £'+Number(w.budget[pr]));
+  const tilted=Object.entries(w.tilt||{}).filter(([,v])=>v).map(([pr])=>sym(pr));
+  const beyond=Math.max(0,gbpCash-buyable);
+  $('acc-week').replaceChildren('THIS WEEK ('+fmt(d0)+' → '+fmt(d1)+'): '+gbp(budget)+' budget ('+parts.join(' / ')+') · '
+    +gbp(spent)+' deployed · '+gbp(toGo)+' to go'+(noM.length?' (incl. '+noM.join(', ')+' that can\'t be bought — no GBP market)':'')+'.',
+    Object.assign(document.createElement('small'),{textContent:'How: small post-only limit buys (≥ £1) every 15 min, spread evenly Monday → Sunday. '
+      +'Dip tilt pulls '+Math.round((tcfg.pull_forward||0)*100)+'% of the week forward when a coin is ≥ '+Math.round((tcfg.drop||0)*100)+'% under its 7-day high'
+      +(Object.keys(w.tilt||{}).length?' (on now: '+(tilted.join(', ')||'none')+')':'')+'. No dip-waiting, no carry-over: it never spends more than the week\'s budget.'}),
+    Object.assign(document.createElement('small'),{textContent:'GBP cash '+gbp(gbpCash)+' = '+gbp(Math.min(gbpCash,buyable))+' still to be bought this week + '
+      +gbp(beyond)+' beyond the weekly budget (the bot won\'t touch it).'}));
+  const oo=p.open_orders||[];
+  $('acc-orders').replaceChildren(Object.assign(document.createElement('div'),{className:'k',textContent:'OPEN ACCUMULATION ORDERS'}),
+    ...(oo.length?oo.map(o=>wrow([[sym(o.product),'','COIN'],[o.side==='BUY'?'▲ BUY':'▼ SELL','','SIDE'],[pxf(Number(o.price)),'r','PRICE'],
+      [amt(Number(o.size)),'r','SIZE'],[gbp(o.gbp),'r','£'],['open since '+String(o.created).slice(5).replace('T',' ')+'Z'+(Number(o.filled)>0?' · £'+o.filled+' filled':''),'wnote','STATUS']]))
+      :[Object.assign(document.createElement('div'),{className:'mute',textContent:'none open — every buy this week has filled'})]));
+  return total;
+}
+function wrow(cells,cls){const r=document.createElement('div');r.className='wrow'+(cls?' '+cls:'');
+  for(const [t,c,l] of cells){const e=document.createElement('span');e.textContent=t;if(c)e.className=c;if(l)e.dataset.l=l;r.appendChild(e)}return r}
 function showPortfolio(p,prices,via){
   $('acc-locked').hidden=true;$('acc-open').hidden=false;$('acc-lock').hidden=false;
   via=via||{};
@@ -462,7 +545,9 @@ function showPortfolio(p,prices,via){
   cell($('ov-btc'),btcPct!=null?btcPct.toFixed(1)+'%':'—%');
   $('ov-btcsub').textContent=btc&&btc.value!=null?gbp(btc.value)+' of '+gbp(val)+' held':'no BTC priced';
   cell($('ov-pl'),sgbp(pl),pcls(pl));$('ov-plsub').textContent=pctf(pct)+' on '+gbp(inv)+' invested';
-  cell($('ov-val'),gbp(val));$('ov-valsub').textContent=rows.length+' coins · incl. ZEC';
+  const acct=renderMoney(p,prices);
+  cell($('ov-val'),gbp(acct??val));
+  $('ov-valsub').textContent=acct!=null?'whole account incl. '+gbp(Number((p.cash||{}).GBP||0))+' GBP cash':rows.length+' coins · incl. ZEC';
   $('ov-unlock').hidden=true;
   const L=['COIN','AMOUNT','AVG BUY','NOW','VALUE','P/L £','P/L %','ALLOC'];
   const body=[];
