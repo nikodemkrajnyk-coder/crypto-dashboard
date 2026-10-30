@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T07:11:42Z",
+  "updated": "2026-10-30T07:28:39Z",
   "daytrade": {
     "mode": "paper",
     "pair": "ETH-GBP",
@@ -20,34 +20,34 @@
     "max_losing_streak": 2,
     "cooldown_active": false,
     "cooldown_until": null,
-    "last_price": 1677.31,
+    "last_price": 1672.67,
     "open_tranches": [
       {
         "entry": 1756.88,
         "target": 1790.72,
         "target_kind": "resistance",
-        "unrealised_pct": -0.0453,
+        "unrealised_pct": -0.0479,
         "status": "held"
       },
       {
         "entry": 1738.85,
         "target": 1770.18,
         "target_kind": "resistance",
-        "unrealised_pct": -0.0354,
+        "unrealised_pct": -0.0381,
         "status": "held"
       },
       {
         "entry": 1720.19,
         "target": 1749.2,
         "target_kind": "resistance",
-        "unrealised_pct": -0.0249,
+        "unrealised_pct": -0.0276,
         "status": "held"
       },
       {
         "entry": 1696.98,
         "target": 1749.2,
         "target_kind": "resistance",
-        "unrealised_pct": -0.0116,
+        "unrealised_pct": -0.0143,
         "status": "held"
       }
     ],
@@ -60,7 +60,7 @@
       "10-29 20:41Z BUY @ £1,696.98 (£5.00)"
     ],
     "strategy": "Support/resistance ladder: resting maker buys at the nearest supports (swing pivots ±3 on 100 one hour candles); each £5 tranche sells just under the next resistance that clears the 1.60% fee floor — never at a loss.",
-    "levels_at": "2026-10-30T07:11:36.177805Z",
+    "levels_at": "2026-10-30T07:28:32.762657Z",
     "support": [
       {
         "price": 1669.21,
@@ -813,8 +813,8 @@
         "t": 1793343600,
         "o": 1678.03,
         "h": 1680.84,
-        "l": 1676.98,
-        "c": 1679.33
+        "l": 1672.67,
+        "c": 1672.67
       }
     ],
     "fills": [
@@ -850,10 +850,10 @@
       "ZEC-GBP"
     ],
     "prices": {
-      "BTC-GBP": 58470.5,
-      "ETH-GBP": 1677.31,
-      "LINK-GBP": 8.29273,
-      "ZEC-GBP": 941.92
+      "BTC-GBP": 58427.46,
+      "ETH-GBP": 1672.67,
+      "LINK-GBP": 8.28023,
+      "ZEC-GBP": 940.91
     },
     "price_via": {
       "ZEC-GBP": "USD"
@@ -871,24 +871,24 @@
     "earlier: 10-29 18:39Z BUY @ £1,738.85 (£5.00)",
     "earlier: 10-29 20:33Z BUY @ £1,720.19 (£5.00)",
     "earlier: 10-29 20:41Z BUY @ £1,696.98 (£5.00)",
-    "07:11Z run start · PAPER mode · scanning ETH-GBP",
-    "07:11Z streak 0/2 — trading normally",
-    "07:11Z ETH-GBP £1677.32 · support £1,669.21×1, £1,621.29×1 · resistance £1,724.29×7, £1,750.95×7, £1,771.95×5, £1,792.51×2 (swing pivots ±3 on 100 one hour candles)",
-    "07:11Z fee floor 1.60% (fees 0.50%x2 + 0.60% net) · min take-profit 1.60%",
-    "07:11Z sell watch: entry £1756.88 -> £1790.72 at resistance £1,792.51 (6.76% away)",
-    "07:11Z sell watch: entry £1738.85 -> £1770.18 at resistance £1,771.95 (5.54% away)",
-    "07:11Z sell watch: entry £1720.19 -> £1749.20 at resistance £1,750.95 (4.29% away)",
-    "07:11Z sell watch: entry £1696.98 -> £1749.20 at resistance £1,750.95 (4.29% away)",
-    "07:11Z ladder: no new buys (all 4 slots in use)",
-    "07:11Z slots 4/4 open · invested £20.00 · cash £0.00 · realized £0.00",
-    "07:11Z accumulation: live — buying on schedule",
-    "07:11Z BTC -4.75% vs 7d high · no big dip"
+    "07:28Z run start · PAPER mode · scanning ETH-GBP",
+    "07:28Z streak 0/2 — trading normally",
+    "07:28Z ETH-GBP £1672.62 · support £1,669.21×1, £1,621.29×1 · resistance £1,724.29×7, £1,750.95×7, £1,771.95×5, £1,792.51×2 (swing pivots ±3 on 100 one hour candles)",
+    "07:28Z fee floor 1.60% (fees 0.50%x2 + 0.60% net) · min take-profit 1.60%",
+    "07:28Z sell watch: entry £1756.88 -> £1790.72 at resistance £1,792.51 (7.06% away)",
+    "07:28Z sell watch: entry £1738.85 -> £1770.18 at resistance £1,771.95 (5.83% away)",
+    "07:28Z sell watch: entry £1720.19 -> £1749.20 at resistance £1,750.95 (4.58% away)",
+    "07:28Z sell watch: entry £1696.98 -> £1749.20 at resistance £1,750.95 (4.58% away)",
+    "07:28Z ladder: no new buys (all 4 slots in use)",
+    "07:28Z slots 4/4 open · invested £20.00 · cash £0.00 · realized £0.00",
+    "07:28Z accumulation: live — buying on schedule",
+    "07:28Z BTC -4.82% vs 7d high · no big dip"
   ],
   "dip_alert": {
     "level": "none",
     "coin": "BTC",
-    "drop_pct": 4.75,
+    "drop_pct": 4.82,
     "high": 61385.58,
-    "price": 58470.5
+    "price": 58427.46
   }
 }
