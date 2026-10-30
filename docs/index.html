@@ -57,13 +57,16 @@
   .ovstat b{color:var(--g)}
 
   /* day-trade chart */
-  .chart{height:clamp(300px,46vh,520px);margin-top:12px;border:1px solid #052;border-radius:5px;overflow:hidden;
+  .chart{height:clamp(440px,66vh,960px);margin-top:12px;border:1px solid #052;border-radius:5px;overflow:hidden;
          color:var(--dim);display:flex;align-items:center;justify-content:center}
   .legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:.72em;color:var(--gd);letter-spacing:.06em}
   .legend i{display:inline-block;width:1.6em;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
   .strategy{font-size:.8em;color:var(--gd);line-height:1.5;margin-top:10px;padding:8px 10px;border-left:2px solid var(--g)}
   .strategy b{color:var(--g)}
   #dt-pnl{font-size:clamp(26px,3.2vw,46px);font-weight:800}
+  @media (max-width:600px){
+    .chart{height:max(440px,68vh);margin-left:calc(-1 * clamp(12px,1.4vw,20px) + 2px);margin-right:calc(-1 * clamp(12px,1.4vw,20px) + 2px)}
+  }
   .card{border:1px solid var(--dim);border-radius:8px;padding:clamp(12px,1.4vw,20px);min-width:0;
         background:rgba(0,20,8,.6);box-shadow:0 0 18px rgba(0,255,102,.08) inset;display:flex;flex-direction:column}
   .card h2{font-size:clamp(12px,1.05vw,15px);letter-spacing:.18em;margin-bottom:12px;text-shadow:0 0 6px var(--g);
@@ -412,6 +415,7 @@ function showTab(t){
   try{localStorage.setItem('wmbot.tab',t)}catch(e){}
   if(location.hash.slice(1)!==t)history.replaceState(null,'','#'+t);
   if(t==='feed')stream.scrollTop=stream.scrollHeight;
+  if(t==='daytrade')fitChart();   // a chart sized while hidden needs refitting once visible
   if(t==='btc'&&!$('acc-form').hidden)$('acc-pass').focus();
 }
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
@@ -435,39 +439,59 @@ function renderDip(a){
 }
 
 // ---- day-trade candle chart: support / resistance / the bot's ladder (TradingView lightweight-charts) ----
-let chart=null,series=null,priceLines=[];
+var chart=null,series=null,priceLines=[],band=null,lastDT=null;   // var: showTab() may run before this line
+// focus the price axis on the visible candles plus the levels near them, so far-away
+// support/resistance can't squash the candles; levels outside that band are listed, not drawn
+const NEAR=0.025;   // a level within 2.5% of the last price stays on the chart even if candles haven't reached it
 function renderChart(t){
-  const el=$('dt-chart'),cs=t.candles||[];
+  const el=$('dt-chart'),all=t.candles||[];
+  lastDT=t;
   if(!window.LightweightCharts){el.textContent='chart library unavailable';return}
-  if(!cs.length){if(!chart)el.textContent='no candle data yet';return}
+  if(!all.length){if(!chart)el.textContent='no candle data yet';return}
   if(!chart){
     el.textContent='';
     chart=LightweightCharts.createChart(el,{autoSize:true,
-      layout:{background:{type:'solid',color:'#000a04'},textColor:'#0c4',fontFamily:'Menlo,Consolas,monospace',fontSize:11},
-      grid:{vertLines:{color:'rgba(0,102,51,.22)'},horzLines:{color:'rgba(0,102,51,.22)'}},
-      rightPriceScale:{borderColor:'#063'},timeScale:{borderColor:'#063',timeVisible:true,secondsVisible:false},
+      layout:{background:{type:'solid',color:'#000a04'},textColor:'#0c4',fontFamily:'Menlo,Consolas,monospace',fontSize:12},
+      grid:{vertLines:{color:'rgba(0,102,51,.18)'},horzLines:{color:'rgba(0,102,51,.18)'}},
+      rightPriceScale:{borderColor:'#063',scaleMargins:{top:.06,bottom:.06}},
+      timeScale:{borderColor:'#063',timeVisible:true,secondsVisible:false,rightOffset:3,minBarSpacing:4},
       crosshair:{mode:0}});
     series=chart.addCandlestickSeries({upColor:'#00ff66',downColor:'#ff4455',borderUpColor:'#00ff66',borderDownColor:'#ff4455',
-      wickUpColor:'#0c4',wickDownColor:'#c33',priceFormat:{type:'price',precision:2,minMove:.01}});
+      wickUpColor:'#0c4',wickDownColor:'#ff4455',priceFormat:{type:'price',precision:2,minMove:.01},
+      autoscaleInfoProvider:()=>band&&{priceRange:{minValue:band[0],maxValue:band[1]}}});
   }
+  const cs=all.slice(innerWidth<600?-48:-72);   // ~2-3 days of hourly candles: wide enough to read
+  const last=cs[cs.length-1].c;
+  let lo=Math.min(...cs.map(c=>c.l)),hi=Math.max(...cs.map(c=>c.h));
+  const lines=[
+    ...(t.support||[]).map(s=>({price:s.price,color:'#00ff66',style:0,title:'S×'+s.touches,w:2})),
+    ...(t.resistance||[]).map(r=>({price:r.price,color:'#ff4455',style:0,title:'R×'+r.touches,w:2})),
+    ...(t.orders||[]).map(o=>o.side==='buy'?{price:o.price,color:'#7dffb0',style:2,title:'BUY',w:2}
+                                           :{price:o.price,color:'#ffb300',style:2,title:'SELL',w:2}),
+    ...(t.open_tranches||[]).map(x=>({price:x.entry,color:'#2a8a55',style:1,title:'',w:1,noLabel:true}))];
+  for(const l of lines)if(Math.abs(l.price-last)/last<=NEAR){lo=Math.min(lo,l.price);hi=Math.max(hi,l.price)}
+  const pad=(hi-lo)*.04;band=[lo-pad,hi+pad];
   series.setData(cs.map(c=>({time:c.t,open:c.o,high:c.h,low:c.l,close:c.c})));
   priceLines.forEach(l=>series.removePriceLine(l));priceLines=[];
-  const seen=new Set();
-  const add=(price,color,style,title,width,label=true)=>{const k=title+price;if(seen.has(k))return;seen.add(k);
-    priceLines.push(series.createPriceLine({price,color,lineWidth:width||1,lineStyle:style,axisLabelVisible:label,title}))};
-  (t.support||[]).forEach(s=>add(s.price,'#00ff66',0,'S×'+s.touches,1));
-  (t.resistance||[]).forEach(r=>add(r.price,'#ff4455',0,'R×'+r.touches,1));
-  (t.open_tranches||[]).forEach(x=>add(x.entry,'#2a8a55',1,'ENTRY',1,false));
-  (t.orders||[]).forEach(o=>o.side==='buy'?add(o.price,'#7dffb0',2,'BUY LMT',2):add(o.price,'#ffb300',2,'SELL TGT',2));
+  const seen=new Set(),off=[];
+  for(const l of lines){
+    const k=l.title+l.price;if(seen.has(k))continue;seen.add(k);
+    if(l.price<band[0]||l.price>band[1]){if(l.title)off.push(l.title+' £'+Number(l.price).toFixed(0));continue}
+    priceLines.push(series.createPriceLine({price:l.price,color:l.color,lineWidth:l.w,lineStyle:l.style,
+      axisLabelVisible:!l.noLabel,title:l.title}));
+  }
   // fills as arrows on the candle they happened in
   const step=cs.length>1?cs[1].t-cs[0].t:3600,t0=cs[0].t;
   series.setMarkers((t.fills||[]).filter(f=>f.t>=t0).map(f=>({time:t0+Math.floor((f.t-t0)/step)*step,
     position:f.side==='buy'?'belowBar':'aboveBar',color:f.side==='buy'?'#00ff66':'#ffb300',
-    shape:f.side==='buy'?'arrowUp':'arrowDown',text:(f.side==='buy'?'BUY ':'SELL ')+Number(f.price).toFixed(0)}))
+    shape:f.side==='buy'?'arrowUp':'arrowDown',text:(f.side==='buy'?'B ':'S ')+Number(f.price).toFixed(0)}))
     .sort((a,b)=>a.time-b.time));
-  if(!chart._fitted){chart.timeScale().fitContent();chart._fitted=true}
-  $('dt-lvlat').textContent=t.levels_at?'levels @ '+String(t.levels_at).slice(11,16)+'Z':'';
+  fitChart();
+  $('dt-lvlat').textContent=(t.levels_at?'levels @ '+String(t.levels_at).slice(11,16)+'Z':'')
+    +(off.length?' · off-chart: '+off.join(', '):'');
 }
+function fitChart(){if(chart&&!$('tab-daytrade').hidden)requestAnimationFrame(()=>chart.timeScale().fitContent())}
+addEventListener('resize',()=>{if(lastDT)renderChart(lastDT)});   // phone rotation: re-pick the candle count
 
 // ---- data ----
 async function load(){
