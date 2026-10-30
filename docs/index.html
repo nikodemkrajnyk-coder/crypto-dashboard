@@ -162,6 +162,17 @@
   .badge{font-size:.72em;letter-spacing:.08em;padding:2px 6px;border-radius:3px;border:1px solid;text-align:center}
   .badge.recovering{color:var(--red);border-color:var(--red)} .badge.in_profit{color:var(--g);border-color:var(--g)}
   .badge.selling{color:var(--warn);border-color:var(--warn)}
+  .orow{display:grid;grid-template-columns:7.6em minmax(0,1fr) minmax(0,1.5fr) minmax(0,.8fr) minmax(0,1fr) 9.8em;gap:8px;
+        padding:6px 8px;border:1px solid #052;border-radius:4px;align-items:baseline;font-variant-numeric:tabular-nums}
+  .orow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .orow .r{text-align:right}
+  .orow.h{border:none;padding:0 8px;color:var(--gd);font-size:.78em;letter-spacing:.1em}
+  .orow.buy{border-left:3px solid #7dffb0} .orow.reserve{border-left:3px solid #4fc3ff} .orow.sell{border-left:3px solid var(--warn)}
+  .side{font-weight:800;letter-spacing:.08em} .side.buy{color:#7dffb0} .side.reserve{color:#4fc3ff} .side.sell{color:var(--warn)}
+  .badge.open{color:var(--gd);border-color:var(--dim)} .badge.filling{color:var(--warn);border-color:var(--warn)}
+  .evlog{margin-top:8px;font-size:.78em;line-height:1.6;max-height:14em;overflow:auto;border:1px solid #052;border-radius:4px;
+         padding:8px 10px;background:rgba(0,8,3,.75);font-variant-numeric:tabular-nums}
+  .evlog div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ev-placed{color:#7dffb0} .ev-cancelled{color:var(--dim)} .ev-filled{color:var(--g);font-weight:700} .ev-sold{color:var(--warn);font-weight:700}
   .lsum{margin-top:12px;font-size:.85em;letter-spacing:.08em;color:var(--gd)} .lsum b{font-size:1.25em}
   .sizing{margin-top:10px}
   @media (max-width:700px){
@@ -170,6 +181,12 @@
     .lrow.h{display:none}
     .lrow span::before{content:attr(data-l);display:block;font-size:.72em;color:var(--gd);letter-spacing:.08em}
     .lrow .r{text-align:left}
+    .orow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:4px}
+    .orow.h{display:none}
+    .orow span{white-space:normal}
+    .orow span::before{content:attr(data-l);display:block;font-size:.72em;color:var(--gd);letter-spacing:.08em}
+    .orow .r{text-align:left}
+    .evlog div{white-space:normal}
   }
   .row.h{border:none;padding:0 8px;color:var(--gd);font-size:.78em;letter-spacing:.1em}
   .row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -285,9 +302,9 @@
       <div class="legend">
         <span><i style="border-color:#00ff66;border-top-width:6px;opacity:.5"></i>RANGE BOX (24H)</span>
         <span><i style="border-color:#2a8a55;border-top-style:dashed"></i>7-DAY BAND</span>
-        <span><i style="border-color:#7dffb0;border-top-style:dashed"></i>GRID BUY</span>
-        <span><i style="border-color:#4fc3ff;border-top-style:dashed"></i>RESERVE BUY</span>
-        <span><i style="border-color:#ffb300;border-top-style:dashed"></i>LOT SELL TARGET</span>
+        <span><i style="border-color:#7dffb0;border-top-style:dashed"></i>▲ OPEN BUY (GRID)</span>
+        <span><i style="border-color:#4fc3ff;border-top-style:dashed"></i>▲ OPEN BUY (RESERVE)</span>
+        <span><i style="border-color:#ffb300;border-top-style:dashed"></i>▼ OPEN SELL (LOT TARGET)</span>
         <span><i style="border-color:#ff4455;border-top-style:dotted"></i>LOT ENTRY (RECOVERING)</span>
         <span><i style="border-color:#00ff66;border-top-style:dotted"></i>LOT ENTRY (IN PROFIT)</span><span>▲▼ FILLS</span>
         <span id="dt-lvlat"></span>
@@ -295,6 +312,10 @@
       <div class="k" style="margin-top:12px" id="dt-potlbl"></div>
       <div class="bar"><i id="dt-potbar"></i></div>
       <div class="k" style="margin-top:10px" id="dt-fees"></div>
+      <div class="lsum" id="dt-osum">OPEN ORDERS</div>
+      <div class="rows lots" id="dt-orows"></div>
+      <div class="lsum">ORDER ACTIVITY <span class="k">· placed · cancelled / repriced · filled · sold — newest first</span></div>
+      <div class="evlog" id="dt-ev"></div>
       <div class="lsum" id="dt-lsum">OPEN-LOT LEDGER</div>
       <div class="rows lots" id="dt-rows"></div>
       <div class="guard" id="dt-guard" hidden></div>
@@ -568,9 +589,9 @@ function renderChart(t){
   const ro=(t.orders||[]).filter(o=>o.tier==='reserve').map(o=>o.price).sort((a,b)=>b-a),lots=t.lots||[];
   const lines=[
     ...(rw?[{price:rw.support,color:'#2a8a55',style:2,title:'7D S',w:1},{price:rw.resistance,color:'#2a8a55',style:2,title:'7D R',w:1}]:[]),
-    ...go.map((p,i)=>({price:p,color:'#7dffb0',style:2,w:2,title:'BUY',noLabel:false})),
-    ...ro.map((p,i)=>({price:p,color:'#4fc3ff',style:2,w:2,title:'RESERVE',keep:i===0})),
-    ...lots.map((x,i)=>({price:x.target,color:'#ffb300',style:2,w:1,title:i===0?'NEXT SELL':'',noLabel:i>0})),
+    ...go.map(p=>({price:p,color:'#7dffb0',style:2,w:2,title:'▲ BUY'})),
+    ...ro.map((p,i)=>({price:p,color:'#4fc3ff',style:2,w:2,title:'▲ RESERVE',keep:i===0})),
+    ...lots.map(x=>({price:x.target,color:'#ffb300',style:2,w:2,title:'▼ SELL'})),
     ...lots.map(x=>({price:x.entry,color:x.status==='recovering'?'#ff4455':'#00ff66',style:1,title:'',w:1,noLabel:true}))];
   for(const l of lines)if(l.keep||Math.abs(l.price-last)/last<=NEAR){lo=Math.min(lo,l.price);hi=Math.max(hi,l.price)}   // the first reserve rung always shows
   const pad=(hi-lo)*.04;band=[lo-pad,hi+pad];
@@ -653,6 +674,25 @@ async function load(){
     const sb=document.createElement('b');sb.textContent='STRATEGY ';
     $('dt-strategy').replaceChildren(sb,t.strategy||'range grid');
     renderChart(t);
+    const oo=t.open_orders||[],nb=oo.filter(o=>o.side==='buy').length,ns=oo.length-nb;
+    const or=(cells,cls)=>{const r=document.createElement('div');r.className='orow'+(cls?' '+cls:'');
+      for(const [txt,c,lbl] of cells){const e=document.createElement('span');e.textContent=txt;if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
+    $('dt-osum').replaceChildren('OPEN ORDERS · ',Object.assign(document.createElement('b'),{style:'color:#7dffb0',textContent:nb}),
+      ' BUY ▲ waiting for a dip · ',Object.assign(document.createElement('b'),{style:'color:var(--warn)',textContent:ns}),' SELL ▼ waiting for a rise');
+    const kindOf=o=>o.side==='sell'?'sell':o.tier==='reserve'?'reserve':'buy';
+    $('dt-orows').replaceChildren(...(oo.length?[or([['SIDE'],['PRICE','r'],['SIZE £ / QTY','r'],['DISTANCE','r'],['PLACED','r'],['STATUS','r']],'h'),
+      ...oo.map(o=>or([[o.side==='sell'?'▼ SELL':o.tier==='reserve'?'▲ RESERVE':'▲ BUY','side '+kindOf(o),'SIDE'],
+        [pxf(o.price),'r','PRICE'],
+        [gbp(o.gbp||0)+' / '+(o.qty!=null?Number(o.qty).toFixed(6):'—')+' ETH','r','SIZE'],
+        [o.away_pct==null?'—':(o.away_pct>0?'+':'')+(o.away_pct*100).toFixed(2)+'%','r','DISTANCE'],
+        [o.placed?String(o.placed).slice(5,16).replace('T',' ')+'Z':'—','r','PLACED'],
+        [o.status==='filling'?'FILLING':'OPEN · WAITING','badge '+o.status,'STATUS']],kindOf(o)))]
+      :[or([['no open orders — the grid is paused and nothing is held','mute full']])]));
+    const ev=(t.order_events||[]).slice().reverse(),EVL={placed:'PLACED',cancelled:'CANCELLED',filled:'FILLED',sold:'SOLD'};
+    $('dt-ev').replaceChildren(...(ev.length?ev.map(e=>Object.assign(document.createElement('div'),{className:'ev-'+e.kind,
+      textContent:String(e.t).slice(11,19)+'Z  '+(EVL[e.kind]||e.kind).padEnd(9)+' '+(e.side==='sell'?'▼ SELL':'▲ BUY')
+        +(e.tier==='reserve'?' (reserve)':'')+' @ '+pxf(e.price)+' · '+gbp(e.gbp)+(e.note?' — '+e.note:'')}))
+      :[Object.assign(document.createElement('div'),{className:'mute',textContent:'no order activity yet today'})]));
     const ST={recovering:'WAITING TO RECOVER',in_profit:'IN PROFIT · TARGET SET',selling:'AT TARGET · SELLING'};
     const lr=(cells,cls)=>{const r=document.createElement('div');r.className='lrow'+(cls?' '+cls:'');
       for(const [txt,c,lbl] of cells){const e=document.createElement('span');e.textContent=txt;if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
