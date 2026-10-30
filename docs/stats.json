@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T10:30:04Z",
+  "updated": "2026-10-30T10:47:12Z",
   "daytrade": {
     "mode": "paper",
     "strategy_kind": "grid",
@@ -34,14 +34,14 @@
     "realized_pnl_gbp": 0.0,
     "gross_pnl_gbp": 0,
     "net_pnl_after_fees": 0,
-    "unrealised_gbp": -0.81,
+    "unrealised_gbp": -0.6997,
     "fee_rate": 0.005,
     "effective_tp": 0.016,
     "losing_streak": 0,
     "max_losing_streak": 2,
     "cooldown_active": false,
     "cooldown_until": null,
-    "last_price": 1657.95,
+    "last_price": 1667.5,
     "regime": "drift",
     "regime_raw": "drift",
     "regime_why": "only 1 swing across the band in 96 candles (need 2) — no clear oscillation",
@@ -95,13 +95,13 @@
         "qty": 0.00294641,
         "entry": 1696.98,
         "gbp": 5.0,
-        "value": 4.885,
-        "unrealised_gbp": -0.115,
-        "unrealised_pct": -0.023,
+        "value": 4.9131,
+        "unrealised_gbp": -0.0869,
+        "unrealised_pct": -0.0174,
         "target": 1724.27,
-        "to_target_pct": 0.04,
+        "to_target_pct": 0.034,
         "opened": "2026-10-29T20:41:37.117332Z",
-        "held_minutes": 828,
+        "held_minutes": 845,
         "tier": "legacy",
         "status": "recovering"
       },
@@ -110,13 +110,13 @@
         "qty": 0.00290665,
         "entry": 1720.19,
         "gbp": 5.0,
-        "value": 4.8191,
-        "unrealised_gbp": -0.1809,
-        "unrealised_pct": -0.0362,
+        "value": 4.8468,
+        "unrealised_gbp": -0.1532,
+        "unrealised_pct": -0.0306,
         "target": 1747.86,
-        "to_target_pct": 0.0542,
+        "to_target_pct": 0.0482,
         "opened": "2026-10-29T20:33:08.832947Z",
-        "held_minutes": 836,
+        "held_minutes": 854,
         "tier": "legacy",
         "status": "recovering"
       },
@@ -125,13 +125,13 @@
         "qty": 0.00287546,
         "entry": 1738.85,
         "gbp": 5.0,
-        "value": 4.7674,
-        "unrealised_gbp": -0.2326,
-        "unrealised_pct": -0.0465,
+        "value": 4.7948,
+        "unrealised_gbp": -0.2052,
+        "unrealised_pct": -0.041,
         "target": 1766.82,
-        "to_target_pct": 0.0657,
+        "to_target_pct": 0.0596,
         "opened": "2026-10-29T18:39:40.544959Z",
-        "held_minutes": 950,
+        "held_minutes": 967,
         "tier": "legacy",
         "status": "recovering"
       },
@@ -140,17 +140,60 @@
         "qty": 0.00284595,
         "entry": 1756.88,
         "gbp": 5.0,
-        "value": 4.7184,
-        "unrealised_gbp": -0.2815,
-        "unrealised_pct": -0.0563,
+        "value": 4.7456,
+        "unrealised_gbp": -0.2544,
+        "unrealised_pct": -0.0509,
         "target": 1785.14,
-        "to_target_pct": 0.0767,
+        "to_target_pct": 0.0705,
         "opened": "2026-10-29T17:02:30.888475Z",
-        "held_minutes": 1047,
+        "held_minutes": 1064,
         "tier": "legacy",
         "status": "recovering"
       }
     ],
+    "projection": {
+      "label": "POTENTIAL — an estimate if the range behaves, not a promise",
+      "lot_gbp": 6.25,
+      "rungs": 2,
+      "net_per_round_trip": 0.0375,
+      "swings_24h": 1,
+      "ranging": false,
+      "base_round_trips_week": 0,
+      "base_potential_week": 0.0,
+      "scenarios": [
+        {
+          "per_day": 1,
+          "round_trips": 7,
+          "potential": 0.26
+        },
+        {
+          "per_day": 3,
+          "round_trips": 21,
+          "potential": 0.79
+        },
+        {
+          "per_day": 5,
+          "round_trips": 35,
+          "potential": 1.31
+        }
+      ],
+      "assumptions": [
+        "price keeps oscillating in the detected range all week (it is NOT now: grid paused)",
+        "each swing across the band completes one round trip per grid rung (2 rungs of ~£6.25)",
+        "swings continue at the last 24h rate (1/day)",
+        "every round trip nets +0.60% of its lot after 0.50% fees each way",
+        "lots bought before a breakdown can wait days or weeks to recover — they earn nothing meanwhile"
+      ]
+    },
+    "plan_vs_actual": {
+      "week_start": "2026-10-26T00:00:00Z",
+      "planned_round_trips_so_far": 0.0,
+      "actual_round_trips": 0,
+      "planned_potential_so_far": 0.0,
+      "actual_net": 0,
+      "status": "STANDING ASIDE — no oscillating range, so no round trips are planned",
+      "basis": "planned = the base estimate above, pro rata for the week so far (at the current swing rate)"
+    },
     "open_orders": [
       {
         "side": "buy",
@@ -159,7 +202,7 @@
         "qty": 0.00364664,
         "tier": "reserve",
         "placed": "2026-10-30T09:51:59.332940Z",
-        "away_pct": -0.0357,
+        "away_pct": -0.0412,
         "status": "open"
       },
       {
@@ -169,7 +212,7 @@
         "qty": 0.00372105,
         "tier": "reserve",
         "placed": "2026-10-30T09:51:59.332940Z",
-        "away_pct": -0.055,
+        "away_pct": -0.0604,
         "status": "open"
       },
       {
@@ -179,7 +222,7 @@
         "qty": 0.00379701,
         "tier": "reserve",
         "placed": "2026-10-30T09:51:59.332940Z",
-        "away_pct": -0.0739,
+        "away_pct": -0.0792,
         "status": "open"
       },
       {
@@ -190,7 +233,7 @@
         "tier": "legacy",
         "placed": "2026-10-29T20:41:37.117332Z",
         "entry": 1696.98,
-        "away_pct": 0.04,
+        "away_pct": 0.034,
         "status": "open"
       },
       {
@@ -201,7 +244,7 @@
         "tier": "legacy",
         "placed": "2026-10-29T20:33:08.832947Z",
         "entry": 1720.19,
-        "away_pct": 0.0542,
+        "away_pct": 0.0482,
         "status": "open"
       },
       {
@@ -212,7 +255,7 @@
         "tier": "legacy",
         "placed": "2026-10-29T18:39:40.544959Z",
         "entry": 1738.85,
-        "away_pct": 0.0657,
+        "away_pct": 0.0596,
         "status": "open"
       },
       {
@@ -223,7 +266,7 @@
         "tier": "legacy",
         "placed": "2026-10-29T17:02:30.888475Z",
         "entry": 1756.88,
-        "away_pct": 0.0767,
+        "away_pct": 0.0705,
         "status": "open"
       }
     ],
@@ -234,7 +277,7 @@
       "cancelled": 17,
       "placed": 20
     },
-    "levels_at": "2026-10-30T10:29:55.021982Z",
+    "levels_at": "2026-10-30T10:46:55.929991Z",
     "journal": [
       "10-29 17:02Z BUY @ £1,756.88 (£5.00)",
       "10-29 18:39Z BUY @ £1,738.85 (£5.00)",
@@ -245,13 +288,6 @@
     ],
     "strategy": "Range grid, only in a genuine oscillating range (fast bounces): rungs 1.60% apart from just under the price down to the 24h support, clustered toward support, using 65% of the £50 pot; the other 35% is a reserve of deep-discount buys under support. Every fill is a lot (coin, buy price, quantity) with its own sell at +1.60% — only lots that hit their own target sell, the rest ride; a lot is never sold below its buy price, it waits to recover. No stop-loss. Trend / breakout / drift: grid withdrawn, lots held.",
     "candles": [
-      {
-        "t": 1793270700,
-        "o": 1743.46,
-        "h": 1747.35,
-        "l": 1743.46,
-        "c": 1746.15
-      },
       {
         "t": 1793271600,
         "o": 1746.21,
@@ -909,6 +945,20 @@
         "h": 1659.98,
         "l": 1651.09,
         "c": 1658.25
+      },
+      {
+        "t": 1793356200,
+        "o": 1657.94,
+        "h": 1672.2,
+        "l": 1657.94,
+        "c": 1671.3
+      },
+      {
+        "t": 1793357100,
+        "o": 1668.81,
+        "h": 1668.81,
+        "l": 1666.53,
+        "c": 1666.53
       }
     ],
     "fills": [
@@ -944,11 +994,12 @@
       "ZEC-GBP"
     ],
     "prices": {
-      "BTC-GBP": 57545.48,
-      "ETH-GBP": 1657.95,
-      "LINK-GBP": 8.19722,
-      "ZEC-GBP": 940.42,
-      "USDC-GBP": 0.7444
+      "BTC-GBP": 57701.18,
+      "ETH-GBP": 1667.5,
+      "LINK-GBP": 8.2215,
+      "ZEC-GBP": 940.21,
+      "ZEC-USDC": 1262.7,
+      "USDC-GBP": 0.7446
     },
     "price_via": {
       "ZEC-GBP": "USD"
@@ -957,9 +1008,9 @@
       "v": 1,
       "kdf": "PBKDF2-SHA256/AES-256-GCM",
       "iter": 600000,
-      "salt": "Yp+B5RfQR8grjYsporPCnw==",
-      "iv": "3WrPq/0K9MXNPTpj",
-      "ct": "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"
+      "salt": "WUhYtoyuALQvBdjvbL0Eyg==",
+      "iv": "g7ET5yZMmi7/8AZ6",
+      "ct": "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"
     }
   },
   "thoughts": [
@@ -969,18 +1020,18 @@
     "earlier: 10-29 20:41Z BUY @ £1,696.98 (£5.00)",
     "earlier: 10-30 09:39Z MIGRATE",
     "earlier: 10-30 09:52Z GRID PAUSED",
-    "10:29Z ETH-GBP £1657.15 · range £1,631.36–£1,761.61 (7.68%) · 7d £1,645.25–£1,798.72",
-    "10:29Z regime DRIFT: only 1 swing across the band in 96 candles (need 2) — no clear oscillation · grid PAUSED (drift)",
-    "10:29Z step 1.60% (fee floor 1.60%) · lot targets +1.60% · grid £20.00/£32.50 · reserve £0.00/£17.50 · 3 buys resting · 4 lots (4 waiting to recover) · realized £0.0000",
-    "10:29Z next sell: ETH lot @ £1696.98 -> £1724.27 (4.05% away)",
-    "10:30Z accumulation: live — buying on schedule",
-    "10:30Z BTC -6.26% vs 7d high · no big dip"
+    "10:46Z ETH-GBP £1666.53 · range £1,631.36–£1,761.61 (7.68%) · 7d £1,645.25–£1,798.72",
+    "10:46Z regime DRIFT: only 1 swing across the band in 96 candles (need 2) — no clear oscillation · grid PAUSED (drift)",
+    "10:46Z step 1.60% (fee floor 1.60%) · lot targets +1.60% · grid £20.00/£32.50 · reserve £0.00/£17.50 · 3 buys resting · 4 lots (4 waiting to recover) · realized £0.0000",
+    "10:46Z next sell: ETH lot @ £1696.98 -> £1724.27 (3.46% away)",
+    "10:47Z accumulation: live — buying on schedule",
+    "10:47Z BTC -6.00% vs 7d high · no big dip"
   ],
   "dip_alert": {
     "level": "none",
     "coin": "BTC",
-    "drop_pct": 6.26,
+    "drop_pct": 6.0,
     "high": 61385.58,
-    "price": 57545.48
+    "price": 57701.18
   }
 }
