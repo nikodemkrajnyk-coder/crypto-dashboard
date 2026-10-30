@@ -266,7 +266,7 @@
         <button class="linkbtn" id="ov-unlock" data-goto="btc" type="button">UNLOCK →</button></div>
       <div class="cell key"><div class="k">ACCUMULATION P/L</div><div class="v" id="ov-pl">🔒</div><div class="sub" id="ov-plsub">encrypted</div></div>
       <div class="cell"><div class="k">PORTFOLIO VALUE</div><div class="v" id="ov-val">🔒</div><div class="sub" id="ov-valsub">encrypted</div></div>
-      <div class="cell key"><div class="k">DAY-TRADE NET (PAPER)</div><div class="v" id="ov-dt">£—</div><div class="sub" id="ov-dtsub">—</div></div>
+      <div class="cell key"><div class="k">DAY-TRADE NET (PAPER)</div><div class="v" id="ov-dt">$—</div><div class="sub" id="ov-dtsub">—</div></div>
       <div class="cell"><div class="k">BTC PRICE</div><div class="v" id="ov-btcpx">£—</div><div class="sub" id="ov-btcdrop">—</div></div>
     </div>
     <div class="card"><h2>SYSTEM STATUS</h2><div class="ovstat" id="ov-status">syncing…</div></div>
@@ -343,12 +343,12 @@
 
   <section class="panel" id="tab-daytrade" role="tabpanel" hidden>
     <div class="card" id="dt">
-      <h2>DAY-TRADE LAYERS // <span id="dt-pair">ETH-GBP</span> <span class="tag" id="dt-mode">PAPER</span></h2>
+      <h2>DAY-TRADE LAYERS // <span id="dt-pair">ETH-USDC</span> <span class="tag" id="dt-mode">PAPER</span></h2>
       <div class="dthero">
-        <div class="cell"><div class="k">REALIZED PROFIT (NET OF FEES)</div><div class="v" id="dt-pnl">£—</div><div class="sub" id="dt-pnlsub">—</div></div>
+        <div class="cell"><div class="k">REALIZED PROFIT (NET OF FEES)</div><div class="v" id="dt-pnl">$—</div><div class="sub" id="dt-pnlsub">—</div></div>
         <div class="cell"><div class="k">OPEN LOTS (INVENTORY)</div><div class="v" id="dt-lots">—</div><div class="sub" id="dt-lotsub">—</div></div>
         <div class="cell"><div class="k">BUYS RESTING</div><div class="v" id="dt-orders">—</div><div class="sub" id="dt-gridsub">—</div></div>
-        <div class="cell"><div class="k">ETH PRICE</div><div class="v" id="dt-price">£—</div><div class="sub" id="dt-unreal">—</div></div>
+        <div class="cell"><div class="k">ETH PRICE</div><div class="v" id="dt-price">$—</div><div class="sub" id="dt-unreal">—</div></div>
       </div>
       <div class="regime" id="dt-regime">—</div>
       <div class="bookbar" id="dt-book">BOOK —</div>
@@ -400,6 +400,11 @@ const dur=m=>m<60?m+'m':m<2880?Math.floor(m/60)+'h '+(m%60)+'m':Math.floor(m/144
 const pctf=n=>n==null?'—':(n>0?'+':'')+(n*100).toFixed(2)+'%';
 const pcls=n=>n==null?'mute':n>0?'up':n<0?'dn':'';
 const pxf=n=>n==null?'—':'£'+Number(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:n<100?5:2});
+// the day-trade sleeve is in its pair's quote currency (ETH-USDC: $), set from stats.daytrade.currency
+let DC='$';
+const dq=n=>(n<0?'-':'')+DC+Math.abs(Number(n)).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const dq4=n=>Math.abs(Number(n))<10?(n<0?'-':'')+DC+Math.abs(Number(n)).toFixed(4):dq(n);
+const dpx=n=>n==null?'—':DC+Number(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:n<100?5:2});
 function row(cells,cls){const r=document.createElement('div');r.className='row'+(cls?' '+cls:'');
   for(const [t,c] of cells){const s=document.createElement('span');s.textContent=t;if(c)s.className=c;r.append(s)}return r}
 
@@ -764,12 +769,12 @@ function renderChart(t){
   priceLines.forEach(l=>series.removePriceLine(l));priceLines=[];
   let offN=0;const off=[];
   for(const l of lines){
-    if(l.price<band[0]||l.price>band[1]){if(l.title)off.push(l.title+' £'+Number(l.price).toFixed(0));else offN++;continue}
+    if(l.price<band[0]||l.price>band[1]){if(l.title)off.push(l.title+' '+DC+Number(l.price).toFixed(0));else offN++;continue}
     priceLines.push(series.createPriceLine({price:l.price,color:l.color,lineWidth:l.w,lineStyle:l.style,
       axisLabelVisible:!l.noLabel,title:l.title}));
   }
-  if(ri){rbox.querySelector('.rt').textContent='RESISTANCE £'+ri.resistance.toFixed(2)+(ri.resistance_touches?' ×'+ri.resistance_touches:'');
-         rbox.querySelector('.rb').textContent='SUPPORT £'+ri.support.toFixed(2)+(ri.support_touches?' ×'+ri.support_touches:'')}
+  if(ri){rbox.querySelector('.rt').textContent='RESISTANCE '+DC+ri.resistance.toFixed(2)+(ri.resistance_touches?' ×'+ri.resistance_touches:'');
+         rbox.querySelector('.rb').textContent='SUPPORT '+DC+ri.support.toFixed(2)+(ri.support_touches?' ×'+ri.support_touches:'')}
   // fills as arrows on the candle they happened in
   const step=cs.length>1?cs[1].t-cs[0].t:900,t0=cs[0].t;
   series.setMarkers((t.fills||[]).filter(f=>f.t>=t0).map(f=>({time:t0+Math.floor((f.t-t0)/step)*step,
@@ -800,20 +805,21 @@ async function load(){
     renderAcc(a);
     // daytrade
     const t=d.daytrade||{};
+    DC=t.currency||'$';
     $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
     const net=t.net_pnl_after_fees??t.realized_pnl_gbp??0;
-    cell($('dt-pnl'),gbp4(net),net<0?'neg':'pos');
-    $('dt-pnlsub').textContent='TODAY '+gbp4(t.net_today||0)+' · '+(t.buys_today||0)+' bought · '+(t.trades_today||0)+' sold · '+(t.trades||0)+' sold all-time';
+    cell($('dt-pnl'),dq4(net),net<0?'neg':'pos');
+    $('dt-pnlsub').textContent='TODAY '+dq4(t.net_today||0)+' · '+(t.buys_today||0)+' bought · '+(t.trades_today||0)+' sold · '+(t.trades||0)+' sold all-time';
     const lots=t.lots||[];
     $('dt-lots').textContent=t.lots_open??lots.length;
     $('dt-lotsub').textContent=(t.lots_recovering||0)+' waiting to recover · '+(t.lots_in_profit||0)+' in profit · '
-      +gbp(t.invested_gbp||0)+' cost';
+      +dq(t.invested_gbp||0)+' cost';
     $('dt-orders').textContent=t.orders_resting??0;
     const LY=t.layers||[];
     $('dt-gridsub').textContent=LY.filter(g=>g.orders.length).map(g=>g.orders.length+' '+g.label.toLowerCase()).join(' · ')||'no buys resting';
-    $('dt-pair').textContent=t.pair||'ETH-GBP';
-    $('dt-price').textContent=t.last_price?pxf(t.last_price):'£—';
-    $('dt-unreal').textContent=t.unrealised_gbp!=null?'open lots '+(t.unrealised_gbp>=0?'+':'')+gbp4(t.unrealised_gbp)+' unrealised (not sold)':'—';
+    $('dt-pair').textContent=t.pair||'ETH-USDC';
+    $('dt-price').textContent=t.last_price?dpx(t.last_price):DC+'—';
+    $('dt-unreal').textContent=t.unrealised_gbp!=null?'open lots '+(t.unrealised_gbp>=0?'+':'')+dq4(t.unrealised_gbp)+' unrealised (not sold)':'—';
     const rg=$('dt-regime'),ranging=gridOn(t)&&!t.cooldown_active;
     rg.className='regime'+(ranging?'':' paused');
     rg.replaceChildren(ranging?'▣ ALL LAYERS BUYING · '+LY.filter(g=>g.timeframes).map(g=>g.label+' '+g.timeframes.join('/')).join(' · ')
@@ -822,9 +828,9 @@ async function load(){
     const bk=t.book,bkEl=$('dt-book'),mk=(tag,props)=>Object.assign(document.createElement(tag),props);
     if(bk){
       const bw=(bk.bid_walls||[])[0],aw=(bk.ask_walls||[])[0];
-      bkEl.replaceChildren('BOOK · BID WALL ',mk('b',{className:'up',textContent:bw?pxf(bw.price)+' ('+Number(bw.size).toFixed(1)+' ETH)':'—'}),
-        ' · ASK WALL ',mk('b',{className:'dn',textContent:aw?pxf(aw.price)+' ('+Number(aw.size).toFixed(1)+' ETH)':'—'}),
-        ' · SPREAD '+pxf(bk.spread)+' · PRESSURE ',mk('b',{className:bk.lean,textContent:(bk.pressure>=0?'+':'')+Number(bk.pressure).toFixed(2)+' '+String(bk.lean).toUpperCase()}));
+      bkEl.replaceChildren('BOOK · BID WALL ',mk('b',{className:'up',textContent:bw?dpx(bw.price)+' ('+Number(bw.size).toFixed(1)+' ETH)':'—'}),
+        ' · ASK WALL ',mk('b',{className:'dn',textContent:aw?dpx(aw.price)+' ('+Number(aw.size).toFixed(1)+' ETH)':'—'}),
+        ' · SPREAD '+dpx(bk.spread)+' · PRESSURE ',mk('b',{className:bk.lean,textContent:(bk.pressure>=0?'+':'')+Number(bk.pressure).toFixed(2)+' '+String(bk.lean).toUpperCase()}));
     }else bkEl.textContent='BOOK — not read yet';
     const ly=(cells,cls)=>{const r=mk('div',{className:'lyrow'+(cls?' '+cls:'')});
       for(const [txt,c,lbl] of cells){const e=mk('span',{textContent:txt});if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
@@ -832,16 +838,16 @@ async function load(){
       b:a.b+g.orders.length,l:a.l+g.lots.length,bt:a.bt+g.bought_today,st:a.st+g.sold_today}),{lots:0,rest:0,b:0,l:0,bt:0,st:0});
     $('dt-layers').replaceChildren(ly([['LAYER'],['ZONE (SUPPORT–RES.)'],['STEP / TP','r'],['IN LOTS + RESTING / CAP','r'],['BUYS','r'],['LOTS','r'],['TODAY B/S','r'],['REALIZED','r']],'h'),
       ...LY.map(g=>ly([[g.label+(g.timeframes?' '+g.timeframes.join('/'):''),'','LAYER'],
-        [g.support?pxf(g.support)+(g.resistance?'–'+pxf(g.resistance):''):'—','','ZONE'],
+        [g.support?dpx(g.support)+(g.resistance?'–'+dpx(g.resistance):''):'—','','ZONE'],
         [g.step_pct!=null?pc(g.step_pct)+' / +'+pc(g.take_profit_pct):'+'+pc(g.take_profit_pct),'r','STEP / TP'],
-        [gbp(g.in_lots_gbp)+' + '+gbp(g.resting_gbp)+(g.cap_gbp!=null?' / '+gbp(g.cap_gbp):''),'r','£ WORKING'],
+        [dq(g.in_lots_gbp)+' + '+dq(g.resting_gbp)+(g.cap_gbp!=null?' / '+dq(g.cap_gbp):''),'r',DC+' WORKING'],
         [g.orders.length+(g.max_rungs?'/'+g.max_rungs:''),'r','BUYS'],[String(g.lots.length),'r','LOTS'],
-        [g.bought_today+' / '+g.sold_today,'r','TODAY B/S'],[gbp4(g.realized_gbp),'r '+(g.realized_gbp>0?'up':''),'REALIZED']],'L-'+g.name)),
-      ly([['TOTAL'],['pot '+gbp(t.pot_gbp||50)],['','r'],[gbp(tot.lots)+' + '+gbp(tot.rest),'r','£ WORKING'],[String(tot.b),'r','BUYS'],
-        [String(tot.l),'r','LOTS'],[tot.bt+' / '+tot.st,'r','TODAY B/S'],[gbp4(LY.reduce((a,g)=>a+g.realized_gbp,0)),'r up','REALIZED']],'tot'));
+        [g.bought_today+' / '+g.sold_today,'r','TODAY B/S'],[dq4(g.realized_gbp),'r '+(g.realized_gbp>0?'up':''),'REALIZED']],'L-'+g.name)),
+      ly([['TOTAL'],['pot '+dq(t.pot_gbp||50)],['','r'],[dq(tot.lots)+' + '+dq(tot.rest),'r',DC+' WORKING'],[String(tot.b),'r','BUYS'],
+        [String(tot.l),'r','LOTS'],[tot.bt+' / '+tot.st,'r','TODAY B/S'],[dq4(LY.reduce((a,g)=>a+g.realized_gbp,0)),'r up','REALIZED']],'tot'));
     const dep=(t.invested_gbp||0),pot=(t.pot_gbp||50),pct=Math.min(100,Math.round(dep/pot*100));
     $('dt-potbar').style.width=pct+'%';
-    $('dt-potlbl').textContent='POT '+gbp(pot)+' · IN LOTS '+gbp(dep)+' · CASH '+gbp(t.cash_gbp??pot-dep)
+    $('dt-potlbl').textContent='POT '+dq(pot)+' · IN LOTS '+dq(dep)+' · CASH '+dq(t.cash_gbp??pot-dep)
       +(t.median_time_to_profit_min!=null?' · MEDIAN TIME-TO-PROFIT '+dur(t.median_time_to_profit_min):'');
     const p2=n=>(Number(n)*100).toFixed(2)+'%';
     const gs=t.grid_stats;
@@ -852,15 +858,15 @@ async function load(){
       const el=$('dt-proj');
       const good=pa&&/ON TRACK|AHEAD/.test(pa.status),aside=pa&&/STANDING|EARLY/.test(pa.status);
       const sc=mk('div',{className:'scen'});
-      for(const x of pj.scenarios)sc.append(mk('span',{textContent:x.per_day+'/day each → '+gbp(x.potential)}));
+      for(const x of pj.scenarios)sc.append(mk('span',{textContent:x.per_day+'/day each → '+dq(x.potential)}));
       el.replaceChildren(mk('div',{className:'k',innerHTML:'POTENTIAL THIS WEEK · <b>estimate, not a promise</b>'}),
-        mk('div',{className:'projv',textContent:pj.ranging?gbp(pj.base_potential_week):'£0.00'}),
+        mk('div',{className:'projv',textContent:pj.ranging?dq(pj.base_potential_week):dq(0)}),
         mk('div',{className:'k',textContent:(pj.ranging?'≈'+pj.round_trips_per_day+' round trips/day · ':'buys paused · ')
-          +LY.filter(g=>g.potential_week!=null).map(g=>g.label+' '+gbp(g.potential_week)).join(' · ')}),sc,
+          +LY.filter(g=>g.potential_week!=null).map(g=>g.label+' '+dq(g.potential_week)).join(' · ')}),sc,
         pa?mk('div',{style:'margin-top:8px;font-size:.85em'}):'');
       if(pa)el.lastChild.append(mk('span',{className:'pva '+(good?'ok':aside?'mute':'bad'),
         textContent:'PLAN vs ACTUAL: '+pa.status}),
-        ' '+pa.actual_round_trips+' / '+pa.planned_round_trips_so_far+' round trips · '+gbp4(pa.actual_net));
+        ' '+pa.actual_round_trips+' / '+pa.planned_round_trips_so_far+' round trips · '+dq4(pa.actual_net));
     }
 
     renderChart(t);
@@ -874,26 +880,26 @@ async function load(){
       const b=mk('div',{className:'lblock L-'+g.name});
       b.append(mk('h3',{textContent:g.label+(g.timeframes?' · '+g.timeframes.join('/'):'')+' '}),
         mk('div',{className:'k',textContent:g.orders.length+' BUYS · '+g.lots.length+' LOTS ('+g.lots_recovering+' recovering) · '
-          +gbp(g.in_lots_gbp)+' in lots · REALIZED '+gbp4(g.realized_gbp)+' · '+g.sold+' sold'+(g.lots.length?' · UNREALISED '+gbp4(g.unrealised_gbp):'')}));
-      b.firstChild.append(mk('small',{textContent:g.support?'zone '+pxf(g.support)+(g.resistance?'–'+pxf(g.resistance):'')
+          +dq(g.in_lots_gbp)+' in lots · REALIZED '+dq4(g.realized_gbp)+' · '+g.sold+' sold'+(g.lots.length?' · UNREALISED '+dq4(g.unrealised_gbp):'')}));
+      b.firstChild.append(mk('small',{textContent:g.support?'zone '+dpx(g.support)+(g.resistance?'–'+dpx(g.resistance):'')
         +(g.swings_per_day!=null?' · '+g.swings_per_day+' swings/day':''):''}));
       if(g.orders.length){const r=mk('div',{className:'rows lots'});b.append(r);
-        r.append(or([['BUY'],['PRICE','r'],['£ / QTY','r'],['AWAY','r'],['PLACED','r'],['BOOK','r']],'h'),
-        ...g.orders.map(o=>or([['▲ BUY '+LTR(g.name),'side buy','SIDE'],[pxf(o.price),'r','PRICE'],
-          [gbp(o.gbp||0)+' / '+(o.qty!=null?Number(o.qty).toFixed(6):'—'),'r','£ / QTY'],[away(o.away_pct),'r','AWAY'],
-          [o.placed?String(o.placed).slice(11,16)+'Z':'—','r','PLACED'],[o.wall?'above wall '+pxf(o.wall):'candle level','r k','BOOK']],'buy '+g.name)))}
+        r.append(or([['BUY'],['PRICE','r'],[DC+' / QTY','r'],['AWAY','r'],['PLACED','r'],['BOOK','r']],'h'),
+        ...g.orders.map(o=>or([['▲ BUY '+LTR(g.name),'side buy','SIDE'],[dpx(o.price),'r','PRICE'],
+          [dq(o.gbp||0)+' / '+(o.qty!=null?Number(o.qty).toFixed(6):'—'),'r',DC+' / QTY'],[away(o.away_pct),'r','AWAY'],
+          [o.placed?String(o.placed).slice(11,16)+'Z':'—','r','PLACED'],[o.wall?'above wall '+dpx(o.wall):'candle level','r k','BOOK']],'buy '+g.name)))}
       if(g.lots.length){const r=mk('div',{className:'rows lots'});b.append(r);
         r.append(lr([['LOT · QTY'],['ENTRY','r'],['UNREALISED','r'],['SELL TARGET','r'],['AGE','r'],['STATUS','r']],'h'),
-        ...g.lots.map(x=>lr([[Number(x.qty).toFixed(6)+' ETH · '+gbp(x.gbp),'','LOT'],[pxf(x.entry),'r','ENTRY'],
-          [x.unrealised_gbp!=null?(x.unrealised_gbp>=0?'+':'')+gbp4(x.unrealised_gbp)+' '+pctf(x.unrealised_pct):'—','r '+pcls(x.unrealised_pct),'UNREALISED'],
-          [pxf(x.target)+' ('+away(x.to_target_pct)+')'+(x.ask_wall?' · under ask wall':''),'r','TARGET'],
+        ...g.lots.map(x=>lr([[Number(x.qty).toFixed(6)+' ETH · '+dq(x.gbp),'','LOT'],[dpx(x.entry),'r','ENTRY'],
+          [x.unrealised_gbp!=null?(x.unrealised_gbp>=0?'+':'')+dq4(x.unrealised_gbp)+' '+pctf(x.unrealised_pct):'—','r '+pcls(x.unrealised_pct),'UNREALISED'],
+          [dpx(x.target)+' ('+away(x.to_target_pct)+')'+(x.ask_wall?' · under ask wall':''),'r','TARGET'],
           [x.held_minutes!=null?dur(x.held_minutes):'—','r','AGE'],[ST[x.status]||'—','badge '+(x.status||''),'STATUS']],x.status)))}
       if(!g.orders.length&&!g.lots.length)b.append(mk('div',{className:'k mute',textContent:'nothing resting or held'}));
       return b}));
     const ev=(t.order_events||[]).slice().reverse(),EVL={placed:'PLACED',cancelled:'CANCELLED',filled:'FILLED',sold:'SOLD'};
     $('dt-ev').replaceChildren(...(ev.length?ev.map(e=>Object.assign(document.createElement('div'),{className:'ev-'+e.kind,
       textContent:String(e.t).slice(11,19)+'Z  '+(EVL[e.kind]||e.kind).padEnd(9)+' '+(e.side==='sell'?'▼ SELL':'▲ BUY')
-        +' '+LTR(e.tier)+' @ '+pxf(e.price)+' · '+gbp(e.gbp)+(e.note?' — '+e.note:'')}))
+        +' '+LTR(e.tier)+' @ '+dpx(e.price)+' · '+dq(e.gbp)+(e.note?' — '+e.note:'')}))
       :[Object.assign(document.createElement('div'),{className:'mute',textContent:'no order activity yet today'})]));
 
     const g=$('dt-guard');
@@ -905,12 +911,12 @@ async function load(){
     }
     $('dt-log').replaceChildren(...(t.journal&&t.journal.length?t.journal:['no trades yet']).slice(-8)
       .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
-    cell($('ov-dt'),gbp4(net),net<0?'neg':'pos');
+    cell($('ov-dt'),dq4(net),net<0?'neg':'pos');
     $('ov-dtsub').textContent=(t.trades?t.trades+' lots sold':'no lots sold yet')+' · '+(t.lots_open||0)+' waiting · '
       +(t.orders_resting||0)+' buys resting · '+(gridOn(t)?'layers buying':'paused');
     renderDip(d.dip_alert);
     const st=[['ACCUMULATION',(a.mode||'offline').toUpperCase()+' — '+(a.status||'')],
-      ['DAY-TRADE',(t.mode||'paper').toUpperCase()+' · '+(t.pair||'ETH-GBP')+' '+(t.last_price?pxf(t.last_price):'')
+      ['DAY-TRADE',(t.mode||'paper').toUpperCase()+' · '+(t.pair||'ETH-USDC')+' '+(t.last_price?dpx(t.last_price):'')
         +' · LAYERS '+(gridOn(t)?'BUYING':'PAUSED (crash guard)')
         +(t.cooldown_active?' · COOLDOWN':'')+' · ticks every 30s'],
       ['DIP ALERT',d.dip_alert?d.dip_alert.level.toUpperCase()+' (warn ≥7%, strong ≥12% below 7-day high)':'unavailable'],
