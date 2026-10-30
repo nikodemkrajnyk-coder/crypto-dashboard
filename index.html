@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WMBOT">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>WMBOT // crypto</title>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"
+        integrity="sha384-JZigAjwiaZtkUbA44CWkPaT3iBb/mU5pO6QOANp+OqHd4q+1+7MG1kzp2OOP9ZfP" crossorigin="anonymous"></script>
+<style>
+  :root{ --g:#00ff66; --gd:#0c4; --dim:#063; --bg:#000; --warn:#ffb300; --red:#ff4455;
+         --pad:clamp(10px,2.2vw,28px); --gap:clamp(10px,1.6vw,20px); }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%;background:var(--bg)}
+  body{color:var(--g);font-family:"SFMono-Regular",Menlo,Consolas,monospace;overflow-x:hidden;
+       -webkit-font-smoothing:none;font-size:clamp(13px,1.15vw,17px)}
+  canvas#rain{position:fixed;inset:0;z-index:0;opacity:.28;width:100vw;height:100vh}
+
+  /* full-bleed shell: fills the viewport (incl. MacBook widths), caps at 1600px only on big external monitors */
+  .wrap{position:relative;z-index:1;width:100%;max-width:1600px;margin:0 auto;min-height:100vh;min-height:100dvh;
+        padding:calc(var(--pad) + env(safe-area-inset-top)) calc(var(--pad) + env(safe-area-inset-right))
+                calc(var(--pad) + env(safe-area-inset-bottom)) calc(var(--pad) + env(safe-area-inset-left));
+        display:flex;flex-direction:column;gap:var(--gap)}
+  .hdr{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px 16px;
+       border-bottom:1px solid var(--dim);padding-bottom:10px}
+  .hdr h1{font-size:clamp(17px,2.2vw,30px);letter-spacing:.2em;text-shadow:0 0 10px var(--g)}
+  .hdr .t{font-size:clamp(11px,1vw,14px);color:var(--gd)}
+  .blink{animation:b 1.1s steps(2) infinite}@keyframes b{50%{opacity:0}}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--dim);padding-bottom:8px}
+  .tabs button{font-size:clamp(11px,.95vw,14px);padding:8px 14px;letter-spacing:.16em;color:var(--gd);background:rgba(0,12,4,.8)}
+  .tabs button[aria-selected="true"]{color:#000;background:var(--g);border-color:var(--g);box-shadow:0 0 14px var(--g);font-weight:700}
+  .panel{flex:1;display:flex;flex-direction:column;gap:var(--gap);min-height:0}
+  .panel[hidden]{display:none}
+
+  /* big-dip top-up alert */
+  .dip{border:2px solid var(--warn);border-radius:8px;padding:12px 16px;background:rgba(40,25,0,.85);color:var(--warn);
+       font-weight:700;font-size:clamp(14px,1.5vw,21px);letter-spacing:.06em;text-shadow:0 0 10px var(--warn)}
+  .dip.strong{border-color:var(--red);color:var(--red);background:rgba(45,0,6,.88);text-shadow:0 0 12px var(--red);
+              animation:flash 1s steps(2) infinite}
+  @keyframes flash{50%{background:rgba(110,0,15,.92);box-shadow:0 0 28px var(--red)}}
+  .dip small{display:block;margin-top:4px;font-weight:400;font-size:.62em;letter-spacing:.08em;opacity:.85;text-shadow:none}
+
+  /* overview heroes: the numbers that matter, big and bold */
+  .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15em),1fr));gap:var(--gap)}
+  .hero .cell{padding:clamp(12px,1.6vw,22px);background:rgba(0,20,8,.6)}
+  .hero .v{font-size:clamp(30px,4vw,58px);font-weight:800}
+  .hero .sub{font-size:.8em;color:var(--gd);margin-top:4px;letter-spacing:.06em}
+  .hero .cell.key{border-color:var(--g);box-shadow:0 0 18px rgba(0,255,102,.18) inset}
+  .linkbtn{margin-top:8px;font-size:.72em;padding:3px 10px}
+  .ovstat{font-size:.82em;color:var(--gd);line-height:1.8}
+  .ovstat b{color:var(--g)}
+
+  /* day-trade chart */
+  .chart{height:clamp(440px,66vh,960px);margin-top:12px;border:1px solid #052;border-radius:5px;overflow:hidden;
+         color:var(--dim);display:flex;align-items:center;justify-content:center;position:relative}
+  .rbox{position:absolute;left:0;pointer-events:none;z-index:2;border-top:2px solid rgba(255,68,85,.75);
+        border-bottom:2px solid rgba(0,255,102,.85);background:rgba(0,255,102,.06)}
+  .rbox span{position:absolute;left:6px;font-size:11px;letter-spacing:.1em;padding:1px 5px;background:rgba(0,10,4,.8)}
+  .rbox .rt{top:2px;color:#ff4455} .rbox .rb{bottom:2px;color:#00ff66}
+  .dthero{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,11em),1fr));gap:clamp(8px,1vw,14px)}
+  .dthero .v{font-size:clamp(24px,3vw,44px);font-weight:800}
+  .dthero .sub{font-size:.74em;color:var(--gd);margin-top:4px;letter-spacing:.05em}
+  .regime{margin-top:10px;padding:8px 12px;border:1px solid var(--g);border-radius:5px;font-weight:700;letter-spacing:.1em;
+          font-size:clamp(13px,1.2vw,17px)}
+  .regime small{display:block;font-weight:400;font-size:.72em;color:var(--gd);letter-spacing:.04em;margin-top:3px}
+  .regime.paused{border-color:var(--warn);color:var(--warn);text-shadow:0 0 8px var(--warn)}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:.72em;color:var(--gd);letter-spacing:.06em}
+  .legend i{display:inline-block;width:1.6em;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
+  .strategy{font-size:.8em;color:var(--gd);line-height:1.5;margin-top:10px;padding:8px 10px;border-left:2px solid var(--g)}
+  .strategy b{color:var(--g)}
+  #dt-pnl{font-size:clamp(26px,3.2vw,46px);font-weight:800}
+  @media (max-width:600px){
+    .chart{height:max(440px,68vh);margin-left:calc(-1 * clamp(12px,1.4vw,20px) + 2px);margin-right:calc(-1 * clamp(12px,1.4vw,20px) + 2px)}
+  }
+  .card{border:1px solid var(--dim);border-radius:8px;padding:clamp(12px,1.4vw,20px);min-width:0;
+        background:rgba(0,20,8,.6);box-shadow:0 0 18px rgba(0,255,102,.08) inset;display:flex;flex-direction:column}
+  .card h2{font-size:clamp(12px,1.05vw,15px);letter-spacing:.18em;margin-bottom:12px;text-shadow:0 0 6px var(--g);
+           display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .tag{font-size:.75em;padding:2px 8px;border:1px solid var(--dim);border-radius:3px;color:var(--gd);letter-spacing:.1em}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,1vw,14px)}
+  .cell{border:1px solid #052;border-radius:5px;padding:clamp(8px,1vw,14px)}
+  .cell .k{font-size:.72em;color:var(--gd);letter-spacing:.12em}
+  .cell .v{font-size:clamp(20px,2.3vw,34px);margin-top:4px;text-shadow:0 0 8px var(--g);overflow-wrap:anywhere;font-weight:700}
+  .v.pos{color:var(--g)} .v.neg{color:var(--red);text-shadow:0 0 8px var(--red)}
+  .k{font-size:.72em;color:var(--gd);letter-spacing:.12em}
+  .bar{height:9px;border:1px solid var(--dim);border-radius:5px;margin-top:8px;overflow:hidden;background:#010}
+  .bar i{display:block;height:100%;width:0;background:var(--g);box-shadow:0 0 10px var(--g);transition:width .8s}
+  .log{font-size:.8em;line-height:1.65;color:var(--gd);margin-top:10px;overflow:auto;max-height:12em}
+  .log div:before{content:"> ";color:var(--g)}
+
+  /* neural feed */
+  #feed{flex:1;min-height:60vh}
+  #feed .stream{font-size:clamp(11px,.85vw,13px);line-height:1.55}
+  #feed .hb .v{font-size:clamp(13px,1.2vw,17px)}
+  .pulse{width:.6em;height:.6em;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g);display:inline-block;
+         margin-right:.5em;animation:p 1.6s ease-in-out infinite}
+  @keyframes p{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.7)}}
+  .hb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+  .hb .cell .v{font-size:clamp(15px,1.7vw,24px)}
+  .stream{flex:1;min-height:14em;overflow-y:auto;border:1px solid #052;border-radius:5px;padding:12px;
+          background:rgba(0,8,3,.75);font-size:clamp(12px,1.05vw,15px);line-height:1.7;scroll-behavior:smooth}
+  .stream .ln{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--gd)}
+  .stream .ln.new{color:var(--g);text-shadow:0 0 6px var(--g)}
+  .stream .ln .p{color:var(--dim)}
+  .rows{margin-top:12px;display:grid;gap:4px;font-size:.85em}
+  /* encrypted portfolio */
+  #acc{container-type:inline-size}
+  .lockbox{border:1px dashed var(--dim);border-radius:6px;padding:16px;text-align:center}
+  .lockmsg{font-size:1.05em;letter-spacing:.12em;margin-bottom:12px;text-shadow:0 0 8px var(--g)}
+  .lockbox form{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .lockerr{margin-top:8px;color:var(--warn);font-size:.8em;letter-spacing:.1em;min-height:1em}
+  input,button{font:inherit;color:var(--g);background:#010;border:1px solid var(--dim);border-radius:4px;padding:7px 10px}
+  input{flex:1;min-width:0;max-width:16em} input:focus{outline:none;border-color:var(--g);box-shadow:0 0 8px rgba(0,255,102,.35)}
+  button{cursor:pointer;letter-spacing:.12em} button:hover{border-color:var(--g);box-shadow:0 0 8px rgba(0,255,102,.4)}
+  .lockbtn{font-size:.72em;padding:2px 8px;margin-left:6px}
+  .grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .grid.four .v{font-size:clamp(16px,1.8vw,26px)}
+  .pt{margin-top:12px;display:grid;gap:4px;font-size:.8em}
+  .pr{display:grid;grid-template-columns:3.4em repeat(7,minmax(0,1fr));gap:6px;padding:6px 8px;border:1px solid #052;
+      border-radius:4px;font-variant-numeric:tabular-nums;align-items:baseline}
+  .pr span{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pr span:first-child{text-align:left}
+  .pr.h{border:none;padding:0 8px;color:var(--gd);font-size:.85em;letter-spacing:.08em}
+  .pr.tot{border-color:var(--g);box-shadow:0 0 10px rgba(0,255,102,.15) inset}
+  .stack{border:1px solid var(--g);border-radius:6px;padding:clamp(12px,1.4vw,18px);margin-bottom:14px;
+         box-shadow:0 0 18px rgba(0,255,102,.15) inset;text-align:center}
+  .stackv{font-size:clamp(28px,4.2vw,60px);font-weight:800;margin:4px 0 12px;text-shadow:0 0 14px var(--g);
+          font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .grid.three{grid-template-columns:repeat(3,minmax(0,1fr));text-align:left}
+  .grid.three .v{font-size:clamp(18px,2.2vw,32px)}
+  .sgq{font-size:.78em;color:var(--gd);margin-top:3px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .stacknote{font-size:.72em;color:var(--gd);margin-top:10px;line-height:1.5;text-align:left}
+  @container (max-width:600px){.grid.three{grid-template-columns:1fr}}
+  .money{border:1px solid var(--dim);border-radius:6px;padding:clamp(12px,1.4vw,18px);margin-bottom:14px}
+  .money h3{font-size:.8em;letter-spacing:.16em;margin:0 0 10px;color:var(--g)}
+  .weeknums{margin-top:12px}
+  .wrow.p4{grid-template-columns:4em repeat(3,minmax(0,1fr))}
+  .tag2{font-size:.85em;letter-spacing:.06em;font-weight:700}
+  #acc-review summary{cursor:pointer}
+  .wrow{display:grid;grid-template-columns:4em repeat(4,minmax(0,1fr)) minmax(0,2.6fr);gap:6px;padding:6px 8px;
+        border:1px solid #052;border-radius:4px;font-variant-numeric:tabular-nums;align-items:baseline;font-size:.82em}
+  .wrow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .wrow .r{text-align:right}
+  .wrow.h{border:none;padding:0 8px;color:var(--gd);font-size:.72em;letter-spacing:.08em}
+  .wnote{color:var(--gd);white-space:normal!important} .wnote.park{color:var(--warn)} .wnote.ok{color:var(--g)} .wnote.no{color:var(--dim)}
+  .accord{margin-top:10px;font-size:.82em}
+  .pva{display:inline-block;margin-left:8px;padding:2px 8px;border:1px solid;border-radius:3px;font-size:.78em;letter-spacing:.1em;font-weight:700}
+  .pva.ok{color:var(--g);border-color:var(--g)} .pva.bad{color:var(--warn);border-color:var(--warn)} .pva.mute{color:var(--gd);border-color:var(--dim)}
+  .proj{margin-top:12px;border:1px dashed var(--dim);border-radius:6px;padding:10px 12px}
+  .proj .k b{color:var(--warn)}
+  .projv{font-size:clamp(22px,2.6vw,36px);font-weight:800;margin:4px 0;color:var(--g)}
+  .proj ul{margin:6px 0 0 1.2em;font-size:.78em;color:var(--gd);line-height:1.5}
+  .scen{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82em;margin-top:6px}
+  .scen span{border:1px solid #052;border-radius:4px;padding:3px 8px}
+  @container (max-width:600px){
+    .wrow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:4px}
+    .wrow.h{display:none}
+    .wrow span{white-space:normal}
+    .wrow span::before{content:attr(data-l);display:block;font-size:.72em;color:var(--gd);letter-spacing:.08em}
+    .wrow .r{text-align:left} .wrow .wnote{grid-column:1/-1}
+  }
+  .btchead{display:flex;align-items:baseline;justify-content:center;gap:.6em;flex-wrap:wrap;letter-spacing:.12em}
+  .btcpct{font-size:clamp(34px,4.5vw,64px);color:var(--g);text-shadow:0 0 14px var(--g);font-variant-numeric:tabular-nums}
+  #acc-open>.bar{margin:6px 0 14px}
+  .pnote{margin:-2px 0 2px;padding:0 8px;font-size:.85em;color:var(--warn);letter-spacing:.04em}
+  @container (max-width:600px){
+    .grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .pr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:6px}
+    .pr.h{display:none}
+    .pr span,.pr span:first-child{text-align:left}
+    .pr span::before{content:attr(data-l);display:block;font-size:.75em;color:var(--gd);letter-spacing:.08em}
+  }
+  .row{display:grid;grid-template-columns:3.6em minmax(0,1fr) minmax(0,1fr) 5.2em 3.4em;gap:8px;padding:6px 8px;
+       border:1px solid #052;border-radius:4px;align-items:baseline;font-variant-numeric:tabular-nums}
+  .row.dt{grid-template-columns:minmax(0,1fr) 5.6em minmax(0,1fr) 5.6em}
+  .rows.lots{max-height:30em;overflow:auto}
+  .lrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr) 4.6em 11.5em;gap:8px;
+        padding:7px 8px;border:1px solid #052;border-left:3px solid var(--dim);border-radius:4px;align-items:baseline;
+        font-variant-numeric:tabular-nums}
+  .lrow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lrow .r{text-align:right} .lrow .full{grid-column:1/-1;white-space:normal}
+  .lrow.h{border:none;padding:0 8px 0 11px;color:var(--gd);font-size:.78em;letter-spacing:.1em}
+  .lrow.recovering{border-left-color:var(--red)} .lrow.in_profit{border-left-color:var(--g)} .lrow.selling{border-left-color:var(--warn)}
+  .badge{font-size:.72em;letter-spacing:.08em;padding:2px 6px;border-radius:3px;border:1px solid;text-align:center}
+  .badge.recovering{color:var(--red);border-color:var(--red)} .badge.in_profit{color:var(--g);border-color:var(--g)}
+  .badge.selling{color:var(--warn);border-color:var(--warn)}
+  .orow{display:grid;grid-template-columns:7.6em minmax(0,1fr) minmax(0,1.5fr) minmax(0,.8fr) minmax(0,1fr) 9.8em;gap:8px;
+        padding:6px 8px;border:1px solid #052;border-radius:4px;align-items:baseline;font-variant-numeric:tabular-nums}
+  .orow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .orow .r{text-align:right}
+  .orow.h{border:none;padding:0 8px;color:var(--gd);font-size:.78em;letter-spacing:.1em}
+  .orow.buy{border-left:3px solid #7dffb0} .orow.reserve{border-left:3px solid #4fc3ff} .orow.sell{border-left:3px solid var(--warn)}
+  .side{font-weight:800;letter-spacing:.08em} .side.buy{color:#7dffb0} .side.reserve{color:#4fc3ff} .side.sell{color:var(--warn)}
+  .badge.open{color:var(--gd);border-color:var(--dim)} .badge.filling{color:var(--warn);border-color:var(--warn)}
+  .evlog{margin-top:8px;font-size:.78em;line-height:1.6;max-height:14em;overflow:auto;border:1px solid #052;border-radius:4px;
+         padding:8px 10px;background:rgba(0,8,3,.75);font-variant-numeric:tabular-nums}
+  .evlog div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ev-placed{color:#7dffb0} .ev-cancelled{color:var(--dim)} .ev-filled{color:var(--g);font-weight:700} .ev-sold{color:var(--warn);font-weight:700}
+  .lsum{margin-top:12px;font-size:.85em;letter-spacing:.08em;color:var(--gd)} .lsum b{font-size:1.25em}
+  .sizing{margin-top:10px}
+  @media (max-width:700px){
+    .lrow{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:6px}
+    .lrow span{white-space:normal}
+    .lrow.h{display:none}
+    .lrow span::before{content:attr(data-l);display:block;font-size:.72em;color:var(--gd);letter-spacing:.08em}
+    .lrow .r{text-align:left}
+    .orow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:4px}
+    .orow.h{display:none}
+    .orow span{white-space:normal}
+    .orow span::before{content:attr(data-l);display:block;font-size:.72em;color:var(--gd);letter-spacing:.08em}
+    .orow .r{text-align:left}
+    .evlog div{white-space:normal}
+  }
+  .row.h{border:none;padding:0 8px;color:var(--gd);font-size:.78em;letter-spacing:.1em}
+  .row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .r{text-align:right} .row .full{grid-column:1/-1}
+  .up{color:var(--g);text-shadow:0 0 6px var(--g)} .dn{color:var(--red);text-shadow:0 0 6px var(--red)} .mute{color:var(--dim)}
+  .guard{margin-top:10px;padding:6px 10px;border:1px solid var(--dim);border-radius:4px;font-size:.78em;
+         letter-spacing:.1em;color:var(--gd)}
+  .guard.on{border-color:var(--warn);color:var(--warn);text-shadow:0 0 8px var(--warn);animation:b 1.4s steps(2) infinite}
+  .cur{display:inline-block;width:.6em;height:1.1em;vertical-align:text-bottom;background:var(--g);
+       box-shadow:0 0 8px var(--g);animation:b 1s steps(2) infinite}
+  .foot{text-align:center;font-size:.7em;color:#073;letter-spacing:.12em}
+  .err{color:var(--warn)}
+</style>
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="wrap">
+  <div class="hdr">
+    <h1>WESTMERE // CRYPTO<span class="blink">_</span></h1>
+    <div class="t" id="updated">SYNCING…</div>
+  </div>
+
+  <div class="dip" id="dip" role="alert" hidden></div>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="overview">OVERVIEW</button>
+    <button type="button" role="tab" data-tab="btc">BITCOIN / ACCUMULATION</button>
+    <button type="button" role="tab" data-tab="daytrade">DAY-TRADE</button>
+    <button type="button" role="tab" data-tab="feed">FEED</button>
+  </nav>
+
+  <section class="panel" id="tab-overview" role="tabpanel">
+    <div class="hero">
+      <div class="cell key"><div class="k">BITCOIN % OF PORTFOLIO</div><div class="v" id="ov-btc">🔒</div>
+        <div class="sub" id="ov-btcsub">encrypted — unlock to view</div>
+        <button class="linkbtn" id="ov-unlock" data-goto="btc" type="button">UNLOCK →</button></div>
+      <div class="cell key"><div class="k">ACCUMULATION P/L</div><div class="v" id="ov-pl">🔒</div><div class="sub" id="ov-plsub">encrypted</div></div>
+      <div class="cell"><div class="k">PORTFOLIO VALUE</div><div class="v" id="ov-val">🔒</div><div class="sub" id="ov-valsub">encrypted</div></div>
+      <div class="cell key"><div class="k">DAY-TRADE NET (PAPER)</div><div class="v" id="ov-dt">£—</div><div class="sub" id="ov-dtsub">—</div></div>
+      <div class="cell"><div class="k">BTC PRICE</div><div class="v" id="ov-btcpx">£—</div><div class="sub" id="ov-btcdrop">—</div></div>
+    </div>
+    <div class="card"><h2>SYSTEM STATUS</h2><div class="ovstat" id="ov-status">syncing…</div></div>
+  </section>
+
+  <section class="panel" id="tab-feed" role="tabpanel" hidden>
+    <div class="card" id="feed">
+      <h2><span><span class="pulse"></span>NEURAL FEED // LIVE</span><span class="tag" id="feed-mode">PAPER</span></h2>
+      <div class="hb">
+        <div class="cell"><div class="k">LAST SYNC</div><div class="v" id="hb-sync">—</div></div>
+        <div class="cell"><div class="k">SYNC AGE</div><div class="v" id="hb-age">—</div></div>
+        <div class="cell"><div class="k">NEXT REFRESH ≤</div><div class="v" id="hb-next">--:--</div></div>
+      </div>
+      <div class="stream" id="stream"><div class="ln" id="cursor-line"><span class="cur"></span></div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="tab-btc" role="tabpanel" hidden>
+    <div class="card" id="acc">
+      <h2>ACCUMULATION ENGINE <span><span class="tag" id="acc-mode">—</span><button class="lockbtn" id="acc-lock" type="button" hidden>LOCK</button></span></h2>
+      <div class="lockbox" id="acc-locked">
+        <div class="lockmsg" id="acc-lockmsg">🔒 LOCKED — ENTER PASSCODE</div>
+        <form id="acc-form" autocomplete="off">
+          <input type="password" id="acc-pass" placeholder="passcode" aria-label="Passcode" autocomplete="off">
+          <button type="submit">UNLOCK</button>
+        </form>
+        <div class="lockerr" id="acc-lockerr"></div>
+      </div>
+      <div id="acc-open" hidden>
+        <div class="stack">
+          <div class="k">₿ STACK — TOTAL BITCOIN HELD</div>
+          <div class="stackv" id="acc-stack">— BTC</div>
+          <div class="grid three">
+            <div class="cell"><div class="k">TODAY</div><div class="v mute" id="acc-sg-d">—</div><div class="sgq" id="acc-sgq-d">needs history</div></div>
+            <div class="cell"><div class="k">WEEK (7 DAYS)</div><div class="v mute" id="acc-sg-w">—</div><div class="sgq" id="acc-sgq-w">needs history</div></div>
+            <div class="cell"><div class="k">MONTH (30 DAYS)</div><div class="v mute" id="acc-sg-m">—</div><div class="sgq" id="acc-sgq-m">needs history</div></div>
+          </div>
+          <div class="stacknote" hidden>Measured in coins, not £: stack growth = (BTC now − BTC then) ÷ BTC then. Total BTC in the account is
+            recorded once a day inside the encrypted snapshot; earlier days were back-filled from the bot's own BTC buys.
+            TODAY / WEEK / MONTH fill in as history builds (first full day, week and month).</div>
+        </div>
+        <div class="money" id="acc-money">
+          <h3>MONEY VIEW — WHOLE ACCOUNT</h3>
+          <div class="grid three">
+            <div class="cell"><div class="k">GBP CASH (UNSPENT)</div><div class="v" id="acc-cash">£—</div><div class="sgq" id="acc-cashsub"></div></div>
+            <div class="cell"><div class="k">STABLECOINS</div><div class="v" id="acc-stable">£—</div><div class="sgq" id="acc-stablesub"></div></div>
+            <div class="cell"><div class="k">OVERALL PORTFOLIO VALUE</div><div class="v" id="acc-total">£—</div><div class="sgq" id="acc-totalsub"></div></div>
+          </div>
+          <div class="grid four weeknums">
+            <div class="cell"><div class="k" id="acc-wlbl">THIS WEEK</div><div class="v" id="acc-wb">£—</div><div class="sgq">budget</div></div>
+            <div class="cell"><div class="k">DEPLOYED</div><div class="v" id="acc-wd">£—</div><div class="sgq" id="acc-wdp"></div></div>
+            <div class="cell"><div class="k">TO GO</div><div class="v" id="acc-wg">£—</div><div class="sgq" id="acc-wgs"></div></div>
+            <div class="cell"><div class="k">PLAN vs ACTUAL</div><div class="v" id="acc-wp">—</div><div class="sgq" id="acc-wps"></div></div>
+          </div>
+          <div class="pt" id="acc-wtable"></div>
+          <div class="proj" id="acc-proj"></div>
+          <div class="accord" id="acc-orders"></div>
+          <details class="proj" id="acc-review" hidden><summary class="k" id="acc-rvsum"></summary><div id="acc-rvlist"></div></details>
+        </div>
+        <div class="btchead"><div class="k">BITCOIN</div><div class="btcpct" id="acc-btc">—%</div><div class="k">OF PORTFOLIO</div></div>
+        <div class="bar"><i id="acc-btcbar"></i></div>
+        <div class="grid four">
+          <div class="cell"><div class="k">INVESTED</div><div class="v" id="acc-inv">£—</div></div>
+          <div class="cell"><div class="k">VALUE NOW</div><div class="v" id="acc-val">£—</div></div>
+          <div class="cell"><div class="k">P/L £</div><div class="v" id="acc-pl">£—</div></div>
+          <div class="cell"><div class="k">P/L %</div><div class="v" id="acc-plp">—</div></div>
+        </div>
+        <div class="pt" id="acc-table"></div>
+      </div>
+      <div class="log" id="acc-status"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="tab-daytrade" role="tabpanel" hidden>
+    <div class="card" id="dt">
+      <h2>DAY-TRADE GRID // <span id="dt-pair">ETH-GBP</span> <span class="tag" id="dt-mode">PAPER</span></h2>
+      <div class="dthero">
+        <div class="cell"><div class="k">REALIZED PROFIT (NET OF FEES)</div><div class="v" id="dt-pnl">£—</div><div class="sub" id="dt-pnlsub">—</div></div>
+        <div class="cell"><div class="k">OPEN LOTS (INVENTORY)</div><div class="v" id="dt-lots">—</div><div class="sub" id="dt-lotsub">—</div></div>
+        <div class="cell"><div class="k">GRID BUYS RESTING</div><div class="v" id="dt-orders">—</div><div class="sub" id="dt-gridsub">—</div></div>
+        <div class="cell"><div class="k">ETH PRICE</div><div class="v" id="dt-price">£—</div><div class="sub" id="dt-unreal">—</div></div>
+      </div>
+      <div class="regime" id="dt-regime">REGIME —</div>
+      <div class="grid four sizing">
+        <div class="cell"><div class="k">GRID STEP</div><div class="v" id="dt-step">—</div><div class="sub k" id="dt-stepsub"></div></div>
+        <div class="cell"><div class="k">GRID DEPTH</div><div class="v" id="dt-depth">—</div><div class="sub k" id="dt-depthsub"></div></div>
+        <div class="cell"><div class="k">DEPLOYED (GRID)</div><div class="v" id="dt-deploy">—</div><div class="sub k" id="dt-deploysub"></div></div>
+        <div class="cell"><div class="k">RESERVE</div><div class="v" id="dt-reserve">—</div><div class="sub k" id="dt-reservesub"></div></div>
+      </div>
+      <div class="proj" id="dt-proj"></div>
+      <div class="strategy" id="dt-strategy"></div>
+      <div class="chart" id="dt-chart">loading chart…</div>
+      <div class="legend">
+        <span><i style="border-color:#00ff66;border-top-width:6px;opacity:.5"></i>RANGE BOX (24H)</span>
+        <span><i style="border-color:#2a8a55;border-top-style:dashed"></i>7-DAY BAND</span>
+        <span><i style="border-color:#7dffb0;border-top-style:dashed"></i>▲ OPEN BUY (GRID)</span>
+        <span><i style="border-color:#4fc3ff;border-top-style:dashed"></i>▲ OPEN BUY (RESERVE)</span>
+        <span><i style="border-color:#ffb300;border-top-style:dashed"></i>▼ OPEN SELL (LOT TARGET)</span>
+        <span><i style="border-color:#ff4455;border-top-style:dotted"></i>LOT ENTRY (RECOVERING)</span>
+        <span><i style="border-color:#00ff66;border-top-style:dotted"></i>LOT ENTRY (IN PROFIT)</span><span>▲▼ FILLS</span>
+        <span id="dt-lvlat"></span>
+      </div>
+      <div class="k" style="margin-top:12px" id="dt-potlbl"></div>
+      <div class="bar"><i id="dt-potbar"></i></div>
+      <div class="k" style="margin-top:10px" id="dt-fees"></div>
+      <div class="lsum" id="dt-osum">OPEN ORDERS</div>
+      <div class="rows lots" id="dt-orows"></div>
+      <div class="lsum">ORDER ACTIVITY <span class="k">· placed · cancelled / repriced · filled · sold — newest first</span></div>
+      <div class="evlog" id="dt-ev"></div>
+      <div class="lsum" id="dt-lsum">OPEN-LOT LEDGER</div>
+      <div class="rows lots" id="dt-rows"></div>
+      <div class="guard" id="dt-guard" hidden></div>
+      <div class="log" id="dt-log"></div>
+    </div>
+  </section>
+
+  <div class="foot" id="foot">WMBOT TERMINAL</div>
+</div>
+
+<script>
+// ---- Matrix rain ----
+const c=document.getElementById('rain'),x=c.getContext('2d');
+let cols,drops;const glyph="アカサタナハマヤラ0123456789ABCDEF<>/#$".split("");
+function size(){c.width=innerWidth;c.height=innerHeight;cols=Math.floor(c.width/14);drops=Array(cols).fill(1)}
+size();addEventListener('resize',size);
+function draw(){x.fillStyle="rgba(0,0,0,.08)";x.fillRect(0,0,c.width,c.height);
+  x.fillStyle="#00ff66";x.font="14px monospace";
+  for(let i=0;i<cols;i++){const t=glyph[Math.floor(Math.random()*glyph.length)];
+    x.fillText(t,i*14,drops[i]*14);
+    if(drops[i]*14>c.height&&Math.random()>.975)drops[i]=0;drops[i]++}}
+setInterval(draw,60);
+
+const $=id=>document.getElementById(id);
+const gbp=n=>(n<0?"-£":"£")+Math.abs(Number(n)).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const gbp4=n=>Math.abs(Number(n))<10?(n<0?"-£":"£")+Math.abs(Number(n)).toFixed(4):gbp(n);   // grid lots are £1: show pennies' fractions
+const dur=m=>m<60?m+'m':m<2880?Math.floor(m/60)+'h '+(m%60)+'m':Math.floor(m/1440)+'d '+Math.floor(m%1440/60)+'h';
+const pctf=n=>n==null?'—':(n>0?'+':'')+(n*100).toFixed(2)+'%';
+const pcls=n=>n==null?'mute':n>0?'up':n<0?'dn':'';
+const pxf=n=>n==null?'—':'£'+Number(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:n<100?5:2});
+function row(cells,cls){const r=document.createElement('div');r.className='row'+(cls?' '+cls:'');
+  for(const [t,c] of cells){const s=document.createElement('span');s.textContent=t;if(c)s.className=c;r.append(s)}return r}
+
+// ---- neural feed: typewriter stream ----
+const stream=$('stream'),cursorLine=$('cursor-line');
+const shown=new Set(),queue=[];let typing=false;
+function enqueue(lines){
+  for(const l of lines){const s=String(l);if(!shown.has(s)){shown.add(s);queue.push(s)}}
+  if(!typing)typeNext();
+}
+function typeNext(){
+  const s=queue.shift();if(s===undefined){typing=false;return}
+  typing=true;
+  stream.querySelectorAll('.ln.new').forEach(e=>e.classList.remove('new'));
+  const ln=document.createElement('div');ln.className='ln new';
+  const pfx=document.createElement('span');pfx.className='p';pfx.textContent='> ';
+  const txt=document.createElement('span');ln.append(pfx,txt);
+  stream.insertBefore(ln,cursorLine);
+  const fast=queue.length>6;let i=0;          // catch up quickly on a big backlog
+  (function tick(){
+    i+=fast?3:1;txt.textContent=s.slice(0,i);stream.scrollTop=stream.scrollHeight;
+    if(i<s.length)setTimeout(tick,fast?6:18+Math.random()*30);
+    else setTimeout(typeNext,fast?60:280);
+  })();
+  while(stream.querySelectorAll('.ln:not(#cursor-line)').length>60)stream.querySelector('.ln').remove();
+}
+
+// ---- heartbeat ----
+let lastSync=null;
+const pad=n=>String(n).padStart(2,'0');
+function heartbeat(){
+  const now=new Date();
+  // the Mac runner works every 2 min; this page is republished on any change, else at least every 15 min
+  if(lastSync){
+    const left=Math.floor((lastSync.getTime()+15*60000-now)/1000);
+    $('hb-next').textContent=left>0?pad(Math.floor(left/60))+':'+pad(left%60):'due';
+    const a=Math.max(0,Math.floor((now-lastSync)/1000));
+    $('hb-age').textContent=a<3600?pad(Math.floor(a/60))+'m '+pad(a%60)+'s':Math.floor(a/3600)+'h '+pad(Math.floor(a%3600/60))+'m';
+  }
+}
+setInterval(heartbeat,1000);heartbeat();
+
+// ---- encrypted accumulation portfolio ----
+// The real portfolio arrives only as AES-GCM ciphertext; the passcode never leaves this browser.
+const PASS_KEY='wmbot.passcode';
+const store={get(){try{return localStorage.getItem(PASS_KEY)}catch(e){return null}},
+  set(v){try{localStorage.setItem(PASS_KEY,v)}catch(e){}},del(){try{localStorage.removeItem(PASS_KEY)}catch(e){}}};
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let keyCache={id:null,key:null},lastAcc=null;
+async function decryptBlob(blob,pass){
+  const id=blob.salt+'|'+blob.iter+'|'+pass;
+  if(keyCache.id!==id){
+    const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+    const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(blob.salt),iterations:blob.iter,hash:'SHA-256'},
+      base,{name:'AES-GCM',length:256},false,['decrypt']);
+    keyCache={id,key};
+  }
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(blob.iv)},keyCache.key,b64(blob.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+// overview heroes for the encrypted figures: placeholders until unlocked
+function ovLocked(){
+  for(const id of ['ov-btc','ov-pl','ov-val'])cell($(id),'🔒');
+  $('ov-btcsub').textContent='encrypted — unlock to view';$('ov-plsub').textContent=$('ov-valsub').textContent='encrypted';
+  $('ov-unlock').hidden=false;
+}
+function showLocked(msg,canUnlock,err){
+  ovLocked();
+  $('acc-open').hidden=true;$('acc-locked').hidden=false;$('acc-lock').hidden=true;
+  $('acc-lockmsg').textContent=msg;$('acc-form').hidden=!canUnlock;$('acc-lockerr').textContent=err||'';
+}
+const sgbp=n=>(n>0?'+':n<0?'-':'')+'£'+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const amt=n=>Number(n).toLocaleString('en-GB',{maximumFractionDigits:8});
+function cell(el,text,cls){el.textContent=text;el.className='v'+(cls?' '+cls:'')}
+function prow(cells,cls){const r=document.createElement('div');r.className='pr'+(cls?' '+cls:'');
+  for(const [t,l,c] of cells){const s=document.createElement('span');s.textContent=t;s.dataset.l=l;if(c)s.className=c;r.append(s)}return r}
+// ₿ stack growth in COINS from the encrypted daily history {UTC date: total BTC}; the last point is live.
+// TODAY compares with the previous day's close, WEEK / MONTH with the close 7 / 30 days ago.
+function renderStack(h){
+  const ent=Object.entries(h||{}).sort(([a],[b])=>a<b?-1:1);
+  if(!ent.length){$('acc-stack').textContent='— BTC';return}
+  const [today,q]=ent[ent.length-1],now=Number(q);
+  $('acc-stack').textContent=now.toFixed(8)+' BTC';
+  const closeOn=days=>{const cut=new Date(Date.parse(today+'T00:00:00Z')-days*864e5).toISOString().slice(0,10);
+    const e=ent.filter(([d])=>d<=cut).pop();return e?Number(e[1]):null};
+  for(const [k,then] of [['d',closeOn(1)],['w',closeOn(7)],['m',closeOn(30)]]){
+    const v=$('acc-sg-'+k),s=$('acc-sgq-'+k);
+    if(!then){v.textContent='—';v.className='v mute';s.textContent=then===0?'stack was empty then':'needs history';continue}
+    const add=now-then,pct=add/then*100;
+    v.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';v.className='v '+(add>0?'up':add<0?'dn':'');
+    s.textContent=(add<0?'−':'+')+Math.abs(add).toFixed(8)+' ₿';
+  }
+}
+// ---- money view + this week's plan (REAL money: only ever from the decrypted snapshot) ----
+function renderMoney(p,prices){
+  const box=$('acc-money');
+  if(!p.week||!p.cash){box.hidden=true;return null}
+  box.hidden=false;
+  const fx=prices['USDC-GBP']??null,cash=p.cash||{},gbpCash=Number(cash.GBP||0);
+  const st=Object.entries(cash).filter(([c])=>c!=='GBP');
+  const stVal=fx!=null?st.reduce((s,[,q])=>s+Number(q)*fx,0):null;
+  let total=gbpCash+(stVal||0);const unpriced=[];
+  for(const [c,q] of Object.entries(p.holdings||{})){const px=prices[c+'-GBP'];if(px!=null)total+=Number(q)*px;else unpriced.push(c)}
+  cell($('acc-cash'),gbp(gbpCash));
+  cell($('acc-stable'),stVal!=null?gbp(stVal):'£—');
+  $('acc-stablesub').textContent=st.length?st.map(([c,q])=>c+' '+Number(q).toFixed(4)).join(' · '):'none held';
+  cell($('acc-total'),gbp(total));
+  $('acc-totalsub').textContent=unpriced.length?'excl. '+unpriced.join(', '):'';
+  // the week: same rule as bot.py — budget ramps evenly Mon 00:00 → Sun 24:00, plus the dip-tilt pull-forward
+  const w=p.week,start=Date.parse(w.start),WK=7*864e5,frac=Math.min(1,Math.max(0,(Date.now()-start)/WK));
+  const tcfg=w.tilt_cfg||{},sym=pr=>pr.split('-')[0],openBy={},routes=w.routes||{};
+  const toPair={};for(const [pr,r] of Object.entries(routes)){toPair[r.market]=pr;toPair[r.fund]=pr}
+  for(const o of p.open_orders||[]){const k=toPair[o.product]||o.product;(openBy[k]=openBy[k]||[]).push(o)}
+  let behind=0,budget=0,spent=0,toGo=0;const rows=[];
+  const L=['COIN','BUDGET','DEPLOYED','DUE NOW','TO GO','STATUS'];
+  for(const [pr,b] of Object.entries(w.budget||{})){
+    const B=Number(b),S=Number((w.spent||{})[pr]||0),noMkt=(w.no_market||[]).includes(pr),tilt=(w.tilt||{})[pr];
+    const due=Math.min(B,B*frac+(tilt?B*(tcfg.pull_forward||0):0)),short=due-S,min=Number((w.min_order||{})[pr]||1),left=Math.max(0,B-S);
+    budget+=B;spent+=S;toGo+=left;
+    let tag,cls;
+    if(noMkt){tag='NO MARKET';cls='no'}
+    else if(openBy[pr]){tag='ORDER OPEN';cls=''}
+    else if(left<=0.005){tag='DONE';cls='ok'}
+    else if(short<=0.005){tag='ON PLAN';cls='ok'}
+    else if(short<min){tag='PARKED £'+short.toFixed(2)+' < £'+min.toFixed(0);cls='park'}
+    else{tag='DUE £'+short.toFixed(2);cls='park';behind+=short}
+    rows.push(wrow([[sym(pr)+(routes[pr]?' $':''),'',L[0]],[gbp(B),'r',L[1]],[gbp(S),'r',L[2]],[noMkt?'—':gbp(due),'r',L[3]],
+      [gbp(left),'r',L[4]],[tag,'tag2 wnote '+cls,L[5]]]));
+  }
+  $('acc-wtable').replaceChildren(wrow(L.map(l=>[l,l==='COIN'||l==='STATUS'?'':'r']),'h'),...rows);
+  const fmt=d=>new Date(d).toUTCString().slice(5,11);
+  $('acc-wlbl').textContent='WEEK '+fmt(start)+' → '+fmt(start+WK-1);
+  cell($('acc-wb'),gbp(budget));cell($('acc-wd'),gbp(spent));cell($('acc-wg'),gbp(toGo));
+  $('acc-wdp').textContent=budget?Math.round(spent/budget*100)+'%':'';
+  $('acc-wgs').textContent='GBP cash '+gbp(gbpCash);
+  const ok=behind<1;
+  cell($('acc-wp'),ok?'ON TRACK':'BEHIND',ok?'pos':'neg');
+  $('acc-wps').textContent=ok?'':'£'+behind.toFixed(2)+' due';
+  // potential coins added if the plan runs clean, at today's price
+  const now=Date.now(),mEnd=Date.UTC(new Date(now).getUTCFullYear(),new Date(now).getUTCMonth()+1,1),dLeft=Math.max(0,(mEnd-now)/864e5);
+  const prow2=[],bq=w.bought_qty||{},mq=(p.month||{}).bought_qty||{},monthName=new Date(now).toUTCString().slice(8,11).toUpperCase();
+  for(const [pr,b] of Object.entries(w.budget||{})){
+    const B=Number(b),S=Number((w.spent||{})[pr]||0),px=prices[pr];if(!px)continue;
+    const due=Math.min(B,B*frac),fmtq=q=>'+'+(q<1?q.toFixed(pr.startsWith('BTC')?6:5):q.toFixed(2));
+    const wk=Number(bq[pr]||0)+Math.max(0,B-S)/px,mo=Number(mq[pr]||0)+(Math.max(0,due-S)+B/7*dLeft)/px,n30=B/7*30/px;
+    prow2.push(wrow([[sym(pr),'','COIN'],[fmtq(wk),'r','THIS WEEK'],[fmtq(mo),'r',monthName],[fmtq(n30),'r','30 DAYS']],'p4'));
+  }
+  $('acc-proj').replaceChildren(Object.assign(document.createElement('div'),{className:'k',textContent:'POTENTIAL COINS ADDED · estimate @ today\'s price'}),
+    wrow([['COIN'],['THIS WEEK','r'],[monthName,'r'],['30 DAYS','r']],'h p4'),...prow2);
+  const rv=p.review,rb=$('acc-review');rb.hidden=!rv;
+  if(rv){const IC={fix:['✗','dn'],watch:['!','park']},n=l=>rv.findings.filter(f=>f.level===l).length;
+    $('acc-rvsum').textContent='REVIEW '+rv.date.slice(5)+' · '+n('fix')+' FIX · '+n('watch')+' WATCH · '+n('ok')+' OK';
+    $('acc-rvlist').replaceChildren(...rv.findings.filter(f=>IC[f.level]).map(f=>{
+      const d=document.createElement('div');d.style.cssText='font-size:.8em;line-height:1.55';
+      d.append(Object.assign(document.createElement('span'),{className:IC[f.level][1],textContent:IC[f.level][0]+' '}),f.text);return d}))}
+  const oo=p.open_orders||[];
+  $('acc-orders').replaceChildren(Object.assign(document.createElement('div'),{className:'k',textContent:'OPEN ORDERS · '+oo.length}),
+    ...oo.map(o=>wrow([[o.product,'','MARKET'],[o.side==='BUY'?'▲ BUY':'▼ SELL','','SIDE'],
+      [(/-(USDC|USD|USDT)$/.test(o.product)?'$':'£')+Number(o.price).toLocaleString('en-GB',{maximumFractionDigits:5}),'r','PRICE'],
+      [amt(Number(o.size)),'r','SIZE'],[gbp(o.gbp),'r','£'],[String(o.created).slice(5).replace('T',' ')+'Z','wnote','PLACED']])));
+  return total;
+}
+function wrow(cells,cls){const r=document.createElement('div');r.className='wrow'+(cls?' '+cls:'');
+  for(const [t,c,l] of cells){const e=document.createElement('span');e.textContent=t;if(c)e.className=c;if(l)e.dataset.l=l;r.appendChild(e)}return r}
+function showPortfolio(p,prices,via){
+  $('acc-locked').hidden=true;$('acc-open').hidden=false;$('acc-lock').hidden=false;
+  via=via||{};
+  const rows=Object.entries(p.coins||{}).map(([pair,c])=>{
+    // invested is null for coins held outside the bot (e.g. ZEC): no cost basis, so no P/L
+    const qty=Number(c.qty||0),inv=c.invested!=null?Number(c.invested):null,price=prices[pair]??null;
+    const value=price!=null?qty*price:(qty?null:0),pl=value!=null&&inv!=null?value-inv:null;
+    const r={pair,qty,inv,avg:c.avg_price!=null?Number(c.avg_price):null,price,value,pl,
+      pct:inv>0&&pl!=null?pl/inv:null,buys:c.buys||0,last:c.last_buy,note:c.note,via:via[pair]};
+    if(c.currency==='USD'){   // bought in dollars (ZEC): cost basis, price, value and P/L shown in $
+      const mk=((p.week||{}).routes||{})[pair],upx=mk?prices[mk.market]:null,inU=Number(c.invested_usd||0),bq=Number(c.bought_qty||0);
+      const vU=upx!=null?qty*upx:null,costU=bq?inU*Math.min(1,qty/bq):null;
+      Object.assign(r,{usd:true,upx,avgU:c.avg_price_usd!=null?Number(c.avg_price_usd):null,valU:vU,
+        plU:vU!=null&&costU?vU-costU:null,pctU:vU!=null&&costU?vU/costU-1:null,route:c.route});
+    }
+    return r;
+  });
+  const costed=rows.filter(r=>r.inv!=null&&r.value!=null);
+  const inv=costed.reduce((s,r)=>s+r.inv,0),pl=costed.reduce((s,r)=>s+r.value,0)-inv,pct=inv>0?pl/inv:null;
+  const val=rows.filter(r=>r.value!=null).reduce((s,r)=>s+r.value,0);   // everything held, incl. ZEC
+  // headline: BTC share of everything held, at live prices (derived from decrypted holdings only)
+  renderStack(p.btc_history);
+  const btc=rows.find(r=>r.pair.startsWith('BTC-')),btcPct=val>0&&btc&&btc.value!=null?btc.value/val*100:null;
+  $('acc-btc').textContent=btcPct!=null?btcPct.toFixed(1)+'%':'—%';
+  $('acc-btcbar').style.width=(btcPct??0)+'%';
+  cell($('acc-inv'),gbp(inv));cell($('acc-val'),gbp(val));
+  cell($('acc-pl'),sgbp(pl),pcls(pl));cell($('acc-plp'),pctf(pct),pcls(pct));
+  cell($('ov-btc'),btcPct!=null?btcPct.toFixed(1)+'%':'—%');
+  $('ov-btcsub').textContent=btc&&btc.value!=null?gbp(btc.value)+' of '+gbp(val)+' held':'no BTC priced';
+  cell($('ov-pl'),sgbp(pl),pcls(pl));$('ov-plsub').textContent=pctf(pct)+' on '+gbp(inv)+' invested';
+  const acct=renderMoney(p,prices);
+  cell($('ov-val'),gbp(acct??val));
+  $('ov-valsub').textContent=acct!=null?'whole account incl. '+gbp(Number((p.cash||{}).GBP||0))+' GBP cash':rows.length+' coins · incl. ZEC';
+  $('ov-unlock').hidden=true;
+  const L=['COIN','AMOUNT','AVG BUY','NOW','VALUE','P/L £','P/L %','ALLOC'];
+  const body=[];
+  for(const r of rows){
+    const sym=r.pair.split('-')[0]+(r.note?'*':'');
+    const usd=n=>n==null?'—':(n<0?'-$':'$')+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+    if(r.usd){
+      body.push(prow([[sym,L[0]],[r.qty?amt(r.qty):'0',L[1]],[usd(r.avgU),L[2]],[usd(r.upx),L[3]],
+        [usd(r.valU)+(r.value!=null?' ('+gbp(r.value)+')':''),L[4]],[r.plU!=null?(r.plU>=0?'+':'')+usd(r.plU):'—',L[5],pcls(r.plU)],
+        [pctf(r.pctU),L[6],pcls(r.pctU)],[val>0&&r.value!=null?(r.value/val*100).toFixed(1)+'%':'—',L[7]]]));
+      body.push(Object.assign(document.createElement('div'),{className:'pnote',
+        textContent:'* '+r.pair.split('-')[0]+' in $ · FX USDC-GBP '+(prices['USDC-GBP']?prices['USDC-GBP'].toFixed(4):'—')}));
+      continue;
+    }
+    body.push(prow([[sym,L[0]],[r.qty?amt(r.qty):'0',L[1]],[r.avg!=null?pxf(r.avg):'—',L[2]],
+      [r.price!=null?pxf(r.price)+(r.via?' ($)':''):'no market',L[3],r.price==null?'mute':''],[r.value!=null?gbp(r.value):'—',L[4]],
+      [r.pl!=null&&r.inv?sgbp(r.pl):'—',L[5],pcls(r.inv?r.pl:null)],[pctf(r.pct),L[6],pcls(r.pct)],
+      [val>0&&r.value!=null?(r.value/val*100).toFixed(1)+'%':'—',L[7]]]));
+    if(r.note&&!r.usd)body.push(Object.assign(document.createElement('div'),{className:'pnote',
+      textContent:'* '+r.pair.split('-')[0]+' ('+r.note+')'}));
+  }
+  $('acc-table').replaceChildren(prow(L.map(l=>[l,'']),'h'),...body,
+    prow([['TOTAL',L[0]],['',L[1]],['',L[2]],['',L[3]],[gbp(val),L[4]],[sgbp(pl),L[5],pcls(pl)],[pctf(pct),L[6],pcls(pct)],['100%',L[7]]],'tot'));
+  const lastBuy=rows.map(r=>r.last).filter(Boolean).sort().pop();
+  const plan=p.plan?'plan '+gbp(Object.values(p.plan).reduce((s,v)=>s+Number(v),0))+'/wk':'';
+  const outside=rows.filter(r=>r.inv==null&&r.value).map(r=>r.pair.split('-')[0]);
+  const missing=rows.filter(r=>r.qty&&r.value==null).map(r=>r.pair.split('-')[0]);
+  $('acc-status').replaceChildren(...[lastAcc&&lastAcc.status||'',
+    [plan,rows.reduce((s,r)=>s+r.buys,0)+' buys filled',lastBuy?'last buy '+String(lastBuy).slice(5,16).replace('T',' ')+'Z':'no fills yet'].filter(Boolean).join(' · '),
+    outside.length?outside.join(', ')+' counted in VALUE NOW, not in the £ INVESTED or P/L'+(rows.some(r=>r.usd)?' (tracked in $ in its own row)':' (no cost basis)'):'',
+    missing.length?'totals exclude '+missing.join(', ')+' (no live price)':''].filter(Boolean)
+    .map(l=>Object.assign(document.createElement('div'),{textContent:l})));
+}
+async function renderAcc(a,tryPass){
+  lastAcc=a;
+  const status=()=>$('acc-status').replaceChildren(Object.assign(document.createElement('div'),{textContent:a.status||'standing by'}));
+  if(!a.encrypted){
+    showLocked(a.reason==='DASH_PASSPHRASE not set'?'🔒 LOCKED — PORTFOLIO ENCRYPTION NOT SET UP':'🔒 LOCKED — NO ENCRYPTED SNAPSHOT YET',false);
+    return status();
+  }
+  if(!(window.crypto&&crypto.subtle)){showLocked('🔒 LOCKED — THIS BROWSER CAN\'T DECRYPT (NEEDS HTTPS)',false);return status()}
+  const pass=tryPass??store.get();
+  if(!pass){showLocked('🔒 LOCKED — ENTER PASSCODE',true);return status()}
+  if(tryPass)$('acc-lockerr').textContent='decrypting…';
+  try{
+    const p=await decryptBlob(a.encrypted,pass);
+    if(tryPass){store.set(pass);$('acc-pass').value=''}
+    showPortfolio(p,a.prices||{},a.price_via);
+  }catch(e){
+    if(!tryPass)store.del();          // stale or changed passcode — ask again
+    showLocked('🔒 LOCKED — ENTER PASSCODE',true,tryPass?'WRONG PASSCODE':'');status();
+  }
+}
+$('acc-form').addEventListener('submit',e=>{e.preventDefault();const v=$('acc-pass').value;if(v&&lastAcc)renderAcc(lastAcc,v)});
+$('acc-lock').addEventListener('click',()=>{store.del();keyCache={id:null,key:null};if(lastAcc)renderAcc(lastAcc)});
+
+// ---- tabs ----
+const TABS=['overview','btc','daytrade','feed'];
+function showTab(t){
+  if(!TABS.includes(t))t='overview';
+  for(const n of TABS)$('tab-'+n).hidden=n!==t;
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  try{localStorage.setItem('wmbot.tab',t)}catch(e){}
+  if(location.hash.slice(1)!==t)history.replaceState(null,'','#'+t);
+  if(t==='feed')stream.scrollTop=stream.scrollHeight;
+  if(t==='daytrade')fitChart();   // a chart sized while hidden needs refitting once visible
+  if(t==='btc'&&!$('acc-form').hidden)$('acc-pass').focus();
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.goto)));
+addEventListener('hashchange',()=>showTab(location.hash.slice(1)));
+showTab(location.hash.slice(1)||(()=>{try{return localStorage.getItem('wmbot.tab')}catch(e){return null}})());
+
+// ---- big-dip top-up alert (public BTC price vs its 7-day high; advice only, never auto-spends) ----
+function renderDip(a){
+  const el=$('dip');
+  if(a)$('ov-btcpx').textContent=pxf(a.price),
+    $('ov-btcdrop').textContent='-'+Number(a.drop_pct).toFixed(2)+'% from 7-day high '+pxf(a.high);
+  if(!a||a.level==='none'){el.hidden=true;return}
+  const d=Number(a.drop_pct).toFixed(1);
+  el.className='dip'+(a.level==='strong'?' strong':'');
+  el.replaceChildren(a.level==='strong'
+    ?'🚨 MAJOR DIP: '+a.coin+' -'+d+'% from its 7-day high — strong top-up opportunity'
+    :'⚡ BIG DIP: '+a.coin+' -'+d+'% from its 7-day high — consider topping up Coinbase to buy the dip',
+    Object.assign(document.createElement('small'),{textContent:'rule-based alert, not financial advice · the bot still spends only its normal weekly budget'}));
+  el.hidden=false;
+}
+
+// ---- day-trade candle chart: support / resistance / the bot's ladder (TradingView lightweight-charts) ----
+var chart=null,series=null,priceLines=[],band=null,lastDT=null,rbox=null;   // var: showTab() may run before this line
+// focus the price axis on the visible candles, the range box and the grid/lots near them, so
+// far-away levels can't squash the candles; lines outside that band are listed, not drawn
+const NEAR=0.03;
+function placeBox(){
+  const r=lastDT&&lastDT.range&&lastDT.range.intraday;
+  if(!rbox||!series||!r){if(rbox)rbox.hidden=true;return}
+  const y1=series.priceToCoordinate(r.resistance),y2=series.priceToCoordinate(r.support);
+  if(y1==null||y2==null){rbox.hidden=true;return}
+  const h=$('dt-chart').clientHeight-chart.timeScale().height();
+  const top=Math.max(0,Math.min(y1,y2)),bot=Math.min(h,Math.max(y1,y2));
+  Object.assign(rbox.style,{top:top+'px',height:Math.max(0,bot-top)+'px',
+    width:($('dt-chart').clientWidth-chart.priceScale('right').width())+'px'});
+  rbox.hidden=false;
+}
+function renderChart(t){
+  const el=$('dt-chart'),all=t.candles||[];
+  lastDT=t;
+  if(!window.LightweightCharts){el.textContent='chart library unavailable';return}
+  if(!all.length){if(!chart)el.textContent='no candle data yet';return}
+  if(!chart){
+    el.textContent='';
+    chart=LightweightCharts.createChart(el,{autoSize:true,
+      layout:{background:{type:'solid',color:'#000a04'},textColor:'#0c4',fontFamily:'Menlo,Consolas,monospace',fontSize:12},
+      grid:{vertLines:{color:'rgba(0,102,51,.18)'},horzLines:{color:'rgba(0,102,51,.18)'}},
+      rightPriceScale:{borderColor:'#063',scaleMargins:{top:.06,bottom:.06}},
+      timeScale:{borderColor:'#063',timeVisible:true,secondsVisible:false,rightOffset:3,minBarSpacing:4},
+      crosshair:{mode:0}});
+    series=chart.addCandlestickSeries({upColor:'#00ff66',downColor:'#ff4455',borderUpColor:'#00ff66',borderDownColor:'#ff4455',
+      wickUpColor:'#0c4',wickDownColor:'#ff4455',priceFormat:{type:'price',precision:2,minMove:.01},
+      autoscaleInfoProvider:()=>band&&{priceRange:{minValue:band[0],maxValue:band[1]}}});
+    rbox=document.createElement('div');rbox.className='rbox';rbox.hidden=true;
+    rbox.innerHTML='<span class="rt"></span><span class="rb"></span>';el.appendChild(rbox);
+    const later=()=>requestAnimationFrame(placeBox);
+    chart.timeScale().subscribeVisibleLogicalRangeChange(later);chart.subscribeCrosshairMove(later);
+    new ResizeObserver(later).observe(el);
+  }
+  const cs=all.slice(innerWidth<600?-56:-96);   // 15-min candles: 14h on a phone, the full 24h on desktop
+  const last=cs[cs.length-1].c;
+  let lo=Math.min(...cs.map(c=>c.l)),hi=Math.max(...cs.map(c=>c.h));
+  const ri=(t.range||{}).intraday,rw=(t.range||{}).wide,rm=(t.range||{}).macro;
+  if(ri){lo=Math.min(lo,ri.support);hi=Math.max(hi,ri.resistance)}
+  const go=(t.orders||[]).filter(o=>o.tier!=='reserve').map(o=>o.price).sort((a,b)=>b-a);
+  const ro=(t.orders||[]).filter(o=>o.tier==='reserve').map(o=>o.price).sort((a,b)=>b-a),lots=t.lots||[];
+  const lines=[
+    ...(rw?[{price:rw.support,color:'#2a8a55',style:2,title:'7D S',w:1},{price:rw.resistance,color:'#2a8a55',style:2,title:'7D R',w:1}]:[]),
+    ...(rm?[{price:rm.support,color:'#00ff66',style:0,title:'60D FLOOR',w:2,keep:true}]:[]),
+    ...go.map(p=>({price:p,color:'#7dffb0',style:2,w:2,title:'▲ BUY'})),
+    ...ro.map((p,i)=>({price:p,color:'#4fc3ff',style:2,w:2,title:'▲ RESERVE',keep:i===0})),
+    ...lots.map(x=>({price:x.target,color:'#ffb300',style:2,w:2,title:'▼ SELL'})),
+    ...lots.map(x=>({price:x.entry,color:x.status==='recovering'?'#ff4455':'#00ff66',style:1,title:'',w:1,noLabel:true}))];
+  for(const l of lines)if(l.keep||Math.abs(l.price-last)/last<=NEAR){lo=Math.min(lo,l.price);hi=Math.max(hi,l.price)}   // the first reserve rung always shows
+  const pad=(hi-lo)*.04;band=[lo-pad,hi+pad];
+  series.setData(cs.map(c=>({time:c.t,open:c.o,high:c.h,low:c.l,close:c.c})));
+  priceLines.forEach(l=>series.removePriceLine(l));priceLines=[];
+  let offN=0;const off=[];
+  for(const l of lines){
+    if(l.price<band[0]||l.price>band[1]){if(l.title)off.push(l.title+' £'+Number(l.price).toFixed(0));else offN++;continue}
+    priceLines.push(series.createPriceLine({price:l.price,color:l.color,lineWidth:l.w,lineStyle:l.style,
+      axisLabelVisible:!l.noLabel,title:l.title}));
+  }
+  if(ri){rbox.querySelector('.rt').textContent='RESISTANCE £'+ri.resistance.toFixed(2)+(ri.resistance_touches?' ×'+ri.resistance_touches:'');
+         rbox.querySelector('.rb').textContent='SUPPORT £'+ri.support.toFixed(2)+(ri.support_touches?' ×'+ri.support_touches:'')}
+  // fills as arrows on the candle they happened in
+  const step=cs.length>1?cs[1].t-cs[0].t:900,t0=cs[0].t;
+  series.setMarkers((t.fills||[]).filter(f=>f.t>=t0).map(f=>({time:t0+Math.floor((f.t-t0)/step)*step,
+    position:f.side==='buy'?'belowBar':'aboveBar',color:f.side==='buy'?'#00ff66':'#ffb300',
+    shape:f.side==='buy'?'arrowUp':'arrowDown',text:f.side==='buy'?'B':'S'}))
+    .sort((a,b)=>a.time-b.time));
+  fitChart();
+  $('dt-lvlat').textContent=(t.levels_at?'grid @ '+String(t.levels_at).slice(11,16)+'Z':'')
+    +(off.length||offN?' · off-chart: '+off.concat(offN?[offN+' more lot lines']:[]).join(', '):'');
+}
+const gridOn=t=>t.grid_active??((t.regime||'range')==='range');
+function fitChart(){if(chart&&!$('tab-daytrade').hidden)requestAnimationFrame(()=>{chart.timeScale().fitContent();requestAnimationFrame(placeBox)})}
+addEventListener('resize',()=>{if(lastDT)renderChart(lastDT)});   // phone rotation: re-pick the candle count
+
+// ---- data ----
+async function load(){
+  try{
+    const r=await fetch('stats.json?ts='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw 0; const d=await r.json();
+    lastSync=new Date(d.updated);
+    const hm=lastSync.toISOString().slice(11,16)+'Z';
+    $('updated').textContent='SYNC '+lastSync.toISOString().slice(5,10)+' '+hm;
+    $('hb-sync').textContent=hm;
+    // accumulation
+    const a=d.accumulation||{};
+    $('acc-mode').textContent=(a.mode||'offline').toUpperCase();
+    renderAcc(a);
+    // daytrade
+    const t=d.daytrade||{};
+    $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
+    const net=t.net_pnl_after_fees??t.realized_pnl_gbp??0;
+    cell($('dt-pnl'),gbp4(net),net<0?'neg':'pos');
+    $('dt-pnlsub').textContent='TODAY '+gbp4(t.net_today||0)+' · '+(t.trades_today||0)+' sold today · '+(t.trades||0)+' all-time';
+    const lots=t.lots||[];
+    $('dt-lots').textContent=t.lots_open??lots.length;
+    $('dt-lotsub').textContent=(t.lots_recovering||0)+' waiting to recover · '+(t.lots_in_profit||0)+' in profit · '
+      +gbp(t.invested_gbp||0)+' cost';
+    $('dt-orders').textContent=t.orders_resting??0;
+    const zz=t.sizing||{},p1=n=>n==null?'—':(Number(n)*100).toFixed(1)+'%';
+    $('dt-gridsub').textContent=t.orders_resting?(t.orders||[]).filter(o=>o.tier!=='reserve').length+' grid · '
+      +(t.orders||[]).filter(o=>o.tier==='reserve').length+' reserve':'no buys resting';
+    $('dt-step').textContent=zz.step_pct!=null?(zz.step_pct*100).toFixed(2)+'%':'—';
+    $('dt-stepsub').textContent=zz.step_pct!=null?(zz.step_pct>zz.step_config_pct?'fee floor '+p1(zz.fee_floor_pct)+' overrides '+p1(zz.step_config_pct)
+      :'configured '+p1(zz.step_config_pct)+' · fee floor '+p1(zz.fee_floor_pct)):'';
+    $('dt-depth').textContent=zz.depth_pct!=null&&gridOn(t)?p1(zz.depth_pct):'—';
+    $('dt-depthsub').textContent=zz.rungs!=null?(t.grid?'£'+t.grid.top.toFixed(0)+' → £'+t.grid.bottom.toFixed(0)+' · ':'')+zz.rungs+' rungs to 60d floor':'grid not built';
+    $('dt-deploy').textContent=zz.deploy_pct!=null?Math.round(zz.deploy_pct*100)+'%':'—';
+    $('dt-deploysub').textContent=zz.grid_cap_gbp!=null?gbp(zz.grid_in_lots_gbp)+' in lots + '+gbp(zz.grid_resting_gbp)+' resting / '+gbp(zz.grid_cap_gbp):'';
+    $('dt-reserve').textContent=zz.reserve_gbp!=null?gbp(zz.reserve_gbp):'—';
+    $('dt-reservesub').textContent=zz.reserve_gbp!=null?gbp(zz.reserve_in_lots_gbp)+' in lots + '+gbp(zz.reserve_resting_gbp)+' resting under support':'';
+    $('dt-pair').textContent=t.pair||'ETH-GBP';
+    $('dt-price').textContent=t.last_price?pxf(t.last_price):'£—';
+    $('dt-unreal').textContent=t.unrealised_gbp!=null?'open lots '+(t.unrealised_gbp>=0?'+':'')+gbp4(t.unrealised_gbp)+' unrealised (not sold)':'—';
+    const rg=$('dt-regime'),ranging=gridOn(t)&&!t.cooldown_active,rm=(t.range||{}).macro||(t.range||{}).intraday;
+    rg.className='regime'+(ranging?'':' paused');
+    rg.replaceChildren((ranging?'▣ GRID ACTIVE — '+String(t.regime_raw||t.regime).replace('_',' ').toUpperCase():t.cooldown_active?'⏸ COOLDOWN — NO NEW GRID BUYS'
+      :'⏸ GUARD: '+String(t.regime).replace('_',' ').toUpperCase()+' — GRID PAUSED, LOTS HELD')
+      +(rm?' · 60D £'+rm.support.toFixed(0)+'–£'+rm.resistance.toFixed(0):''),
+      Object.assign(document.createElement('small'),{textContent:t.regime_why||''}));
+    const dep=(t.invested_gbp||0),pot=(t.pot_gbp||50),pct=Math.min(100,Math.round(dep/pot*100));
+    $('dt-potbar').style.width=pct+'%';
+    $('dt-potlbl').textContent='POT '+gbp(pot)+' · IN LOTS '+gbp(dep)+' · CASH '+gbp(t.cash_gbp??pot-dep)
+      +(t.median_time_to_profit_min!=null?' · MEDIAN TIME-TO-PROFIT '+dur(t.median_time_to_profit_min):'');
+    const p2=n=>(Number(n)*100).toFixed(2)+'%';
+    $('dt-fees').textContent='MAKER FEE '+p2(t.fee_rate||0)+'/SIDE · EVERY LOT SELLS AT +'+p2(t.effective_tp||0)
+      +' · NO STOP-LOSS · NEVER SOLD AT A LOSS'+(t.grid_stats?' · TODAY: '+t.grid_stats.reprices+' REPRICES, '
+      +t.grid_stats.cancelled+' BUYS CANCELLED':'');
+    const pj=t.projection,pa=t.plan_vs_actual;
+    if(pj){
+      const el=$('dt-proj'),mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+      const good=pa&&/ON TRACK|AHEAD/.test(pa.status),aside=pa&&/STANDING|EARLY/.test(pa.status);
+      const sc=mk('div',{className:'scen'});
+      for(const x of pj.scenarios)sc.append(mk('span',{textContent:x.per_day+'/day → '+gbp(x.potential)}));
+      el.replaceChildren(mk('div',{className:'k',innerHTML:'POTENTIAL THIS WEEK · <b>estimate, not a promise</b>'}),
+        mk('div',{className:'projv',textContent:pj.ranging?gbp(pj.base_potential_week):'£0.00'}),
+        mk('div',{className:'k',textContent:(pj.ranging?pj.base_round_trips_week+' round trips':'grid paused')+' · '+pj.rungs+' × '+gbp(pj.lot_gbp)
+          +' · '+gbp4(pj.net_per_round_trip)+'/round trip · '+pj.swings_24h+' swing/24h'}),sc,
+        pa?mk('div',{style:'margin-top:8px;font-size:.85em'}):'');
+      if(pa)el.lastChild.append(mk('span',{className:'pva '+(good?'ok':aside?'mute':'bad'),
+        textContent:'PLAN vs ACTUAL: '+(aside?'STANDING ASIDE':pa.status)}),
+        ' '+pa.actual_round_trips+' / '+pa.planned_round_trips_so_far+' round trips · '+gbp4(pa.actual_net)+' / '+gbp(pa.planned_potential_so_far));
+    }
+    const sb=document.createElement('b');sb.textContent='STRATEGY ';
+    $('dt-strategy').replaceChildren(sb,t.strategy||'range grid');
+    renderChart(t);
+    const oo=t.open_orders||[],nb=oo.filter(o=>o.side==='buy').length,ns=oo.length-nb;
+    const or=(cells,cls)=>{const r=document.createElement('div');r.className='orow'+(cls?' '+cls:'');
+      for(const [txt,c,lbl] of cells){const e=document.createElement('span');e.textContent=txt;if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
+    $('dt-osum').replaceChildren('OPEN ORDERS · ',Object.assign(document.createElement('b'),{style:'color:#7dffb0',textContent:nb}),
+      ' BUY ▲ waiting for a dip · ',Object.assign(document.createElement('b'),{style:'color:var(--warn)',textContent:ns}),' SELL ▼ waiting for a rise');
+    const kindOf=o=>o.side==='sell'?'sell':o.tier==='reserve'?'reserve':'buy';
+    $('dt-orows').replaceChildren(...(oo.length?[or([['SIDE'],['PRICE','r'],['SIZE £ / QTY','r'],['DISTANCE','r'],['PLACED','r'],['STATUS','r']],'h'),
+      ...oo.map(o=>or([[o.side==='sell'?'▼ SELL':o.tier==='reserve'?'▲ RESERVE':'▲ BUY','side '+kindOf(o),'SIDE'],
+        [pxf(o.price),'r','PRICE'],
+        [gbp(o.gbp||0)+' / '+(o.qty!=null?Number(o.qty).toFixed(6):'—')+' ETH','r','SIZE'],
+        [o.away_pct==null?'—':(o.away_pct>0?'+':'')+(o.away_pct*100).toFixed(2)+'%','r','DISTANCE'],
+        [o.placed?String(o.placed).slice(5,16).replace('T',' ')+'Z':'—','r','PLACED'],
+        [o.status==='filling'?'FILLING':'OPEN · WAITING','badge '+o.status,'STATUS']],kindOf(o)))]
+      :[or([['no open orders — the grid is paused and nothing is held','mute full']])]));
+    const ev=(t.order_events||[]).slice().reverse(),EVL={placed:'PLACED',cancelled:'CANCELLED',filled:'FILLED',sold:'SOLD'};
+    $('dt-ev').replaceChildren(...(ev.length?ev.map(e=>Object.assign(document.createElement('div'),{className:'ev-'+e.kind,
+      textContent:String(e.t).slice(11,19)+'Z  '+(EVL[e.kind]||e.kind).padEnd(9)+' '+(e.side==='sell'?'▼ SELL':'▲ BUY')
+        +(e.tier==='reserve'?' (reserve)':'')+' @ '+pxf(e.price)+' · '+gbp(e.gbp)+(e.note?' — '+e.note:'')}))
+      :[Object.assign(document.createElement('div'),{className:'mute',textContent:'no order activity yet today'})]));
+    const ST={recovering:'WAITING TO RECOVER',in_profit:'IN PROFIT · TARGET SET',selling:'AT TARGET · SELLING'};
+    const lr=(cells,cls)=>{const r=document.createElement('div');r.className='lrow'+(cls?' '+cls:'');
+      for(const [txt,c,lbl] of cells){const e=document.createElement('span');e.textContent=txt;if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
+    $('dt-lsum').replaceChildren('OPEN-LOT LEDGER · ',Object.assign(document.createElement('b'),{className:'dn',textContent:t.lots_recovering||0}),
+      ' WAITING TO RECOVER · ',Object.assign(document.createElement('b'),{className:'up',textContent:t.lots_in_profit||0}),
+      ' IN PROFIT / TARGET SET · nothing is ever sold below its buy price');
+    $('dt-rows').replaceChildren(...(lots.length?[lr([['LOT (COIN · QTY)'],['BUY PRICE','r'],['NOW / UNREALISED','r'],['SELL TARGET','r'],['HELD','r'],['STATUS','r']],'h'),
+      ...lots.map(x=>lr([[(x.coin||'ETH')+' '+Number(x.qty).toFixed(6)+' · '+gbp(x.gbp)+(x.tier!=='grid'?' ('+(x.tier==='legacy'?'old':x.tier)+')':''),'','LOT'],
+        [pxf(x.entry),'r','BUY'],
+        [x.unrealised_gbp!=null?(x.unrealised_gbp>=0?'+':'')+gbp4(x.unrealised_gbp)+' '+pctf(x.unrealised_pct):'—','r '+pcls(x.unrealised_pct),'UNREALISED'],
+        [pxf(x.target)+(x.to_target_pct>0?' (+'+(x.to_target_pct*100).toFixed(2)+'%)':''),'r','TARGET'],
+        [x.held_minutes!=null?dur(x.held_minutes):'—','r','HELD'],
+        [ST[x.status]||'—','badge '+(x.status||''),'STATUS']],x.status))]
+      :[lr([['no open lots — the grid buys when price dips into its rungs','mute full']])]));
+    const g=$('dt-guard');
+    if(t.losing_streak!=null){
+      g.hidden=false;g.classList.toggle('on',!!t.cooldown_active);
+      g.textContent=t.cooldown_active
+        ?'⚠ COOLDOWN · '+t.losing_streak+' BAD DAYS · NO NEW GRID BUYS UNTIL '+String(t.cooldown_until).slice(5,16).replace('T',' ')+'Z'
+        :'SAFEGUARD OK · BAD-DAY STREAK '+t.losing_streak+'/'+(t.max_losing_streak||2)+' · NEW BUYS ALLOWED';
+    }
+    $('dt-log').replaceChildren(...(t.journal&&t.journal.length?t.journal:['no trades yet']).slice(-8)
+      .map(l=>Object.assign(document.createElement('div'),{textContent:String(l)})));
+    cell($('ov-dt'),gbp4(net),net<0?'neg':'pos');
+    $('ov-dtsub').textContent=(t.trades?t.trades+' lots sold':'no lots sold yet')+' · '+(t.lots_open||0)+' waiting · '
+      +(t.orders_resting||0)+' buys resting · '+(gridOn(t)?'grid active':'paused');
+    renderDip(d.dip_alert);
+    const st=[['ACCUMULATION',(a.mode||'offline').toUpperCase()+' — '+(a.status||'')],
+      ['DAY-TRADE',(t.mode||'paper').toUpperCase()+' · '+(t.pair||'ETH-GBP')+' '+(t.last_price?pxf(t.last_price):'')
+        +' · GRID '+(gridOn(t)?'ACTIVE':'PAUSED ('+String(t.regime).replace('_',' ')+')')
+        +(t.cooldown_active?' · COOLDOWN':'')+' · ticks every 30s'],
+      ['DIP ALERT',d.dip_alert?d.dip_alert.level.toUpperCase()+' (warn ≥7%, strong ≥12% below 7-day high)':'unavailable'],
+      ['LAST SYNC',lastSync.toISOString().slice(0,16).replace('T',' ')+'Z · runner every 2 min, page refresh ≤15 min']];
+    $('ov-status').replaceChildren(...st.map(([k,v])=>{const e=document.createElement('div'),b=document.createElement('b');
+      b.textContent=k+' ';e.append(b,v);return e}));
+    $('foot').textContent='WMBOT TERMINAL · ACCUMULATION '+(a.mode||'offline').toUpperCase()
+      +' · DAY-TRADE '+(t.mode||'paper').toUpperCase()+' · REAL PORTFOLIO ENCRYPTED';
+    enqueue(d.thoughts&&d.thoughts.length?d.thoughts:['awaiting first reasoning run…']);
+    heartbeat();
+  }catch(e){
+    $('updated').innerHTML='<span class="err">NO SIGNAL — awaiting first bot run</span>';
+    enqueue(['link down — retrying in 60s…']);
+  }
+}
+enqueue(['boot sequence · WMBOT terminal online','establishing uplink to stats feed…']);
+load();setInterval(load,60000);
+</script>
+</body>
+</html>
