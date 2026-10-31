@@ -388,6 +388,7 @@
         <span><i style="border-color:#ff4455;border-top-style:dotted"></i>LOT ENTRY (RECOVERING)</span>
         <span><i style="border-color:#00ff66;border-top-style:dotted"></i>LOT ENTRY (IN PROFIT)</span><span>▲▼ FILLS</span>
         <span id="dt-lvlat"></span>
+        <span id="dt-ghost" style="color:var(--warn)"></span>
       </div>
       <div class="k" style="margin-top:12px" id="dt-potlbl"></div>
       <div class="bar"><i id="dt-potbar"></i></div>
@@ -746,7 +747,7 @@ function renderDip(a){
 }
 
 // ---- day-trade candle chart: support / resistance / the bot's ladder (TradingView lightweight-charts) ----
-var chart=null,series=null,priceLines=[],band=null,lastDT=null,rbox=null,chanSeries=[];   // var: showTab() may run before this line
+var chart=null,series=null,priceLines=[],band=null,lastDT=null,rbox=null,chanSeries=[],ghost=null;   // var: showTab() may run before this line
 // focus the price axis on the visible candles, the range box and the grid/lots near them, so
 // far-away levels can't squash the candles; lines outside that band are listed, not drawn
 const NEAR=0.03;
@@ -788,7 +789,7 @@ function renderChart(t){
       layout:{background:{type:'solid',color:'#000a04'},textColor:'#0c4',fontFamily:'Menlo,Consolas,monospace',fontSize:12},
       grid:{vertLines:{color:'rgba(0,102,51,.18)'},horzLines:{color:'rgba(0,102,51,.18)'}},
       rightPriceScale:{borderColor:'#063',scaleMargins:{top:.06,bottom:.06}},
-      timeScale:{borderColor:'#063',timeVisible:true,secondsVisible:false,rightOffset:3,minBarSpacing:4},
+      timeScale:{borderColor:'#063',timeVisible:true,secondsVisible:false,rightOffset:8,minBarSpacing:4},
       crosshair:{mode:0}});
     series=chart.addCandlestickSeries({upColor:'#00ff66',downColor:'#ff4455',borderUpColor:'#00ff66',borderDownColor:'#ff4455',
       wickUpColor:'#0c4',wickDownColor:'#ff4455',priceFormat:{type:'price',precision:2,minMove:.01},
@@ -842,6 +843,7 @@ function renderChart(t){
     position:f.side==='buy'?'belowBar':'aboveBar',color:f.side==='buy'?'#00ff66':'#ffb300',
     shape:f.side==='buy'?'arrowUp':'arrowDown',text:f.side==='buy'?'B':'S'})).concat(bos)
     .sort((a,b)=>a.time-b.time));
+  drawGhost();
   fitChart();
   $('dt-lvlat').textContent=(t.levels_at?'grid @ '+String(t.levels_at).slice(11,16)+'Z':'')
     +(off.length||offN?' · off-chart: '+off.concat(offN?[offN+' more lot lines']:[]).join(', '):'');
@@ -867,6 +869,42 @@ function liveTick(px,bid,ask,at){
   const dot=$('mkt-dot');dot.classList.add('on');clearTimeout(liveTick.t);liveTick.t=setTimeout(()=>dot.classList.remove('on'),250);
   if(!paintLive.q){paintLive.q=true;requestAnimationFrame(paintLive)}
 }
+// ---- PROJECTION ("ghost" candles): a picture of the engine's CURRENT lean — not a forecast to trust ----
+// From the last (forming) candle, GHOST_N hollow, faded candles step by S × GHOST_DRIFT × the timeframe's
+// typical candle range (mean high−low of the last 30): a strong lean draws them steeper in its direction, a
+// weak one nearly flat and grey. A dashed cone (± range × √steps) shows the spread around that path.
+// The lean is the layer matching the chart's timeframe: 15M → FAST, 1H → MEDIUM, 4H → SLOW.
+const GHOST_N=5,GHOST_DRIFT=.5,GHOST_CONE=.8,GHOST_LAYER={'15m':'fast','1h':'medium','4h':'slow'};
+function drawGhost(){
+  if(!chart||!series)return;
+  const t=lastDT||{},c=t.confluence,lay=c&&c.layers&&(c.layers[GHOST_LAYER[chartTF]]||c.layers.fast);
+  const cs=MKT.candles[chartTF]||(t.charts&&t.charts[chartTF])||[];
+  if(!ghost){
+    ghost={c:chart.addCandlestickSeries({upColor:'rgba(0,0,0,0)',downColor:'rgba(0,0,0,0)',borderVisible:true,
+        priceLineVisible:false,lastValueVisible:false,autoscaleInfoProvider:()=>null}),
+      hi:chart.addLineSeries({lineWidth:1,lineStyle:2,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false,autoscaleInfoProvider:()=>null}),
+      lo:chart.addLineSeries({lineWidth:1,lineStyle:2,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false,autoscaleInfoProvider:()=>null})};
+  }
+  if(!lay||cs.length<31){ghost.c.setData([]);ghost.hi.setData([]);ghost.lo.setData([]);$('dt-ghost').textContent='';return}
+  const S=Number(lay.S)||0,conf=Math.abs(S),step=TFS[chartTF].secs,last=cs[cs.length-1];
+  const atr=cs.slice(-31,-1).reduce((a,k)=>a+(k.h-k.l),0)/30;
+  const a=(.18+.55*Math.min(1,conf*2)).toFixed(2);   // fainter with less conviction
+  const col=lay.direction==='up'?'0,255,102':lay.direction==='down'?'255,68,85':'160,160,160';
+  ghost.c.applyOptions({borderUpColor:'rgba('+col+','+a+')',borderDownColor:'rgba('+col+','+a+')',
+    wickUpColor:'rgba('+col+','+a+')',wickDownColor:'rgba('+col+','+a+')'});
+  ghost.hi.applyOptions({color:'rgba('+col+','+(a*.6).toFixed(2)+')'});ghost.lo.applyOptions({color:'rgba('+col+','+(a*.6).toFixed(2)+')'});
+  const bars=[],up=[{time:last.t,value:last.c}],dn=[{time:last.t,value:last.c}];
+  let prev=last.c;
+  for(let k=1;k<=GHOST_N;k++){
+    const mid=last.c+k*S*GHOST_DRIFT*atr,tt=last.t+k*step,w=GHOST_CONE*atr*Math.sqrt(k);
+    bars.push({time:tt,open:prev,close:mid,high:Math.max(prev,mid)+.3*atr,low:Math.min(prev,mid)-.3*atr});
+    up.push({time:tt,value:mid+w});dn.push({time:tt,value:mid-w});prev=mid;
+  }
+  ghost.c.setData(bars);ghost.hi.setData(up);ghost.lo.setData(dn);
+  ghost.c.setMarkers([{time:bars[0].time,position:'aboveBar',color:'rgba('+col+',.9)',shape:'circle',text:'PROJECTION'}]);
+  $('dt-ghost').textContent='PROJECTION · '+String(lay.direction).toUpperCase()+' · confidence '+conf.toFixed(2)
+    +' · '+GHOST_N+' candles, cone ±range·√n · a picture of the current lean — not a prediction guarantee';
+}
 function paintLive(){
   paintLive.q=false;
   const px=MKT.price,t=lastDT;
@@ -884,6 +922,7 @@ function paintLive(){
     const c=cs[cs.length-1];
     if(band&&(px>band[1]||px<band[0]))band=[Math.min(band[0],px),Math.max(band[1],px)];
     try{series.update({time:c.t,open:c.o,high:c.h,low:c.l,close:c.c})}catch(e){}
+    drawGhost();   // the projection moves with the forming candle
   }
   renderBook();
   renderLean();   // "pressing resistance" / "testing support" follow the live price
