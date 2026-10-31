@@ -929,19 +929,37 @@ document.querySelector('[data-tab="daytrade"]').addEventListener('click',()=>{if
 // this site's own stats.json (Pages allows ~10 builds/hour). Whichever is newer wins.
 const STATS_POLL=20;
 var nextPoll=null,lastUpdated=null;   // var: heartbeat() runs before this line
-const LIVE_SRC=(()=>{const m=location.hostname.match(/^([^.]+)\.github\.io$/),repo=location.pathname.split('/')[1];
-  return m&&repo?'https://raw.githubusercontent.com/'+m[1]+'/'+repo+'/live/stats.json':null})();
+const LIVE_REPO=(()=>{const m=location.hostname.match(/^([^.]+)\.github\.io$/),repo=location.pathname.split('/')[1];
+  return m&&repo?m[1]+'/'+repo:null})();
+const LIVE_SRC=LIVE_REPO?'https://raw.githubusercontent.com/'+LIVE_REPO+'/live/stats.json':null;
+// raw's CDN can serve a branch URL up to 5 min stale whatever the query string (most requests do
+// come back fresh), so every poll reads the branch URL, and at most every 2 min the page also asks
+// GitHub for the live branch's commit and reads that exact commit's file, which is never stale.
+// Anonymous GitHub API calls are limited to 60/hour per IP (even unchanged 304s count): 2 min keeps
+// one open page at ~30/hour; on a 403 / 429 it backs off for 15 min. Newest copy always wins.
+let shaAt=0,shaBackoff=0;
+async function liveSha(){
+  if(Date.now()-shaAt<120000||Date.now()<shaBackoff)return null;
+  shaAt=Date.now();
+  try{const r=await fetch('https://api.github.com/repos/'+LIVE_REPO+'/commits/live',
+      {cache:'no-store',headers:{Accept:'application/vnd.github.sha'}});
+    if(r.status===403||r.status===429){shaBackoff=Date.now()+900000;return null}
+    const t=r.ok?(await r.text()).trim():'';return /^[0-9a-f]{40}$/.test(t)?t:null}catch(e){return null}
+}
 async function fetchStats(){
-  const get=u=>fetch(u+(u.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
-  const [a,b]=await Promise.all([get('stats.json'),LIVE_SRC?get(LIVE_SRC):null]);
-  return [a,b].filter(Boolean).sort((x,y)=>String(y.updated).localeCompare(String(x.updated)))[0]||null;
+  const get=(u,bust)=>fetch(bust?u+(u.includes('?')?'&':'?')+'t='+Date.now():u,{cache:bust?'no-store':'default'})
+    .then(r=>r.ok?r.json():null).catch(()=>null);
+  const sha=LIVE_REPO?await liveSha():null;
+  const got=await Promise.all([get('stats.json',true),LIVE_SRC?get(LIVE_SRC,true):null,
+    sha?get('https://raw.githubusercontent.com/'+LIVE_REPO+'/'+sha+'/stats.json',false):null]);
+  return got.filter(Boolean).sort((x,y)=>String(y.updated).localeCompare(String(x.updated)))[0]||null;
 }
 async function load(){
   nextPoll=new Date(Date.now()+STATS_POLL*1000);
   try{
     const d=await fetchStats();
     if(!d)throw 0;
-    if(d.updated===lastUpdated){heartbeat();return}   // nothing new published: keep what's on screen
+    if(lastUpdated&&String(d.updated)<=String(lastUpdated)){heartbeat();return}   // nothing newer published: keep what's on screen
     lastUpdated=d.updated;
     lastSync=new Date(d.updated);
     $('hb-sync').textContent=lastSync.toISOString().slice(11,19)+'Z';
