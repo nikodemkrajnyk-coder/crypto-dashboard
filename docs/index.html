@@ -59,6 +59,10 @@
   /* day-trade chart */
   .chart{height:clamp(440px,66vh,960px);margin-top:12px;border:1px solid #052;border-radius:5px;overflow:hidden;
          color:var(--dim);display:flex;align-items:center;justify-content:center;position:relative}
+  .learn{margin-top:12px;padding:8px 12px;border:1px solid #063;border-radius:5px;font-size:.8em;line-height:1.65;letter-spacing:.04em}
+  .learn .lh{font-weight:700;letter-spacing:.12em;color:var(--g)}
+  .learn .lh .bad{color:#ff4455} .learn .lh .ok{color:#00ff66} .learn .lh .mid{color:var(--warn)}
+  .learn div{color:var(--gd)} .learn b{color:var(--g);font-weight:700}
   .tfbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:12px;font-size:.78em;letter-spacing:.08em}
   .tfbar button{font-size:1em;padding:4px 10px;color:var(--gd)}
   .tfbar button[aria-pressed="true"]{color:#000;background:var(--g);border-color:var(--g);font-weight:700}
@@ -358,6 +362,7 @@
       <div class="regime" id="dt-regime">—</div>
       <div class="bookbar" id="dt-book">BOOK —</div>
       <div class="rows" id="dt-layers"></div>
+      <div class="learn" id="dt-learn" hidden></div>
       <div class="proj" id="dt-proj"></div>
       <div class="tfbar" role="group" aria-label="chart timeframe"><span>CHART</span>
         <button type="button" data-tf="15m">15M</button><button type="button" data-tf="1h">1H</button><button type="button" data-tf="4h">4H</button>
@@ -875,6 +880,26 @@ async function load(){
     const gs=t.grid_stats;
     $('dt-fees').textContent='MAKER FEE '+p2(t.fee_rate||0)+'/SIDE · NO STOP-LOSS · NEVER SOLD AT A LOSS'
       +(gs?' · TODAY '+gs.placed+' PLACED · '+gs.cancelled+' CANCELLED · '+(gs.filled||0)+' FILLED · '+(gs.sold||0)+' SOLD · '+gs.reprices+' REPRICES':'');
+    const lr0=t.learning,le=$('dt-learn');
+    if(lr0&&(lr0.day||lr0.latest_safeguard)){
+      const lm=lr0.metrics,pm=lr0.prev,v=String(lr0.verdict||'—'),g=lr0.reprice_guard,lv=lr0.live;
+      const row=(k,txt)=>{const d=mk('div');d.append(mk('b',{textContent:k+' '}),txt);return d};
+      const eff=x=>x==null?'—':(x*100).toFixed(2)+'%';
+      const kids=[mk('div',{className:'lh',textContent:'DAILY LEARNINGS · '+(lr0.day||'—')+' · '})];
+      kids[0].append(mk('span',{className:/BETTER/.test(v)?'ok':/WORSE/.test(v)?'bad':'mid',textContent:v}));
+      if(lm)kids.push(row('DAY','sold '+lm.sells+(pm?' vs '+pm.sells:'')+' · filled '+lm.buys+(pm?' vs '+pm.buys:'')
+        +' · net '+dq4(lm.net)+(pm?' vs '+dq4(pm.net):'')+' · fill eff '+eff(lm.fill_eff)+' ('+lm.buys+'/'+lm.placed+')'
+        +' · reprices '+lm.reprices+(lm.range_pct!=null?' · range '+eff(lm.range_pct):'')));
+      for(const f of (lr0.findings||[]))kids.push(row(f.who==='bot'?'CAUSE · BOT':'CAUSE · MARKET',f.text));
+      kids.push(row('CHANGE',[...(lr0.changes||[]),...(lr0.reverted||[]).map(r=>'REVERTED '+r)].join(' · ')||'none'));
+      const sg=lr0.latest_safeguard;
+      if(sg)kids.push(row('SAFEGUARD #'+(lr0.safeguards||[]).length,sg.title+' (since '+sg.added+')'));
+      if(lv)kids.push(row('LAST '+lv.hours+'H','placed '+lv.placed+' · reprices '+(lv.reprices||0)+' ('+(lv.book_reprices||0)+' book) · filled '
+        +(lv.filled||0)+' · sold '+(lv.sold||0)+' · fill eff '+eff(lv.fill_eff)));
+      if(g)kids.push(row('GUARD','wall drift ≤'+(g.wall_move_pct*100).toFixed(2)+'% · wall ≥'+g.wall_min_age_s+'s & ≥'+g.wall_min_mult
+        +'× · hold buys within '+(g.hold_near_pct*100).toFixed(1)+'% · ≤'+g.max_reprices_per_hour+' book reprices/h/layer'));
+      le.replaceChildren(...kids);le.hidden=false;
+    }else le.hidden=true;
     const pj=t.projection,pa=t.plan_vs_actual;
     if(pj){
       const el=$('dt-proj');
