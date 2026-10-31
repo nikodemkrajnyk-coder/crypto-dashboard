@@ -30,6 +30,10 @@
   .hdr h1{font-size:clamp(17px,2.2vw,30px);letter-spacing:.2em;text-shadow:0 0 10px var(--g)}
   .hdr .t{font-size:clamp(11px,1vw,14px);color:var(--gd)}
   .blink{animation:b 1.1s steps(2) infinite}@keyframes b{50%{opacity:0}}
+  .fresh{display:flex;flex-wrap:wrap;gap:2px 14px;justify-content:flex-end}
+  .fresh .dot{display:inline-block;width:.6em;height:.6em;border-radius:50%;background:#063;margin-right:5px;vertical-align:middle;transition:background .4s}
+  .fresh .dot.on{background:#00ff66;box-shadow:0 0 8px #00ff66;transition:none}
+  .fresh .stale{color:var(--warn)}
 
   /* tabs */
   .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--dim);padding-bottom:8px}
@@ -256,7 +260,7 @@
 <div class="wrap">
   <div class="hdr">
     <h1>WESTMERE // CRYPTO<span class="blink">_</span></h1>
-    <div class="t" id="updated">SYNCING…</div>
+    <div class="t fresh"><span id="mkt-fresh"><i class="dot" id="mkt-dot"></i>MARKET connecting…</span><span id="updated">BOT STATE syncing…</span></div>
   </div>
 
   <div class="dip" id="dip" role="alert" hidden></div>
@@ -287,7 +291,7 @@
       <div class="hb">
         <div class="cell"><div class="k">LAST SYNC</div><div class="v" id="hb-sync">—</div></div>
         <div class="cell"><div class="k">SYNC AGE</div><div class="v" id="hb-age">—</div></div>
-        <div class="cell"><div class="k">NEXT REFRESH ≤</div><div class="v" id="hb-next">--:--</div></div>
+        <div class="cell"><div class="k">NEXT BOT-STATE CHECK</div><div class="v" id="hb-next">--:--</div></div>
       </div>
       <div class="stream" id="stream"><div class="ln" id="cursor-line"><span class="cur"></span></div></div>
     </div>
@@ -450,14 +454,19 @@ function typeNext(){
 let lastSync=null;
 const pad=n=>String(n).padStart(2,'0');
 function heartbeat(){
-  const now=new Date();
-  // the Mac runner works every 2 min; this page is republished on any change, else at least every 15 min
+  const now=new Date(),ago=s=>s<60?s+'s':s<3600?Math.floor(s/60)+'m '+pad(s%60)+'s':Math.floor(s/3600)+'h '+pad(Math.floor(s%3600/60))+'m';
+  // bot state: the Mac runner publishes every ~2 min on change; this page re-checks every STATS_POLL seconds
   if(lastSync){
-    const left=Math.floor((lastSync.getTime()+15*60000-now)/1000);
-    $('hb-next').textContent=left>0?pad(Math.floor(left/60))+':'+pad(left%60):'due';
     const a=Math.max(0,Math.floor((now-lastSync)/1000));
-    $('hb-age').textContent=a<3600?pad(Math.floor(a/60))+'m '+pad(a%60)+'s':Math.floor(a/3600)+'h '+pad(Math.floor(a%3600/60))+'m';
+    $('hb-age').textContent=ago(a);
+    const u=$('updated');u.textContent='BOT STATE updated '+ago(a)+' ago';u.className=a>600?'stale':'';
   }
+  if(nextPoll){const left=Math.max(0,Math.ceil((nextPoll-now)/1000));$('hb-next').textContent='0:'+pad(left)}
+  // market: straight from Coinbase in this browser
+  const mf=$('mkt-fresh');
+  if(window.MKT&&MKT.at){const a=Math.max(0,Math.floor((now-MKT.at)/1000));
+    mf.lastChild.textContent='MARKET '+(a<20?'LIVE':'last tick '+ago(a)+' ago')+' · '+MKT.at.toISOString().slice(11,19)+'Z';
+    mf.className=a<20?'':'stale'}
 }
 setInterval(heartbeat,1000);heartbeat();
 
@@ -755,11 +764,14 @@ function setTF(tf){
   chartTF=tf;try{localStorage.setItem('dt-tf',tf)}catch(e){}
   document.querySelectorAll('.tfbar button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tf===tf));
   if(lastDT){if(chart)chart.timeScale().resetTimeScale();renderChart(lastDT)}
+  liveCandles();
 }
 document.querySelectorAll('.tfbar button').forEach(b=>b.addEventListener('click',()=>setTF(b.dataset.tf)));
 document.querySelectorAll('.tfbar button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tf===chartTF));
 function renderChart(t){
-  const tf=TFS[chartTF],el=$('dt-chart'),all=(t.charts&&t.charts[chartTF])||(chartTF==='15m'&&t.candles)||[];
+  if(!MKT.candles[chartTF]&&!GRAN[chartTF]&&t.charts&&t.charts[chartTF])   // 4H: the bot's series, ticked live below
+    MKT.candles[chartTF]=t.charts[chartTF].map(c=>Object.assign({},c));
+  const tf=TFS[chartTF],el=$('dt-chart'),all=MKT.candles[chartTF]||(t.charts&&t.charts[chartTF])||(chartTF==='15m'&&t.candles)||[];
   lastDT=t;
   if(!window.LightweightCharts){el.textContent='chart library unavailable';return}
   if(!all.length){$('dt-tflbl').textContent=tf.name+' candles unavailable right now';if(!chart)el.textContent='no candle data yet';else series.setData([]);return}
@@ -781,7 +793,8 @@ function renderChart(t){
     new ResizeObserver(later).observe(el);
   }
   const cs=all.slice(-(innerWidth<600?tf.phone:tf.show));   // fewer, wider candles on a phone
-  $('dt-tflbl').replaceChildren(mk2('b',tf.name+' CANDLES'),' · LAST '+cs.length+' ('+span(cs.length*tf.secs)+') · '+(lastDT.pair||'ETH-USDC'));
+  $('dt-tflbl').replaceChildren(mk2('b',tf.name+' CANDLES'),' · LAST '+cs.length+' ('+span(cs.length*tf.secs)+') · '+(lastDT.pair||'ETH-USDC')
+    +(MKT.candles[chartTF]?(GRAN[chartTF]?' · LIVE from Coinbase':' · last candle LIVE'):' · bot snapshot'));
   const last=cs[cs.length-1].c;
   let lo=Math.min(...cs.map(c=>c.l)),hi=Math.max(...cs.map(c=>c.h));
   const ri=(t.range||{}).intraday,rw=(t.range||{}).wide,rm=(t.range||{}).macro;
@@ -818,15 +831,120 @@ const LTR=x=>({fast:'F',medium:'M',slow:'S',reserve:'R'})[x]||String(x||'?').toU
 function fitChart(){if(chart&&!$('tab-daytrade').hidden)requestAnimationFrame(()=>{chart.timeScale().fitContent();requestAnimationFrame(placeBox)})}
 addEventListener('resize',()=>{if(lastDT)renderChart(lastDT)});   // phone rotation: re-pick the candle count
 
-// ---- data ----
-async function load(){
+// ---- LIVE MARKET: straight from Coinbase's public Exchange API in this browser (no keys, read-only) ----
+// The bot trades ETH-USDC, which Coinbase runs on its unified USD/USDC book: the public ETH-USD feed
+// below IS that market. Price + best bid/ask stream over the public websocket (fallback: ticker poll
+// every 5s); the chart's candles refetch every 60s and its last candle ticks with every trade; the
+// book bar's depth read (~0.5 MB) refreshes every 60s, only while the DAY-TRADE tab is open.
+// Not limited by GitHub Pages — unlike the bot state above it, which the Mac publishes.
+var MKT={price:null,bid:null,ask:null,at:null,candles:{},book:null,bookAt:null,ws:null};
+const EXCH='https://api.exchange.coinbase.com/products/ETH-USD';
+const GRAN={'15m':900,'1h':3600};   // Coinbase has no 4h candles: the 4H chart is the bot's series, its last candle live
+const BOOKCFG={window:.03,bucket:.001,wallMult:3,imbalance:.005,lean:.2};   // = daytrade_config.yaml book settings
+function liveTick(px,bid,ask,at){
+  if(!(px>0))return;
+  MKT.price=px;if(bid>0)MKT.bid=bid;if(ask>0)MKT.ask=ask;MKT.at=at||new Date();
+  const dot=$('mkt-dot');dot.classList.add('on');clearTimeout(liveTick.t);liveTick.t=setTimeout(()=>dot.classList.remove('on'),250);
+  if(!paintLive.q){paintLive.q=true;requestAnimationFrame(paintLive)}
+}
+function paintLive(){
+  paintLive.q=false;
+  const px=MKT.price,t=lastDT;
+  if(!px)return;
+  $('dt-price').textContent=dpx(px);
+  if(t&&t.lots&&t.lots.length){   // open lots valued at the live price (same formula as the bot: qty × price − cost)
+    const u=t.lots.reduce((a,x)=>a+Number(x.qty)*px-Number(x.gbp),0);
+    $('dt-unreal').textContent='open lots '+(u>=0?'+':'')+dq4(u)+' unrealised at the live price (not sold)';
+  }
+  const cs=MKT.candles[chartTF];
+  if(chart&&series&&cs&&cs.length){   // the forming candle ticks with every trade
+    const per=TFS[chartTF].secs,ts=Math.floor(MKT.at.getTime()/1000),b=ts-ts%per,last=cs[cs.length-1];
+    if(b>last.t)cs.push({t:b,o:last.c,h:Math.max(last.c,px),l:Math.min(last.c,px),c:px});
+    else if(b===last.t){last.h=Math.max(last.h,px);last.l=Math.min(last.l,px);last.c=px}
+    const c=cs[cs.length-1];
+    if(band&&(px>band[1]||px<band[0]))band=[Math.min(band[0],px),Math.max(band[1],px)];
+    try{series.update({time:c.t,open:c.o,high:c.h,low:c.l,close:c.c})}catch(e){}
+  }
+  renderBook();
+}
+function connectWS(){
   try{
-    const r=await fetch('stats.json?ts='+Date.now(),{cache:'no-store'});
-    if(!r.ok)throw 0; const d=await r.json();
+    const ws=new WebSocket('wss://ws-feed.exchange.coinbase.com');MKT.ws=ws;
+    ws.onopen=()=>ws.send(JSON.stringify({type:'subscribe',product_ids:['ETH-USD'],channels:['ticker']}));
+    ws.onmessage=e=>{const m=JSON.parse(e.data);
+      if(m.type==='ticker')liveTick(Number(m.price),Number(m.best_bid),Number(m.best_ask),m.time?new Date(m.time):new Date())};
+    ws.onclose=()=>{MKT.ws=null;setTimeout(connectWS,3000)};
+    ws.onerror=()=>{try{ws.close()}catch(e){}};
+  }catch(e){setTimeout(connectWS,5000)}
+}
+async function pollTicker(){   // fallback when the websocket is quiet or blocked
+  if(MKT.at&&Date.now()-MKT.at<10000)return;
+  try{const r=await fetch(EXCH+'/ticker',{cache:'no-store'});if(r.ok){const k=await r.json();
+    liveTick(Number(k.price),Number(k.bid),Number(k.ask),k.time?new Date(k.time):new Date())}}catch(e){}
+}
+async function liveCandles(){
+  const g=GRAN[chartTF];if(!g)return;
+  try{const r=await fetch(EXCH+'/candles?granularity='+g,{cache:'no-store'});if(!r.ok)return;
+    const raw=await r.json();   // [time, low, high, open, close, volume], newest first
+    MKT.candles[chartTF]=raw.map(c=>({t:c[0],o:c[3],h:c[2],l:c[1],c:c[4]})).sort((a,b)=>a.t-b.t);
+    if(lastDT&&!$('tab-daytrade').hidden)renderChart(lastDT);
+  }catch(e){}
+}
+function readBook(bids,asks){   // mirrors levels.read_book: 0.1% buckets within 3% of the mid; ≥3× median = wall
+  const C=BOOKCFG,bid=bids[0][0],ask=asks[0][0],mid=(bid+ask)/2;
+  const walls=lv=>{const B=new Map();for(const [p,q] of lv){if(Math.abs(p/mid-1)>C.window)continue;
+      const k=Math.trunc((p/mid-1)/C.bucket),w=B.get(k)||[0,0];w[0]+=q;w[1]+=p*q;B.set(k,w)}
+    const sz=[...B.values()].map(v=>v[0]).sort((a,b)=>a-b),med=sz[Math.floor(sz.length/2)]||0;
+    return [...B.values()].filter(v=>med&&v[0]>=C.wallMult*med).map(v=>({price:v[1]/v[0],size:v[0]})).sort((a,b)=>b.size-a.size)};
+  const near=lv=>lv.reduce((a,[p,q])=>a+(Math.abs(p/mid-1)<=C.imbalance?q:0),0),b=near(bids),a=near(asks);
+  const pr=b+a?(b-a)/(b+a):0;
+  return {bid_walls:walls(bids),ask_walls:walls(asks),pressure:pr,lean:pr>=C.lean?'buyers':pr<=-C.lean?'sellers':'neutral'};
+}
+async function liveBook(){
+  if(document.hidden||$('tab-daytrade').hidden)return;
+  try{const r=await fetch(EXCH+'/book?level=2',{cache:'no-store'});if(!r.ok)return;const k=await r.json();
+    const n=x=>x.map(([p,q])=>[Number(p),Number(q)]);
+    MKT.book=readBook(n(k.bids),n(k.asks));MKT.bookAt=new Date();renderBook();
+  }catch(e){}
+}
+function renderBook(){   // live depth read (this browser) + the walls the bot actually TRUSTS (bot state)
+  const el=$('dt-book'),t=lastDT||{},bk=MKT.book||t.book,live=!!MKT.book;
+  if(!bk){el.textContent='BOOK — not read yet';return}
+  const mk=(tag,props)=>Object.assign(document.createElement(tag),props),bw=(bk.bid_walls||[])[0],aw=(bk.ask_walls||[])[0];
+  const spread=MKT.bid&&MKT.ask?MKT.ask-MKT.bid:bk.spread,as=t.anti_spoof;
+  const age=live?Math.round((Date.now()-MKT.bookAt)/1000)+'s':'bot';
+  el.replaceChildren((live?'BOOK LIVE ('+age+') · ':'BOOK (bot) · ')+'BID WALL ',mk('b',{className:'up',textContent:bw?dpx(bw.price)+' ('+Number(bw.size).toFixed(1)+' ETH)':'—'}),
+    ' · ASK WALL ',mk('b',{className:'dn',textContent:aw?dpx(aw.price)+' ('+Number(aw.size).toFixed(1)+' ETH)':'—'}),
+    ' · SPREAD '+(spread!=null?dpx(spread):'—')+' · PRESSURE ',mk('b',{className:bk.lean,textContent:(bk.pressure>=0?'+':'')+Number(bk.pressure).toFixed(2)+' '+String(bk.lean).toUpperCase()}),
+    as?' · BOT TRUSTS: support '+(as.support?dpx(as.support.price):'none')+' / resistance '+(as.resistance?dpx(as.resistance.price):'none'):'');
+}
+connectWS();setInterval(pollTicker,5000);
+setInterval(liveCandles,60000);setTimeout(liveCandles,1500);
+setInterval(liveBook,60000);
+document.querySelector('[data-tab="daytrade"]').addEventListener('click',()=>{if(!MKT.bookAt||Date.now()-MKT.bookAt>30000)setTimeout(liveBook,50)});
+
+// ---- bot state: stats.json, polled every STATS_POLL s ----
+// The Mac runner publishes the bot state every ~2 min (on change) to the repo's `live` branch, read
+// here through raw.githubusercontent.com (no Pages rebuild in the way), and at least every 6 min to
+// this site's own stats.json (Pages allows ~10 builds/hour). Whichever is newer wins.
+const STATS_POLL=20;
+var nextPoll=null,lastUpdated=null;   // var: heartbeat() runs before this line
+const LIVE_SRC=(()=>{const m=location.hostname.match(/^([^.]+)\.github\.io$/),repo=location.pathname.split('/')[1];
+  return m&&repo?'https://raw.githubusercontent.com/'+m[1]+'/'+repo+'/live/stats.json':null})();
+async function fetchStats(){
+  const get=u=>fetch(u+(u.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
+  const [a,b]=await Promise.all([get('stats.json'),LIVE_SRC?get(LIVE_SRC):null]);
+  return [a,b].filter(Boolean).sort((x,y)=>String(y.updated).localeCompare(String(x.updated)))[0]||null;
+}
+async function load(){
+  nextPoll=new Date(Date.now()+STATS_POLL*1000);
+  try{
+    const d=await fetchStats();
+    if(!d)throw 0;
+    if(d.updated===lastUpdated){heartbeat();return}   // nothing new published: keep what's on screen
+    lastUpdated=d.updated;
     lastSync=new Date(d.updated);
-    const hm=lastSync.toISOString().slice(11,16)+'Z';
-    $('updated').textContent='SYNC '+lastSync.toISOString().slice(5,10)+' '+hm;
-    $('hb-sync').textContent=hm;
+    $('hb-sync').textContent=lastSync.toISOString().slice(11,19)+'Z';
     // accumulation
     const a=d.accumulation||{};
     $('acc-mode').textContent=(a.mode||'offline').toUpperCase();
@@ -853,13 +971,9 @@ async function load(){
     rg.replaceChildren(ranging?'▣ ALL LAYERS BUYING · '+LY.filter(g=>g.timeframes).map(g=>g.label+' '+g.timeframes.join('/')).join(' · ')
       :t.cooldown_active?'⏸ COOLDOWN — NO NEW BUYS, LOTS HELD':'⏸ CRASH GUARD — NEW BUYS PAUSED, LOTS HELD',
       Object.assign(document.createElement('small'),{textContent:ranging?'':t.guard_why||''}));
-    const bk=t.book,bkEl=$('dt-book'),mk=(tag,props)=>Object.assign(document.createElement(tag),props);
-    if(bk){
-      const bw=(bk.bid_walls||[])[0],aw=(bk.ask_walls||[])[0];
-      bkEl.replaceChildren('BOOK · BID WALL ',mk('b',{className:'up',textContent:bw?dpx(bw.price)+' ('+Number(bw.size).toFixed(1)+' ETH)':'—'}),
-        ' · ASK WALL ',mk('b',{className:'dn',textContent:aw?dpx(aw.price)+' ('+Number(aw.size).toFixed(1)+' ETH)':'—'}),
-        ' · SPREAD '+dpx(bk.spread)+' · PRESSURE ',mk('b',{className:bk.lean,textContent:(bk.pressure>=0?'+':'')+Number(bk.pressure).toFixed(2)+' '+String(bk.lean).toUpperCase()}));
-    }else bkEl.textContent='BOOK — not read yet';
+    const mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+    if(MKT.candles['4h'])delete MKT.candles['4h'];   // re-seeded from the new bot series
+    renderBook();
     const ly=(cells,cls)=>{const r=mk('div',{className:'lyrow'+(cls?' '+cls:'')});
       for(const [txt,c,lbl] of cells){const e=mk('span',{textContent:txt});if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
     const pc=n=>n==null?'—':(n*100).toFixed(2)+'%',tot=LY.reduce((a,g)=>({lots:a.lots+g.in_lots_gbp,rest:a.rest+g.resting_gbp,
@@ -929,6 +1043,7 @@ async function load(){
     }
 
     renderChart(t);
+    if(MKT.price)paintLive();   // keep the live price / forming candle on top of the bot's snapshot
     const or=(cells,cls)=>{const r=document.createElement('div');r.className='orow'+(cls?' '+cls:'');
       for(const [txt,c,lbl] of cells){const e=document.createElement('span');e.textContent=txt;if(c)e.className=c;if(lbl)e.dataset.l=lbl;r.appendChild(e)}return r};
     const ST={recovering:'RECOVERING',in_profit:'IN PROFIT',selling:'SELLING'};
@@ -979,7 +1094,7 @@ async function load(){
         +' · LAYERS '+(gridOn(t)?'BUYING':'PAUSED (crash guard)')
         +(t.cooldown_active?' · COOLDOWN':'')+' · ticks every 30s'],
       ['DIP ALERT',d.dip_alert?d.dip_alert.level.toUpperCase()+' (warn ≥7%, strong ≥12% below 7-day high)':'unavailable'],
-      ['LAST SYNC',lastSync.toISOString().slice(0,16).replace('T',' ')+'Z · runner every 2 min, page refresh ≤15 min']];
+      ['LAST SYNC',lastSync.toISOString().slice(0,16).replace('T',' ')+'Z · bot state published every ~2 min on change (floor ~2–3 min), checked here every '+STATS_POLL+'s · market prices live from Coinbase']];
     $('ov-status').replaceChildren(...st.map(([k,v])=>{const e=document.createElement('div'),b=document.createElement('b');
       b.textContent=k+' ';e.append(b,v);return e}));
     $('foot').textContent='WMBOT TERMINAL · ACCUMULATION '+(a.mode||'offline').toUpperCase()
@@ -987,12 +1102,12 @@ async function load(){
     enqueue(d.thoughts&&d.thoughts.length?d.thoughts:['awaiting first reasoning run…']);
     heartbeat();
   }catch(e){
-    $('updated').innerHTML='<span class="err">NO SIGNAL — awaiting first bot run</span>';
-    enqueue(['link down — retrying in 60s…']);
+    if(!lastUpdated){$('updated').innerHTML='<span class="err">NO SIGNAL — awaiting first bot run</span>';
+      enqueue(['link down — retrying in '+STATS_POLL+'s…'])}
   }
 }
 enqueue(['boot sequence · WMBOT terminal online','establishing uplink to stats feed…']);
-load();setInterval(load,60000);
+load();setInterval(load,STATS_POLL*1000);
 </script>
 </body>
 </html>
