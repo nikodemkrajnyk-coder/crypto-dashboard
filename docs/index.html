@@ -362,6 +362,7 @@
       <div class="regime" id="dt-regime">—</div>
       <div class="bookbar" id="dt-book">BOOK —</div>
       <div class="rows" id="dt-layers"></div>
+      <div class="learn" id="dt-spoof" hidden></div>
       <div class="learn" id="dt-learn" hidden></div>
       <div class="proj" id="dt-proj"></div>
       <div class="tfbar" role="group" aria-label="chart timeframe"><span>CHART</span>
@@ -880,6 +881,17 @@ async function load(){
     const gs=t.grid_stats;
     $('dt-fees').textContent='MAKER FEE '+p2(t.fee_rate||0)+'/SIDE · NO STOP-LOSS · NEVER SOLD AT A LOSS'
       +(gs?' · TODAY '+gs.placed+' PLACED · '+gs.cancelled+' CANCELLED · '+(gs.filled||0)+' FILLED · '+(gs.sold||0)+' SOLD · '+gs.reprices+' REPRICES':'');
+    const as=t.anti_spoof,se=$('dt-spoof');
+    if(as){
+      const tr=x=>x?dpx(x.price)+' (trust '+Number(x.trust).toFixed(2)+')':'none trusted';
+      const r2=(k,txt)=>{const d=mk('div');d.append(mk('b',{textContent:k+' '}),txt);return d};
+      se.replaceChildren(mk('div',{className:'lh',textContent:'ANTI-SPOOF · WALL TRUST'}),
+        r2('NOW','walls seen '+as.seen+' · trusted '+as.trusted+' · spoof-flagged '+as.flagged+' · cooldowns '+as.spoofs_active+' · spoofs 24h '+as.spoofs_24h),
+        r2('USING','support '+tr(as.support)+' · resistance '+tr(as.resistance)),
+        r2('WALLS',(as.walls||[]).map(w=>(w.side==='bid'?'B ':'A ')+dpx(w.price)+' '+Number(w.trust).toFixed(2)
+          +(w.trusted?' ✓':w.flagged?' ✗':' ·')).join('  ')||'—'));
+      se.hidden=false;
+    }else se.hidden=true;
     const lr0=t.learning,le=$('dt-learn');
     if(lr0&&(lr0.day||lr0.latest_safeguard)){
       const lm=lr0.metrics,pm=lr0.prev,v=String(lr0.verdict||'—'),g=lr0.reprice_guard,lv=lr0.live;
