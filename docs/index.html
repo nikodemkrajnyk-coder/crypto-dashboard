@@ -34,6 +34,7 @@
   .fresh .dot{display:inline-block;width:.6em;height:.6em;border-radius:50%;background:#063;margin-right:5px;vertical-align:middle;transition:background .4s}
   .fresh .dot.on{background:#00ff66;box-shadow:0 0 8px #00ff66;transition:none}
   .fresh .stale{color:var(--warn)}
+  .fresh a{color:#000;background:var(--g);padding:0 6px;border-radius:3px;text-decoration:none;font-weight:700}
 
   /* tabs */
   .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--dim);padding-bottom:8px}
@@ -260,7 +261,7 @@
 <div class="wrap">
   <div class="hdr">
     <h1>WESTMERE // CRYPTO<span class="blink">_</span></h1>
-    <div class="t fresh"><span id="mkt-fresh"><i class="dot" id="mkt-dot"></i>MARKET connecting…</span><span id="updated">BOT STATE syncing…</span></div>
+    <div class="t fresh"><span id="mkt-fresh"><i class="dot" id="mkt-dot"></i>MARKET connecting…</span><span id="updated">BOT STATE syncing…</span><a id="live-link" hidden rel="noopener">⚡ REAL-TIME VIEW (Mac)</a></div>
   </div>
 
   <div class="dip" id="dip" role="alert" hidden></div>
@@ -459,7 +460,8 @@ function heartbeat(){
   if(lastSync){
     const a=Math.max(0,Math.floor((now-lastSync)/1000));
     $('hb-age').textContent=ago(a);
-    const u=$('updated');u.textContent='BOT STATE updated '+ago(a)+' ago';u.className=a>600?'stale':'';
+    const u=$('updated');u.textContent='BOT STATE '+(ON_MAC?'(Mac, live) ':'')+'updated '+ago(a)+' ago';
+    u.className=a>(ON_MAC?120:600)?'stale':'';
   }
   if(nextPoll){const left=Math.max(0,Math.ceil((nextPoll-now)/1000));$('hb-next').textContent='0:'+pad(left)}
   // market: straight from Coinbase in this browser
@@ -927,7 +929,10 @@ document.querySelector('[data-tab="daytrade"]').addEventListener('click',()=>{if
 // The Mac runner publishes the bot state every ~2 min (on change) to the repo's `live` branch, read
 // here through raw.githubusercontent.com (no Pages rebuild in the way), and at least every 6 min to
 // this site's own stats.json (Pages allows ~10 builds/hour). Whichever is newer wins.
-const STATS_POLL=20;
+// served from the Mac itself (live_server.py, via its tunnel): the bot state is rebuilt every 10s from
+// the 30s loop's own files, so poll it every 5s; on GitHub Pages every 20s
+const ON_MAC=!/\.github\.io$/.test(location.hostname);
+const STATS_POLL=ON_MAC?5:20;
 var nextPoll=null,lastUpdated=null;   // var: heartbeat() runs before this line
 const LIVE_REPO=(()=>{const m=location.hostname.match(/^([^.]+)\.github\.io$/),repo=location.pathname.split('/')[1];
   return m&&repo?m[1]+'/'+repo:null})();
@@ -961,6 +966,8 @@ async function load(){
     if(!d)throw 0;
     if(lastUpdated&&String(d.updated)<=String(lastUpdated)){heartbeat();return}   // nothing newer published: keep what's on screen
     lastUpdated=d.updated;
+    const ll=$('live-link'),lv=d.live_view;   // on the GitHub copy: a link to the Mac's real-time view
+    if(!ON_MAC&&lv&&/^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/.test(lv.url)){ll.href=lv.url;ll.hidden=false}else ll.hidden=true;
     lastSync=new Date(d.updated);
     $('hb-sync').textContent=lastSync.toISOString().slice(11,19)+'Z';
     // accumulation
