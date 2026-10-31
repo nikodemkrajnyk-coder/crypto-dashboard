@@ -983,7 +983,7 @@ function renderLean(){   // CONFLUENCE: the engine's measured lean from current 
     row('SIGNALS (FAST)',sig+(f.pattern&&f.pattern!=='none'?' · pattern: '+f.pattern:'')),
     row('LAYERS',Object.entries(c.layers).map(([n,x])=>n.toUpperCase()+' '+arw(x.direction)+' '+(x.S>=0?'+':'')+Number(x.S).toFixed(2)
       +(x.knife?' KNIFE GUARD':x.regime==='downtrend'&&!x.bounce?' downtrend: throttled':'')
-      +(x.tp_eff!=null?' · tp '+(x.tp_eff*100).toFixed(2)+'%'+(x.bounce_med?' (bounce '+(x.bounce_med*100).toFixed(2)+'%)':''):'')).join(' · ')),
+      +(x.tp_eff!=null?' · tp '+(x.tp_eff*100).toFixed(2)+'%'+(x.bounce_med?' (bounce '+(x.bounce_med*100).toFixed(2)+'%'+(x.bounce_tf?' on '+x.bounce_tf:'')+')':''):'')).join(' · ')),
     row('SUPPORT MAP (FAST)',(f.support_map||[]).map(z=>dpx(z.price)+' '+z.class.toUpperCase()+' '+Number(z.strength).toFixed(2)
       +' ('+z.touches+' bounce'+(z.touches===1?'':'s')+(z.wall?' · wall':'')+(z.channel?' · channel':'')+(z.round?' · round':'')+')'
       +(z.event&&z.event!=='none'?' '+z.event.toUpperCase():'')).join(' · ')||'no swing-low zones near price'),
@@ -1126,12 +1126,28 @@ async function load(){
       se.hidden=false;
     }else se.hidden=true;
     const lr0=t.learning,le=$('dt-learn');
-    if(lr0&&(lr0.day||lr0.latest_safeguard)){
+    if(lr0&&(lr0.day||lr0.latest_safeguard||lr0.check)){
       const lm=lr0.metrics,pm=lr0.prev,v=String(lr0.verdict||'—'),g=lr0.reprice_guard,lv=lr0.live;
       const row=(k,txt)=>{const d=mk('div');d.append(mk('b',{textContent:k+' '}),txt);return d};
       const eff=x=>x==null?'—':(x*100).toFixed(2)+'%';
-      const kids=[mk('div',{className:'lh',textContent:'DAILY LEARNINGS · '+(lr0.day||'—')+' · '})];
-      kids[0].append(mk('span',{className:/BETTER/.test(v)?'ok':/WORSE/.test(v)?'bad':'mid',textContent:v}));
+      const vcls=x=>/BETTER/.test(x)?'ok':/WORSE/.test(x)?'bad':'mid';
+      const every=lr0.every_min||1440,ck=lr0.check;
+      const cad=every<1440?'self-review every '+every+' min':'nightly self-review';
+      const kids=[mk('div',{className:'lh',textContent:'LEARNINGS · '+cad})];
+      if(ck){
+        const at=new Date(ck.at),ago=Math.max(0,Math.round((Date.now()-at)/60000)),sl=ck.since_last||{};
+        const h=mk('div');
+        h.append(mk('b',{textContent:'LAST CHECK '}),at.toISOString().slice(11,16)+'Z ('+ago+' min ago) · ',
+          mk('span',{className:vcls(ck.verdict),textContent:ck.verdict}),
+          ' · since previous: filled '+(sl.buys||0)+' · sold '+(sl.sells||0)+' · net '+dq4(sl.net||0)
+          +(ck.next_at?' · next ~'+new Date(ck.next_at).toISOString().slice(11,16)+'Z':''));
+        kids.push(h,row('ACTION',ck.action||'none'));
+        for(const f of (ck.findings||[]))kids.push(row(f.who==='bot'?'CAUSE · BOT':'CAUSE · MARKET',f.text));
+        if((ck.pending||[]).length)kids.push(row('WATCHING',ck.pending.join(' · ')));
+      }
+      const nh=mk('div',{className:'lh',style:'margin-top:6px',textContent:'NIGHTLY REVIEW · '+(lr0.day||'—')+' · '});
+      nh.append(mk('span',{className:vcls(v),textContent:v}));
+      kids.push(nh);
       if(lm)kids.push(row('DAY','sold '+lm.sells+(pm?' vs '+pm.sells:'')+' · filled '+lm.buys+(pm?' vs '+pm.buys:'')
         +' · net '+dq4(lm.net)+(pm?' vs '+dq4(pm.net):'')+' · fill eff '+eff(lm.fill_eff)+' ('+lm.buys+'/'+lm.placed+')'
         +' · reprices '+lm.reprices+(lm.range_pct!=null?' · range '+eff(lm.range_pct):'')));
