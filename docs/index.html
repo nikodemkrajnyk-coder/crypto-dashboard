@@ -942,7 +942,22 @@ function renderLean(){   // CONFLUENCE: the engine's measured lean from current 
   const row=(k,txt)=>{const d=mk('div');d.append(mk('b',{textContent:k+' '}),txt);return d};
   el.replaceChildren(h,
     row('SIGNALS (FAST)',sig+(f.pattern&&f.pattern!=='none'?' · pattern: '+f.pattern:'')),
-    row('LAYERS',Object.entries(c.layers).map(([n,x])=>n.toUpperCase()+' '+arw(x.direction)+' '+(x.S>=0?'+':'')+Number(x.S).toFixed(2)).join(' · ')),
+    row('LAYERS',Object.entries(c.layers).map(([n,x])=>n.toUpperCase()+' '+arw(x.direction)+' '+(x.S>=0?'+':'')+Number(x.S).toFixed(2)
+      +(x.knife?' KNIFE GUARD':x.regime==='downtrend'&&!x.bounce?' downtrend: throttled':'')
+      +(x.tp_eff!=null?' · tp '+(x.tp_eff*100).toFixed(2)+'%'+(x.bounce_med?' (bounce '+(x.bounce_med*100).toFixed(2)+'%)':''):'')).join(' · ')),
+    row('SUPPORT MAP (FAST)',(f.support_map||[]).map(z=>dpx(z.price)+' '+z.class.toUpperCase()+' '+Number(z.strength).toFixed(2)
+      +' ('+z.touches+' bounce'+(z.touches===1?'':'s')+(z.wall?' · wall':'')+(z.channel?' · channel':'')+(z.round?' · round':'')+')'
+      +(z.event&&z.event!=='none'?' '+z.event.toUpperCase():'')).join(' · ')||'no swing-low zones near price'),
+    row('LAST SUPPORT EVENT',(()=>{const all=Object.entries(c.layers).map(([n,x])=>[n,x.knife||x.event]).filter(([n,e])=>e);
+      if(!all.length)return 'none — no spring or breakdown in view';
+      return all.map(([n,e])=>n.toUpperCase()+' '+String(e.event).toUpperCase()+' at '+dpx(e.price)
+        +(e.event==='spring'?' → BUY signal (wick under, reclaimed)':e.event==='breakdown'?(e.class!=='weak'?' → STAND ASIDE (knife guard)':' → weak level, lean only'):e.event==='reclaim'?' → buying resumes':' → undecided')).join(' · ')})()),
+    row('POT',(()=>{const t=lastDT||{},inl=Number(t.invested_gbp||0),rest=(t.orders||[]).reduce((a,o)=>a+Number(o.gbp||0),0),pot=Number(t.pot_gbp||50);
+      return 'committed '+dq(inl+rest)+' ('+Math.round((inl+rest)/pot*100)+'%: in lots '+dq(inl)+' + resting '+dq(rest)+') · held back '+dq(Math.max(0,pot-inl-rest))})()),
+    row('BUYS vs SELLS',(()=>{const b=(lastDT||{}).balance;if(!b)return '—';
+      return 'today '+b.today.buys+' / '+b.today.sells+' · yesterday '+b.yesterday.buys+' / '+b.yesterday.sells
+        +(b.median_time_to_sell_min!=null?' · median time-to-sell '+dur(b.median_time_to_sell_min):' · no sells in 24h')
+        +(b.skewed?' · ⚠ SKEWED TO BUYS — targets / buying being corrected':'')})()),
     row('WEIGHTS (LEARNED)',Object.entries(c.weights||{}).map(([k,w])=>k+' '+Number(w).toFixed(2)).join(' · ')),
     row('TRAIL','ride the rise: exit on a '+(c.trail_pct!=null?(c.trail_pct*100).toFixed(2)+'%':'—')+' pullback from the peak, never below the planned profit'),
     mk('div',{className:'k',textContent:'confidence = |weighted mean of the signal votes| — a measured lean from current structure, not a guaranteed probability'}));
