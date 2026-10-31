@@ -59,6 +59,11 @@
   /* day-trade chart */
   .chart{height:clamp(440px,66vh,960px);margin-top:12px;border:1px solid #052;border-radius:5px;overflow:hidden;
          color:var(--dim);display:flex;align-items:center;justify-content:center;position:relative}
+  .tfbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:12px;font-size:.78em;letter-spacing:.08em}
+  .tfbar button{font-size:1em;padding:4px 10px;color:var(--gd)}
+  .tfbar button[aria-pressed="true"]{color:#000;background:var(--g);border-color:var(--g);font-weight:700}
+  .tfbar b{color:var(--g)}
+  .tfbar + .chart{margin-top:6px}
   .rbox{position:absolute;left:0;pointer-events:none;z-index:2;border-top:2px solid rgba(255,68,85,.75);
         border-bottom:2px solid rgba(0,255,102,.85);background:rgba(0,255,102,.06)}
   .rbox span{position:absolute;left:6px;font-size:11px;letter-spacing:.1em;padding:1px 5px;background:rgba(0,10,4,.8)}
@@ -354,6 +359,9 @@
       <div class="bookbar" id="dt-book">BOOK —</div>
       <div class="rows" id="dt-layers"></div>
       <div class="proj" id="dt-proj"></div>
+      <div class="tfbar" role="group" aria-label="chart timeframe"><span>CHART</span>
+        <button type="button" data-tf="15m">15M</button><button type="button" data-tf="1h">1H</button><button type="button" data-tf="4h">4H</button>
+        <span id="dt-tflbl"></span></div>
       <div class="chart" id="dt-chart">loading chart…</div>
       <div class="legend">
         <span><i style="border-color:#7dffb0;border-top-style:dashed"></i>▲ F FAST BUY</span>
@@ -720,6 +728,7 @@ var chart=null,series=null,priceLines=[],band=null,lastDT=null,rbox=null;   // v
 // focus the price axis on the visible candles, the range box and the grid/lots near them, so
 // far-away levels can't squash the candles; lines outside that band are listed, not drawn
 const NEAR=0.03;
+const mk2=(tag,text)=>Object.assign(document.createElement(tag),{textContent:text});
 function placeBox(){
   const r=lastDT&&lastDT.range&&lastDT.range.intraday;
   if(!rbox||!series||!r){if(rbox)rbox.hidden=true;return}
@@ -731,11 +740,23 @@ function placeBox(){
     width:($('dt-chart').clientWidth-chart.priceScale('right').width())+'px'});
   rbox.hidden=false;
 }
+// the chart's timeframe toggle: 15m (last 24h) · 1h (last 3 days) · 4h (last 15 days); remembered per viewer
+const TFS={'15m':{name:'15M',secs:900,show:96,phone:56},'1h':{name:'1H',secs:3600,show:72,phone:48},'4h':{name:'4H',secs:14400,show:90,phone:60}};
+var chartTF='15m';
+try{const v=localStorage.getItem('dt-tf');if(TFS[v])chartTF=v}catch(e){}
+const span=s=>s>=86400?Math.round(s/86400)+(s>=172800?' days':' day'):Math.round(s/3600)+'h';
+function setTF(tf){
+  chartTF=tf;try{localStorage.setItem('dt-tf',tf)}catch(e){}
+  document.querySelectorAll('.tfbar button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tf===tf));
+  if(lastDT){if(chart)chart.timeScale().resetTimeScale();renderChart(lastDT)}
+}
+document.querySelectorAll('.tfbar button').forEach(b=>b.addEventListener('click',()=>setTF(b.dataset.tf)));
+document.querySelectorAll('.tfbar button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tf===chartTF));
 function renderChart(t){
-  const el=$('dt-chart'),all=t.candles||[];
+  const tf=TFS[chartTF],el=$('dt-chart'),all=(t.charts&&t.charts[chartTF])||(chartTF==='15m'&&t.candles)||[];
   lastDT=t;
   if(!window.LightweightCharts){el.textContent='chart library unavailable';return}
-  if(!all.length){if(!chart)el.textContent='no candle data yet';return}
+  if(!all.length){$('dt-tflbl').textContent=tf.name+' candles unavailable right now';if(!chart)el.textContent='no candle data yet';else series.setData([]);return}
   if(!chart){
     el.textContent='';
     chart=LightweightCharts.createChart(el,{autoSize:true,
@@ -753,7 +774,8 @@ function renderChart(t){
     chart.timeScale().subscribeVisibleLogicalRangeChange(later);chart.subscribeCrosshairMove(later);
     new ResizeObserver(later).observe(el);
   }
-  const cs=all.slice(innerWidth<600?-56:-96);   // 15-min candles: 14h on a phone, the full 24h on desktop
+  const cs=all.slice(-(innerWidth<600?tf.phone:tf.show));   // fewer, wider candles on a phone
+  $('dt-tflbl').replaceChildren(mk2('b',tf.name+' CANDLES'),' · LAST '+cs.length+' ('+span(cs.length*tf.secs)+') · '+(lastDT.pair||'ETH-USDC'));
   const last=cs[cs.length-1].c;
   let lo=Math.min(...cs.map(c=>c.l)),hi=Math.max(...cs.map(c=>c.h));
   const ri=(t.range||{}).intraday,rw=(t.range||{}).wide,rm=(t.range||{}).macro;
