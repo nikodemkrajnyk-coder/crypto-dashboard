@@ -387,6 +387,7 @@
       <div class="rows" id="dt-layers"></div>
       <div class="learn" id="dt-spoof" hidden></div>
       <div class="learn" id="dt-learn" hidden></div>
+      <div class="learn" id="dt-pat" hidden></div>
       <div class="proj" id="dt-proj"></div>
       <div class="tfbar" role="group" aria-label="chart timeframe"><span>CHART</span>
         <button type="button" data-tf="15m">15M</button><button type="button" data-tf="1h">1H</button><button type="button" data-tf="4h">4H</button>
@@ -1118,7 +1119,36 @@ function selectPair(p){
   DTSEL=p;try{localStorage.setItem('dt-pair',p)}catch(e){}
   lastDT=null;renderPairs();
 }
+// ---- PATTERNS (patterns.py): what survived OUT-OF-SAMPLE validation — measured history, never a promise ----
+function renderPatterns(pt){
+  const el=$('dt-pat');
+  if(!pt){el.hidden=true;return}
+  const mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+  const row=(k,txt)=>{const d=mk('div');d.append(mk('b',{textContent:k+' '}),txt);return d};
+  const pc=x=>x==null?'—':(x*100).toFixed(1)+'%',rg=b=>b?(b[0]===b[1]?pc(b[0]):pc(b[0])+'–'+pc(b[1])):'—';
+  const dirs=pt.directional||[],act=dirs.filter(r=>r.status==='active');
+  const kids=[mk('div',{className:'lh',textContent:'PATTERNS · HISTORY · '+pt.tested+' candidates tested'
+    +(pt.mined_at?' (mined '+String(pt.mined_at).slice(0,10)+')':'')+' · '+pt.survived+' survived out-of-sample · '
+    +act.length+' directional in use'})];
+  if(dirs.length)for(const r of dirs)kids.push(row((r.layer||'').toUpperCase()+(r.active_now?' · ACTIVE NOW':''),
+    r.what+' · val hit '+pc(r.val.hit)+' vs '+pc(r.val.p0)+' base (n '+r.val.n+') · live '+(r.live.n?pc(r.live.hit)+' vs '+pc(r.live.p0)+' (n '+r.live.n+')':'no events yet')
+    +' · '+(r.status==='active'?'weight '+Number(r.strength||0).toFixed(2):'RETIRED (stopped working live)')));
+  else kids.push(row('DIRECTIONAL','none survived validation — the HISTORY signal stays idle (no vote) rather than trade on noise'));
+  if(pt.quiet&&pt.quiet.hours)kids.push(row('QUIET (info)'+(pt.quiet.now?' · NOW':''),pt.quiet.hours+' · '+rg(pt.quiet.val_hit)+' of these hours ranged under the 30-day median (val)'));
+  if(pt.active&&pt.active.hours)kids.push(row('ACTIVE (info)'+(pt.active.now?' · NOW':''),pt.active.hours+' · '+rg(pt.active.val_hit)+' of these hours ranged over the 30-day median (val)'));
+  for(const n of (pt.near_misses||[]))kids.push(row('REJECTED',n.what+' — '+pc(n.train_hit)+' vs '+pc(n.train_p0)+' in training, '
+    +pc(n.val_hit)+' vs '+pc(n.val_p0)+' on unseen data · '+String(n.why||'').replace(/ \(.*$/,'')));
+  const sp=pt.spoof;
+  if(sp)kids.push(row('SPOOF HOURS',sp.status==='collecting'?'collecting — '+sp.note:(sp.spoof_heavy_hours||[]).length?sp.spoof_heavy_hours.map(h=>String(h.hour).padStart(2,'0')+':00').join(', ')+' UTC (validated)':'tested — no hour stands out'));
+  const bt=pt.backtest;
+  if(bt&&bt.plain)kids.push(row('BACKTEST '+bt.days+'D','simplified grid replay: realized '+dq(bt.plain.net)+' · open lots '+dq(bt.plain.unrealised)
+    +' at the end · total '+dq(bt.plain.equity)+(bt.session?' · volatility-sized variant total '+dq(bt.session.equity)+(bt.session.equity-bt.plain.equity>=.10?' (better — candidate)':bt.session.equity>bt.plain.equity?' (negligible difference — not used)':' (no better — not used)'):'')));
+  kids.push(mk('div',{className:'k',textContent:'hit = share of occurrences in the pattern\'s direction on the UNSEEN validation slice (after '
+    +String(pt.train_to||'').slice(0,10)+'), next to its baseline · walk-forward re-scored · measured history, not a guarantee'}));
+  el.replaceChildren(...kids);el.hidden=false;
+}
 function renderDT(t){
+  renderPatterns(t.patterns);
   DC=t.currency||'$';COIN=(t.pair||'ETH-USDC').split('-')[0];
   $('dt-pricek').textContent=COIN+' PRICE';
   $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
