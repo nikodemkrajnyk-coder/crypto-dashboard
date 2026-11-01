@@ -1162,7 +1162,7 @@ function renderSession(se){
   const mk=(tag,props)=>Object.assign(document.createElement(tag),props);
   const h=String(se.hour).padStart(2,'0'),L=(se.layers||[]).map(x=>x.toUpperCase()).join('/');
   const what={active:'ACTIVE · full trading',normal:'normal · full trading',
-    quiet:'QUIET · throttled — '+L+' new buys ×'+se.quiet_size+' size, '+Math.round(se.quiet_rungs*100)+'% of rungs, spacing ×'+se.quiet_step+' (lots still sell as normal)'}[se.state];
+    quiet:se.throttle===false?'QUIET · full trading (throttle off — map shown as info only)':'QUIET · throttled — '+L+' new buys ×'+se.quiet_size+' size, '+Math.round(se.quiet_rungs*100)+'% of rungs, spacing ×'+se.quiet_step+' (lots still sell as normal)'}[se.state];
   const top=mk('div');top.append(mk('b',{textContent:'HOUR '+h+' UTC: '}),mk('span',{className:'st '+se.state,textContent:what}),
     se.mapped?'':' (no validated hour map yet — trading normally)');
   const strip=mk('div',{className:'hrs'});
@@ -1170,7 +1170,7 @@ function renderSession(se){
     strip.append(mk('span',{className:c+(i===se.hour?' now':''),textContent:String(i).padStart(2,'0'),
       title:String(i).padStart(2,'0')+':00 UTC '+({a:'active',q:'quiet',n:'normal'})[c]}))}
   el.replaceChildren(top,se.mapped?strip:'',mk('div',{className:'k',textContent:se.mapped?'ACTIVE '+(se.active_text||'none')+' · QUIET '+(se.quiet_text||'none')
-    +' · from this pair\'s own validated volatility map (out-of-sample, re-mined weekly) — not hard-coded':''}));
+    +' · from this pair\'s own validated volatility map (out-of-sample, re-mined weekly)'+(se.throttle===false?' · INFO ONLY: every hour trades the full grid':''):''}));
   el.hidden=false;
 }
 function renderDT(t){
