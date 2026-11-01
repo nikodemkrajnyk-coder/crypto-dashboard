@@ -77,6 +77,13 @@
   .tfbar button[aria-pressed="true"]{color:#000;background:var(--g);border-color:var(--g);font-weight:700}
   .tfbar b{color:var(--g)}
   .tfbar + .chart{margin-top:6px}
+  .sess{margin-top:8px;padding:6px 10px;border:1px solid #063;border-radius:5px;font-size:.8em;letter-spacing:.06em}
+  .sess .st{font-weight:700} .sess .st.active{color:#00ff66} .sess .st.quiet{color:var(--warn)} .sess .st.normal{color:var(--g)}
+  .sess .hrs{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;margin:6px 0 4px}
+  .sess .hrs span{height:16px;font-size:.62em;line-height:16px;text-align:center;color:#000;border-radius:2px}
+  .sess .hrs .a{background:#00ff66} .sess .hrs .q{background:#665c00;color:#ddd} .sess .hrs .n{background:#063;color:#9c9}
+  .sess .hrs .now{outline:2px solid #fff;outline-offset:-1px}
+  .sess .k{color:var(--gd)}
   .ptabs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
   .ptabs button{font-size:.85em;padding:6px 14px;color:var(--gd);letter-spacing:.1em}
   .ptabs button[aria-selected="true"]{color:#000;background:var(--g);border-color:var(--g);font-weight:700}
@@ -382,6 +389,7 @@
         <div class="cell"><div class="k" id="dt-pricek">ETH PRICE</div><div class="v" id="dt-price">$—</div><div class="sub" id="dt-unreal">—</div></div>
       </div>
       <div class="regime" id="dt-regime">—</div>
+      <div class="sess" id="dt-sess" hidden></div>
       <div class="bookbar" id="dt-book">BOOK —</div>
       <div class="lean" id="dt-lean" hidden></div>
       <div class="rows" id="dt-layers"></div>
@@ -1147,8 +1155,27 @@ function renderPatterns(pt){
     +String(pt.train_to||'').slice(0,10)+'), next to its baseline · walk-forward re-scored · measured history, not a guarantee'}));
   el.replaceChildren(...kids);el.hidden=false;
 }
+// ---- ACTIVE HOURS: the pair's validated hour map and what this hour means for its buying ----
+function renderSession(se){
+  const el=$('dt-sess');
+  if(!se){el.hidden=true;return}
+  const mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+  const h=String(se.hour).padStart(2,'0'),L=(se.layers||[]).map(x=>x.toUpperCase()).join('/');
+  const what={active:'ACTIVE · full trading',normal:'normal · full trading',
+    quiet:'QUIET · throttled — '+L+' new buys ×'+se.quiet_size+' size, '+Math.round(se.quiet_rungs*100)+'% of rungs, spacing ×'+se.quiet_step+' (lots still sell as normal)'}[se.state];
+  const top=mk('div');top.append(mk('b',{textContent:'HOUR '+h+' UTC: '}),mk('span',{className:'st '+se.state,textContent:what}),
+    se.mapped?'':' (no validated hour map yet — trading normally)');
+  const strip=mk('div',{className:'hrs'});
+  for(let i=0;i<24;i++){const c=se.active.includes(i)?'a':se.quiet.includes(i)?'q':'n';
+    strip.append(mk('span',{className:c+(i===se.hour?' now':''),textContent:String(i).padStart(2,'0'),
+      title:String(i).padStart(2,'0')+':00 UTC '+({a:'active',q:'quiet',n:'normal'})[c]}))}
+  el.replaceChildren(top,se.mapped?strip:'',mk('div',{className:'k',textContent:se.mapped?'ACTIVE '+(se.active_text||'none')+' · QUIET '+(se.quiet_text||'none')
+    +' · from this pair\'s own validated volatility map (out-of-sample, re-mined weekly) — not hard-coded':''}));
+  el.hidden=false;
+}
 function renderDT(t){
   renderPatterns(t.patterns);
+  renderSession(t.session);
   DC=t.currency||'$';COIN=(t.pair||'ETH-USDC').split('-')[0];
   $('dt-pricek').textContent=COIN+' PRICE';
   $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
