@@ -101,7 +101,7 @@
   .ptabs button{font-size:.85em;padding:6px 14px;color:var(--gd);letter-spacing:.1em}
   .ptabs button[aria-selected="true"]{color:#000;background:var(--g);border-color:var(--g);font-weight:700}
   .bake{margin:0 0 12px;font-size:.78em;letter-spacing:.04em;overflow-x:auto}
-  .bake table{border-collapse:collapse;width:100%;min-width:46em}
+  .bake table{border-collapse:collapse;width:100%;min-width:50em}
   .bake th,.bake td{padding:4px 8px;text-align:right;border-bottom:1px solid #063;white-space:nowrap}
   .bake th{color:var(--gd);font-weight:400;letter-spacing:.1em}
   .bake th:first-child,.bake td:first-child{text-align:left}
@@ -409,6 +409,7 @@
       <div class="lean" id="dt-lean" hidden></div>
       <div class="rows" id="dt-layers"></div>
       <div class="learn" id="dt-spoof" hidden></div>
+      <div class="learn" id="dt-sim" hidden></div>
       <div class="learn" id="dt-learn" hidden></div>
       <div class="learn" id="dt-pat" hidden></div>
       <div class="proj" id="dt-proj"></div>
@@ -1119,23 +1120,23 @@ function renderPairs(){
   if(S.length>1){
     const best=Math.max(...S.map(r=>Number(r.net||0))),lead=S.filter(r=>Number(r.net||0)===best);
     const tb=mk('table'),hd=mk('tr');
-    for(const h of ['PAIR','PRICE','DAILY','WEEKLY','MONTHLY','ALL-TIME','SOLD','FILLS','FILL EFF 24H','LOTS','BUYS RESTING'])hd.append(mk('th',{textContent:h}));
+    for(const h of ['PAIR','PRICE','DAILY','WEEKLY','MONTHLY','ALL-TIME','REAL NET*','SOLD','FILLS','FILL EFF 24H','LOTS','BUYS RESTING'])hd.append(mk('th',{textContent:h}));
     const pn=x=>{const n=Number(x?x.net:0);return [dq4(n),n>0?'pos':n<0?'neg':'']};
     const body=mk('tbody');
     for(const r of S){const tr=mk('tr',{className:r.pair===DTSEL?'sel':''});tr.addEventListener('click',()=>selectPair(r.pair));
       const n=Number(r.net||0);
-      for(const [txt,c] of [[r.coin+(best>0&&lead.length===1&&lead[0]===r?' ★':''),''],[dpx(r.last_price),''],...['daily','weekly','monthly','all_time'].map(k=>pn((r.periods||{})[k])),[String(r.trades),''],[String(r.fills),''],
+      for(const [txt,c] of [[r.coin+(best>0&&lead.length===1&&lead[0]===r?' ★':''),''],[dpx(r.last_price),''],...['daily','weekly','monthly','all_time'].map(k=>pn((r.periods||{})[k])),pn({net:r.real_net||0}),[String(r.trades),''],[String(r.fills),''],
         [r.fill_eff_24h!=null?(r.fill_eff_24h*100).toFixed(2)+'%':'—',''],[String(r.lots_open),''],[String(r.orders_resting),'']])
         tr.append(mk('td',{textContent:txt,className:c}));
       body.append(tr)}
     const PT=DTD.periods_total;
     if(PT){const tr=mk('tr',{className:'tot'}),sum=k=>S.reduce((a,r)=>a+Number(r[k]||0),0);
-      for(const [txt,c] of [['ALL '+S.length,''],['—',''],...['daily','weekly','monthly','all_time'].map(k=>pn(PT[k])),[String(sum('trades')),''],[String(sum('fills')),''],['—',''],[String(sum('lots_open')),''],[String(sum('orders_resting')),'']])
+      for(const [txt,c] of [['ALL '+S.length,''],['—',''],...['daily','weekly','monthly','all_time'].map(k=>pn(PT[k])),pn({net:sum('real_net')}),[String(sum('trades')),''],[String(sum('fills')),''],['—',''],[String(sum('lots_open')),''],[String(sum('orders_resting')),'']])
         tr.append(mk('td',{textContent:txt,className:c}));
       body.append(tr)}
     tb.append(mk('thead'),body);tb.firstChild.append(hd);
     bk.replaceChildren(tb,mk('div',{className:'k',textContent:'BAKE-OFF · each pair runs the identical system on its own $'
-      +(S[0].pot||50)+' paper pot · figures = realized profit after both fees · ★ = all-time leader (ETH\'s all-time includes its trades before the bake-off) · click a row or tab to open that pair'}));
+      +(S[0].pot||50)+' paper pot · figures = realized profit after both fees · ★ = all-time leader (ETH\'s all-time includes its trades before the bake-off) · *REAL NET = since realistic fills went live; the other columns include earlier optimistic fills · click a row or tab to open that pair'}));
     bk.hidden=false;
   }else bk.hidden=true;
   const t=B[DTSEL]||{};
@@ -1211,7 +1212,27 @@ function renderPeriods(t){
     ...line(COIN,P,'n'),...(T&&(DTD.pairs||[]).length>1?line('ALL '+DTD.pairs.length,T,'t'):[]));
   el.hidden=false;
 }
+// ---- REALISTIC FILLS: queue model, maker vs taker, the true fee tier — paper made pessimistic on purpose ----
+function renderSim(s){
+  const el=$('dt-sim');
+  if(!s){el.hidden=true;return}
+  const mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+  const row=(k,txt)=>{const d=mk('div');d.append(mk('b',{textContent:k+' '}),txt);return d};
+  const pc=(x,d=2)=>x==null?'—':(x*100).toFixed(d)+'%',when=String(s.since).slice(5,16).replace('T',' ')+'Z';
+  const tf=Object.entries(s.tier_fill||{}).filter(([k,t])=>t.filled+t.missed).map(([k,t])=>k.toUpperCase()+' '+t.filled+'/'+(t.filled+t.missed)).join(' · ');
+  const kids=[mk('div',{className:'lh',textContent:'REALISTIC FILLS · since '+when+' · maker '+pc(s.maker_fee)+' · taker '+pc(s.taker_fee)+' + spread + slippage'}),
+    row('REAL NET',dq4(s.net)+' after the correct fee tier · '+s.round_trips+' round trips'
+      +(s.avg_maker_entry!=null?' · maker-entry avg '+pc(s.avg_maker_entry):'')+(s.avg_taker_entry!=null?' · taker-entry avg '+pc(s.avg_taker_entry):'')),
+    row('MAKER',(s.maker_fill_rate==null?'fill rate — (no order has reached its level and resolved yet)':'fill rate '+pc(s.maker_fill_rate,0)+' · '+s.maker_filled+' filled ('+s.maker_through+' traded through, '+s.maker_queued+' queue cleared) · '+s.maker_missed+' missed')+(tf?' · '+tf:'')),
+    row('TAKER','buys '+s.buys_taker+' · sells '+s.sells_taker+' (trailing exits + chosen takes) · maker fills: '+s.buys_maker+' buys, '+s.sells_maker+' sells'),
+    row('COSTS','fees '+dq4(s.fees_maker)+' maker + '+dq4(s.fees_taker)+' taker · spread + slippage '+dq4(s.spread_slip)),
+    row('CHOICES','at the level: stayed posted '+s.chose_post+' · took '+s.chose_take+' · needs '+pc(s.take_edge)+' edge (learned)')];
+  for(const d of (s.last_decisions||[]).slice().reverse())kids.push(row(String(d.ts).slice(11,16)+'Z '+String(d.tier).toUpperCase()+' '+String(d.side).toUpperCase()+' '+dpx(d.price),d.why));
+  kids.push(mk('div',{className:'k',textContent:'a maker order fills only when the market trades past it, or prints at its level clear '+s.queue_mult+'× the size shown ahead plus its own · deliberately pessimistic · figures before '+when+' used the old optimistic fills'}));
+  el.replaceChildren(...kids);el.hidden=false;
+}
 function renderDT(t){
+  renderSim(t.sim);
   renderPatterns(t.patterns);
   renderSession(t.session);
   DC=t.currency||'$';COIN=(t.pair||'ETH-USDC').split('-')[0];
