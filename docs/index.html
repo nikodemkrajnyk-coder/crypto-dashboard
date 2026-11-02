@@ -1220,7 +1220,11 @@ function renderSim(s){
   const row=(k,txt)=>{const d=mk('div');d.append(mk('b',{textContent:k+' '}),txt);return d};
   const pc=(x,d=2)=>x==null?'—':(x*100).toFixed(d)+'%',when=String(s.since).slice(5,16).replace('T',' ')+'Z';
   const tf=Object.entries(s.tier_fill||{}).filter(([k,t])=>t.filled+t.missed).map(([k,t])=>k.toUpperCase()+' '+t.filled+'/'+(t.filled+t.missed)).join(' · ');
-  const kids=[mk('div',{className:'lh',textContent:'REALISTIC FILLS · since '+when+' · maker '+pc(s.maker_fee)+' · taker '+pc(s.taker_fee)+' + spread + slippage'}),
+  const src=s.fee_source==='coinbase_account'?'YOUR COINBASE TIER (fee endpoint, '+String(s.fee_as_of||'').slice(5,16).replace('T',' ')+'Z)':'COINBASE PUBLISHED TIER (account lookup unavailable)',R=s.rules;
+  const kids=[mk('div',{className:'lh',textContent:'REALISTIC FILLS · since '+when}),
+    row('FEES','maker '+pc(s.maker_fee)+' · taker '+pc(s.taker_fee)+' — '+src+' · Coinbase One\'s zero fees don\'t apply to Advanced'),
+    ...(R?[row('COINBASE RULES','min order '+dq(R.min_order)+' · price step '+DC+R.price_inc+' · size step '+R.base_inc+' '+COIN+' · spread '+(s.spread!=null?dpx(s.spread):'—')
+      +(R.post_only?' · POST-ONLY NOW':R.taker_ok?'':' · NO TAKERS NOW'))]:[]),
     row('REAL NET',dq4(s.net)+' after the correct fee tier · '+s.round_trips+' round trips'
       +(s.avg_maker_entry!=null?' · maker-entry avg '+pc(s.avg_maker_entry):'')+(s.avg_taker_entry!=null?' · taker-entry avg '+pc(s.avg_taker_entry):'')),
     row('MAKER',(s.maker_fill_rate==null?'fill rate — (no order has reached its level and resolved yet)':'fill rate '+pc(s.maker_fill_rate,0)+' · '+s.maker_filled+' filled ('+s.maker_through+' traded through, '+s.maker_queued+' queue cleared) · '+s.maker_missed+' missed')+(tf?' · '+tf:'')),
@@ -1228,7 +1232,7 @@ function renderSim(s){
     row('COSTS','fees '+dq4(s.fees_maker)+' maker + '+dq4(s.fees_taker)+' taker · spread + slippage '+dq4(s.spread_slip)),
     row('CHOICES','at the level: stayed posted '+s.chose_post+' · took '+s.chose_take+' · needs '+pc(s.take_edge)+' edge (learned)')];
   for(const d of (s.last_decisions||[]).slice().reverse())kids.push(row(String(d.ts).slice(11,16)+'Z '+String(d.tier).toUpperCase()+' '+String(d.side).toUpperCase()+' '+dpx(d.price),d.why));
-  kids.push(mk('div',{className:'k',textContent:'a maker order fills only when the market trades past it, or prints at its level clear '+s.queue_mult+'× the size shown ahead plus its own · deliberately pessimistic · figures before '+when+' used the old optimistic fills'}));
+  kids.push(mk('div',{className:'k',textContent:'taker fills cross Coinbase\'s real spread and walk its real book, plus a slippage margin · a maker order fills only when the market trades past it, or prints at its level clear '+s.queue_mult+'× the size shown ahead plus its own · deliberately pessimistic · figures before '+when+' used the old optimistic fills'}));
   el.replaceChildren(...kids);el.hidden=false;
 }
 function renderDT(t){
