@@ -1236,6 +1236,7 @@ function renderSim(s){
   el.replaceChildren(...kids);el.hidden=false;
 }
 function renderDT(t){
+  DC=t.currency||'$';COIN=(t.pair||'ETH-USDC').split('-')[0];   // first: every box below labels with them
   renderSim(t.sim);
   renderPatterns(t.patterns);
   renderSession(t.session);
