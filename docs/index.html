@@ -84,15 +84,29 @@
   .sess .hrs .a{background:#00ff66} .sess .hrs .q{background:#665c00;color:#ddd} .sess .hrs .n{background:#063;color:#9c9}
   .sess .hrs .now{outline:2px solid #fff;outline-offset:-1px}
   .sess .k{color:var(--gd)}
+  .pper{display:grid;grid-template-columns:minmax(3.2em,auto) repeat(3,minmax(0,1fr)) minmax(0,.8fr);gap:2px 8px;align-items:baseline;margin:0 0 12px;padding:8px 10px;border:1px solid #063;border-radius:5px}
+  .pper .h{font-size:.68em;color:var(--gd);letter-spacing:.06em;line-height:1.3}
+  .pper .h b{display:block;color:var(--g);font-size:1.15em;letter-spacing:.1em}
+  .pper .c{font-weight:700;color:var(--g);font-size:.85em;letter-spacing:.06em}
+  .pper .n{font-weight:800;font-size:clamp(17px,2.2vw,30px);white-space:nowrap}
+  .pper .t{font-weight:700;font-size:clamp(13px,1.3vw,17px);white-space:nowrap}
+  .pper .at{font-weight:400;font-size:clamp(12px,1.1vw,15px);color:var(--gd);white-space:nowrap}
+  .pper .pos{color:#00ff66} .pper .neg{color:#ff4455}
+  .pper small{display:block;font-size:.62em;font-weight:400;color:var(--gd);letter-spacing:.04em}
+  .pper .ttl{grid-column:1/-1;font-size:.72em;color:var(--gd);letter-spacing:.08em;margin-bottom:4px}
+  @media (max-width:600px){.pper{grid-template-columns:2.7em repeat(4,minmax(0,1fr));gap:2px 5px;padding:8px}
+    .pper .n{font-size:14px}.pper .t{font-size:13px}.pper .at{font-size:13px}.pper .h{font-size:.62em;letter-spacing:0}.pper .h b{letter-spacing:.02em}
+    .pper small{font-size:10px;letter-spacing:0}.pper .c{font-size:.72em;letter-spacing:0}}
   .ptabs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
   .ptabs button{font-size:.85em;padding:6px 14px;color:var(--gd);letter-spacing:.1em}
   .ptabs button[aria-selected="true"]{color:#000;background:var(--g);border-color:var(--g);font-weight:700}
   .bake{margin:0 0 12px;font-size:.78em;letter-spacing:.04em;overflow-x:auto}
-  .bake table{border-collapse:collapse;width:100%;min-width:34em}
+  .bake table{border-collapse:collapse;width:100%;min-width:46em}
   .bake th,.bake td{padding:4px 8px;text-align:right;border-bottom:1px solid #063;white-space:nowrap}
   .bake th{color:var(--gd);font-weight:400;letter-spacing:.1em}
   .bake th:first-child,.bake td:first-child{text-align:left}
   .bake tr.sel td{color:var(--g);font-weight:700} .bake tbody tr{cursor:pointer}
+  .bake tr.tot td{font-weight:700;border-top:1px solid var(--g);color:var(--g)} .bake tbody tr.tot{cursor:default}
   .bake td.pos{color:#00ff66} .bake td.neg{color:#ff4455}
   .bake .k{color:var(--gd);margin-top:4px}
   .rbox{position:absolute;left:0;pointer-events:none;z-index:2;border-top:2px solid rgba(255,68,85,.75);
@@ -302,7 +316,7 @@
         <button class="linkbtn" id="ov-unlock" data-goto="btc" type="button">UNLOCK →</button></div>
       <div class="cell key"><div class="k">ACCUMULATION P/L</div><div class="v" id="ov-pl">🔒</div><div class="sub" id="ov-plsub">encrypted</div></div>
       <div class="cell"><div class="k">PORTFOLIO VALUE</div><div class="v" id="ov-val">🔒</div><div class="sub" id="ov-valsub">encrypted</div></div>
-      <div class="cell key"><div class="k">DAY-TRADE NET (PAPER)</div><div class="v" id="ov-dt">$—</div><div class="sub" id="ov-dtsub">—</div></div>
+      <div class="cell key"><div class="k">DAY-TRADE NET ALL-TIME (PAPER)</div><div class="v" id="ov-dt">$—</div><div class="sub" id="ov-dtsub">—</div></div>
       <div class="cell"><div class="k">BTC PRICE</div><div class="v" id="ov-btcpx">£—</div><div class="sub" id="ov-btcdrop">—</div></div>
     </div>
     <div class="card"><h2>SYSTEM STATUS</h2><div class="ovstat" id="ov-status">syncing…</div></div>
@@ -382,8 +396,9 @@
       <h2>DAY-TRADE LAYERS // <span id="dt-pair">ETH-USDC</span> <span class="tag" id="dt-mode">PAPER</span></h2>
       <div class="ptabs" id="dt-ptabs" role="tablist" aria-label="pair"></div>
       <div class="bake" id="dt-bake" hidden></div>
+      <div class="pper" id="dt-periods" hidden></div>
       <div class="dthero">
-        <div class="cell"><div class="k">REALIZED PROFIT (NET OF FEES)</div><div class="v" id="dt-pnl">$—</div><div class="sub" id="dt-pnlsub">—</div></div>
+        <div class="cell"><div class="k">ALL-TIME REALIZED NET (AFTER FEES)</div><div class="v" id="dt-pnl">$—</div><div class="sub" id="dt-pnlsub">—</div></div>
         <div class="cell"><div class="k">OPEN LOTS (INVENTORY)</div><div class="v" id="dt-lots">—</div><div class="sub" id="dt-lotsub">—</div></div>
         <div class="cell"><div class="k">BUYS RESTING</div><div class="v" id="dt-orders">—</div><div class="sub" id="dt-gridsub">—</div></div>
         <div class="cell"><div class="k" id="dt-pricek">ETH PRICE</div><div class="v" id="dt-price">$—</div><div class="sub" id="dt-unreal">—</div></div>
@@ -1104,18 +1119,23 @@ function renderPairs(){
   if(S.length>1){
     const best=Math.max(...S.map(r=>Number(r.net||0))),lead=S.filter(r=>Number(r.net||0)===best);
     const tb=mk('table'),hd=mk('tr');
-    for(const h of ['PAIR','PRICE','NET (AFTER FEES)','TODAY','SOLD','FILLS','FILL EFF 24H','LOTS','BUYS RESTING'])hd.append(mk('th',{textContent:h}));
+    for(const h of ['PAIR','PRICE','DAILY','WEEKLY','MONTHLY','ALL-TIME','SOLD','FILLS','FILL EFF 24H','LOTS','BUYS RESTING'])hd.append(mk('th',{textContent:h}));
+    const pn=x=>{const n=Number(x?x.net:0);return [dq4(n),n>0?'pos':n<0?'neg':'']};
     const body=mk('tbody');
     for(const r of S){const tr=mk('tr',{className:r.pair===DTSEL?'sel':''});tr.addEventListener('click',()=>selectPair(r.pair));
       const n=Number(r.net||0);
-      for(const [txt,c] of [[r.coin+(best>0&&lead.length===1&&lead[0]===r?' ★':''),''],[dpx(r.last_price),''],[dq4(n),n>0?'pos':n<0?'neg':''],
-        [dq4(r.net_today||0)+' · '+(r.fills_today||0)+'B/'+(r.trades_today||0)+'S',''],[String(r.trades),''],[String(r.fills),''],
+      for(const [txt,c] of [[r.coin+(best>0&&lead.length===1&&lead[0]===r?' ★':''),''],[dpx(r.last_price),''],...['daily','weekly','monthly','all_time'].map(k=>pn((r.periods||{})[k])),[String(r.trades),''],[String(r.fills),''],
         [r.fill_eff_24h!=null?(r.fill_eff_24h*100).toFixed(2)+'%':'—',''],[String(r.lots_open),''],[String(r.orders_resting),'']])
+        tr.append(mk('td',{textContent:txt,className:c}));
+      body.append(tr)}
+    const PT=DTD.periods_total;
+    if(PT){const tr=mk('tr',{className:'tot'}),sum=k=>S.reduce((a,r)=>a+Number(r[k]||0),0);
+      for(const [txt,c] of [['ALL '+S.length,''],['—',''],...['daily','weekly','monthly','all_time'].map(k=>pn(PT[k])),[String(sum('trades')),''],[String(sum('fills')),''],['—',''],[String(sum('lots_open')),''],[String(sum('orders_resting')),'']])
         tr.append(mk('td',{textContent:txt,className:c}));
       body.append(tr)}
     tb.append(mk('thead'),body);tb.firstChild.append(hd);
     bk.replaceChildren(tb,mk('div',{className:'k',textContent:'BAKE-OFF · each pair runs the identical system on its own $'
-      +(S[0].pot||50)+' paper pot · net = realized profit after both fees (★ = leader) · click a row or tab to open that pair'}));
+      +(S[0].pot||50)+' paper pot · figures = realized profit after both fees · ★ = all-time leader (ETH\'s all-time includes its trades before the bake-off) · click a row or tab to open that pair'}));
     bk.hidden=false;
   }else bk.hidden=true;
   const t=B[DTSEL]||{};
@@ -1173,6 +1193,24 @@ function renderSession(se){
     +' · from this pair\'s own validated volatility map (out-of-sample, re-mined weekly)'+(se.throttle===false?' · INFO ONLY: every hour trades the full grid':''):''}));
   el.hidden=false;
 }
+// ---- REALIZED NET (after fees) by DAY / WEEK / MONTH: this coin's, then every coin's together ----
+function renderPeriods(t){
+  const el=$('dt-periods'),P=t.periods,T=DTD&&DTD.periods_total;
+  if(!P){el.hidden=true;return}
+  const mk=(tag,props)=>Object.assign(document.createElement(tag),props),f=P.from;
+  const day=d=>new Date(d+'T00:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'});
+  const mon=new Date(f.monthly+'T00:00:00Z').toLocaleDateString('en-GB',{month:'short',timeZone:'UTC'});
+  const head=(b,s)=>{const d=mk('div',{className:'h'});d.append(mk('b',{textContent:b}),s);return d};
+  const val=(x,cl)=>{const n=Number(x.net),d=mk('div',{className:cl+(n>0?' pos':n<0?' neg':''),textContent:dq4(n)});
+    d.append(mk('small',{textContent:x.sells+' sale'+(x.sells===1?'':'s')}));return d};
+  const K=['daily','weekly','monthly'];
+  const line=(label,src,cl)=>[mk('div',{className:'c',textContent:label}),...K.map(k=>val(src[k],cl)),val(src.all_time,'at')];
+  el.replaceChildren(mk('div',{className:'ttl',textContent:'REALIZED NET AFTER FEES · all times UTC · weekly = calendar week from Monday'}),
+    mk('div'),head('DAILY','since 00:00'),head('WEEKLY','since Mon '+day(f.weekly)),
+    head('MONTHLY',mon+' to date'),head('ALL-TIME','total'),
+    ...line(COIN,P,'n'),...(T&&(DTD.pairs||[]).length>1?line('ALL '+DTD.pairs.length,T,'t'):[]));
+  el.hidden=false;
+}
 function renderDT(t){
   renderPatterns(t.patterns);
   renderSession(t.session);
@@ -1181,7 +1219,8 @@ function renderDT(t){
   $('dt-mode').textContent=$('feed-mode').textContent=(t.mode||'paper').toUpperCase();
   const net=t.net_pnl_after_fees??t.realized_pnl_gbp??0;
   cell($('dt-pnl'),dq4(net),net<0?'neg':'pos');
-  $('dt-pnlsub').textContent='TODAY '+dq4(t.net_today||0)+' · '+(t.buys_today||0)+' bought · '+(t.trades_today||0)+' sold · '+(t.trades||0)+' sold all-time';
+  $('dt-pnlsub').textContent='today '+(t.buys_today||0)+' bought · '+(t.trades_today||0)+' sold · '+(t.trades||0)+' sold all-time';
+  renderPeriods(t);
   const lots=t.lots||[];
   $('dt-lots').textContent=t.lots_open??lots.length;
   $('dt-lotsub').textContent=(t.lots_recovering||0)+' waiting to recover · '+(t.lots_in_profit||0)+' in profit · '
