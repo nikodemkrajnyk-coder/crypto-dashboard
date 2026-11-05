@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-05T07:39:15Z",
+  "updated": "2026-11-05T07:46:08Z",
   "daytrade": {
     "mode": "paper",
     "strategy_kind": "layers",
@@ -15,112 +15,23 @@
         "fee_floor_pct": 0.0065,
         "cap_gbp": 22.5,
         "in_lots_gbp": 4.66,
-        "resting_gbp": 16.24,
-        "orders": [
-          {
-            "side": "buy",
-            "price": 2391.31,
-            "gbp": 2.03,
-            "tier": "fast",
-            "qty": 0.00084891,
-            "wall": null,
-            "placed": "2026-11-05T07:37:41.432465Z",
-            "away_pct": -0.0093,
-            "status": "open"
-          },
-          {
-            "side": "buy",
-            "price": 2369.13,
-            "gbp": 2.03,
-            "tier": "fast",
-            "qty": 0.00085685,
-            "wall": null,
-            "placed": "2026-11-05T07:37:41.432465Z",
-            "away_pct": -0.0185,
-            "status": "open"
-          },
-          {
-            "side": "buy",
-            "price": 2347.46,
-            "gbp": 2.03,
-            "tier": "fast",
-            "qty": 0.00086476,
-            "wall": null,
-            "placed": "2026-11-05T07:37:41.432465Z",
-            "away_pct": -0.0275,
-            "status": "open"
-          },
-          {
-            "side": "buy",
-            "price": 2326.26,
-            "gbp": 2.03,
-            "tier": "fast",
-            "qty": 0.00087265,
-            "wall": null,
-            "placed": "2026-11-05T07:37:41.432465Z",
-            "away_pct": -0.0363,
-            "status": "open"
-          },
-          {
-            "side": "buy",
-            "price": 2305.54,
-            "gbp": 2.03,
-            "tier": "fast",
-            "qty": 0.00088049,
-            "wall": null,
-            "placed": "2026-11-05T07:37:41.432465Z",
-            "away_pct": -0.0449,
-            "status": "open"
-          },
-          {
-            "side": "buy",
-            "price": 2285.28,
-            "gbp": 2.03,
-            "tier": "fast",
-            "qty": 0.00088829,
-            "wall": null,
-            "placed": "2026-11-05T07:37:41.432465Z",
-            "away_pct": -0.0533,
-            "status": "open"
-          },
-          {
-            "side": "buy",
-            "price": 2265.48,
-            "gbp": 2.03,
-            "tier": "fast",
-            "qty": 0.00089606,
-            "wall": null,
-            "placed": "2026-11-05T07:37:41.432465Z",
-            "away_pct": -0.0615,
-            "status": "open"
-          },
-          {
-            "side": "buy",
-            "price": 2246.13,
-            "gbp": 2.03,
-            "tier": "fast",
-            "qty": 0.00090378,
-            "wall": null,
-            "placed": "2026-11-05T07:37:41.432465Z",
-            "away_pct": -0.0695,
-            "status": "open"
-          }
-        ],
+        "resting_gbp": 0,
+        "orders": [],
         "lots": [
           {
             "coin": "ETH",
             "qty": 0.000999,
             "entry": 2422.43,
             "gbp": 2.42,
-            "value": 2.4114,
-            "unrealised_gbp": -0.0086,
-            "unrealised_pct": -0.0035,
+            "value": 2.4105,
+            "unrealised_gbp": -0.0095,
+            "unrealised_pct": -0.0039,
             "target": 2438.22,
-            "to_target_pct": 0.0101,
+            "to_target_pct": 0.0105,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T23:30:23.194236Z",
-            "held_minutes": 488,
+            "held_minutes": 495,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -131,15 +42,15 @@
             "qty": 0.00091992,
             "entry": 2435.0,
             "gbp": 2.24,
-            "value": 2.2206,
-            "unrealised_gbp": -0.0194,
-            "unrealised_pct": -0.0087,
+            "value": 2.2197,
+            "unrealised_gbp": -0.0203,
+            "unrealised_pct": -0.0091,
             "target": 2450.87,
-            "to_target_pct": 0.0153,
+            "to_target_pct": 0.0157,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:05:27.268757Z",
-            "held_minutes": 993,
+            "held_minutes": 1000,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -147,7 +58,7 @@
           }
         ],
         "lots_recovering": 2,
-        "unrealised_gbp": -0.028,
+        "unrealised_gbp": -0.0298,
         "realized_gbp": 0.1217,
         "sold": 29,
         "sold_today": 1,
@@ -173,12 +84,12 @@
         },
         "swings_per_day": 16.11,
         "step_pct": 0.0082,
-        "depth_pct": 0.07473,
+        "depth_pct": 0.07465,
         "lean": "neutral",
-        "built_at": "2026-11-05T07:37:41.432465Z",
-        "net_per_round_trip": 0.003,
+        "built_at": "2026-11-05T07:40:42.213034Z",
+        "net_per_round_trip": 0.0,
         "round_trips_per_day": 128.9,
-        "potential_week": 2.75
+        "potential_week": 0.0
       },
       {
         "name": "medium",
@@ -197,7 +108,7 @@
             "qty": 0.00047865,
             "wall": null,
             "placed": "2026-11-05T06:07:46.917593Z",
-            "away_pct": -0.0133,
+            "away_pct": -0.0129,
             "status": "open"
           },
           {
@@ -208,7 +119,7 @@
             "qty": 0.00048415,
             "wall": null,
             "placed": "2026-11-05T07:29:08.797065Z",
-            "away_pct": -0.0245,
+            "away_pct": -0.0241,
             "status": "open"
           },
           {
@@ -219,7 +130,7 @@
             "qty": 0.00048874,
             "wall": null,
             "placed": "2026-11-05T07:15:35.421667Z",
-            "away_pct": -0.0337,
+            "away_pct": -0.0333,
             "status": "open"
           },
           {
@@ -230,7 +141,7 @@
             "qty": 0.00050507,
             "wall": null,
             "placed": "2026-11-05T07:15:35.421667Z",
-            "away_pct": -0.0485,
+            "away_pct": -0.0482,
             "status": "open"
           },
           {
@@ -241,7 +152,7 @@
             "qty": 0.00050112,
             "wall": null,
             "placed": "2026-11-05T07:29:08.797065Z",
-            "away_pct": -0.0576,
+            "away_pct": -0.0572,
             "status": "open"
           },
           {
@@ -252,7 +163,7 @@
             "qty": 0.00050655,
             "wall": null,
             "placed": "2026-11-05T07:29:08.797065Z",
-            "away_pct": -0.0677,
+            "away_pct": -0.0673,
             "status": "open"
           },
           {
@@ -263,7 +174,7 @@
             "qty": 0.00051186,
             "wall": null,
             "placed": "2026-11-05T07:29:08.797065Z",
-            "away_pct": -0.0773,
+            "away_pct": -0.077,
             "status": "open"
           }
         ],
@@ -273,15 +184,15 @@
             "qty": 0.00049867,
             "entry": 2406.44,
             "gbp": 1.2,
-            "value": 1.2037,
-            "unrealised_gbp": 0.0037,
-            "unrealised_pct": 0.0031,
-            "target": 2434.09,
-            "to_target_pct": 0.0084,
-            "ask_wall": 2434.83,
+            "value": 1.2032,
+            "unrealised_gbp": 0.0032,
+            "unrealised_pct": 0.0027,
+            "target": 2434.26,
+            "to_target_pct": 0.0089,
+            "ask_wall": 2435.0,
             "book_snap": null,
             "opened": "2026-11-04T19:50:19.415356Z",
-            "held_minutes": 708,
+            "held_minutes": 715,
             "tier": "medium",
             "status": "in_profit",
             "trail_peak": null,
@@ -292,15 +203,15 @@
             "qty": 0.00046729,
             "entry": 2418.23,
             "gbp": 1.13,
-            "value": 1.128,
-            "unrealised_gbp": -0.002,
-            "unrealised_pct": -0.0018,
+            "value": 1.1275,
+            "unrealised_gbp": -0.0025,
+            "unrealised_pct": -0.0022,
             "target": 2454.51,
-            "to_target_pct": 0.0168,
+            "to_target_pct": 0.0172,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-05T00:58:17.468939Z",
-            "held_minutes": 400,
+            "held_minutes": 407,
             "tier": "medium",
             "status": "recovering",
             "trail_peak": null,
@@ -311,15 +222,15 @@
             "qty": 0.00053044,
             "entry": 2431.96,
             "gbp": 1.29,
-            "value": 1.2804,
-            "unrealised_gbp": -0.0096,
-            "unrealised_pct": -0.0074,
+            "value": 1.2799,
+            "unrealised_gbp": -0.0101,
+            "unrealised_pct": -0.0078,
             "target": 2468.44,
-            "to_target_pct": 0.0226,
+            "to_target_pct": 0.023,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:05:27.268757Z",
-            "held_minutes": 993,
+            "held_minutes": 1000,
             "tier": "medium",
             "status": "recovering",
             "trail_peak": null,
@@ -327,7 +238,7 @@
           }
         ],
         "lots_recovering": 2,
-        "unrealised_gbp": -0.0079,
+        "unrealised_gbp": -0.0094,
         "realized_gbp": 0.0622,
         "sold": 11,
         "sold_today": 0,
@@ -377,7 +288,7 @@
             "qty": 0.00042506,
             "wall": null,
             "placed": "2026-11-05T07:18:36.167396Z",
-            "away_pct": -0.0059,
+            "away_pct": -0.0055,
             "status": "open"
           },
           {
@@ -388,7 +299,7 @@
             "qty": 0.00043296,
             "wall": null,
             "placed": "2026-11-05T07:18:36.167396Z",
-            "away_pct": -0.024,
+            "away_pct": -0.0236,
             "status": "open"
           },
           {
@@ -399,7 +310,7 @@
             "qty": 0.00044108,
             "wall": null,
             "placed": "2026-11-05T01:41:00.132388Z",
-            "away_pct": -0.042,
+            "away_pct": -0.0416,
             "status": "open"
           },
           {
@@ -410,7 +321,7 @@
             "qty": 0.00044818,
             "wall": null,
             "placed": "2026-11-05T07:18:36.167396Z",
-            "away_pct": -0.0572,
+            "away_pct": -0.0568,
             "status": "open"
           },
           {
@@ -421,7 +332,7 @@
             "qty": 0.00045538,
             "wall": null,
             "placed": "2026-11-05T03:44:05.782658Z",
-            "away_pct": -0.0721,
+            "away_pct": -0.0717,
             "status": "open"
           },
           {
@@ -432,7 +343,7 @@
             "qty": 0.00046454,
             "wall": null,
             "placed": "2026-11-05T03:30:32.050038Z",
-            "away_pct": -0.0904,
+            "away_pct": -0.09,
             "status": "open"
           }
         ],
@@ -442,15 +353,15 @@
             "qty": 0.00048382,
             "entry": 2418.3,
             "gbp": 1.17,
-            "value": 1.1679,
-            "unrealised_gbp": -0.0021,
-            "unrealised_pct": -0.0018,
+            "value": 1.1674,
+            "unrealised_gbp": -0.0026,
+            "unrealised_pct": -0.0022,
             "target": 2494.72,
-            "to_target_pct": 0.0335,
+            "to_target_pct": 0.0339,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-05T00:08:03.930706Z",
-            "held_minutes": 451,
+            "held_minutes": 458,
             "tier": "slow",
             "status": "recovering",
             "trail_peak": null,
@@ -458,7 +369,7 @@
           }
         ],
         "lots_recovering": 1,
-        "unrealised_gbp": -0.0021,
+        "unrealised_gbp": -0.0026,
         "realized_gbp": 0.1087,
         "sold": 3,
         "sold_today": 0,
@@ -508,7 +419,7 @@
             "qty": 0.00069518,
             "wall": null,
             "placed": "2026-11-04T00:08:12.064414Z",
-            "away_pct": -0.1061,
+            "away_pct": -0.1058,
             "status": "open"
           },
           {
@@ -519,7 +430,7 @@
             "qty": 0.0007056,
             "wall": null,
             "placed": "2026-11-04T00:08:12.064414Z",
-            "away_pct": -0.1193,
+            "away_pct": -0.119,
             "status": "open"
           },
           {
@@ -530,7 +441,7 @@
             "qty": 0.00071619,
             "wall": null,
             "placed": "2026-11-04T00:08:12.064414Z",
-            "away_pct": -0.1323,
+            "away_pct": -0.132,
             "status": "open"
           },
           {
@@ -541,7 +452,7 @@
             "qty": 0.00072693,
             "wall": null,
             "placed": "2026-11-04T00:08:12.064414Z",
-            "away_pct": -0.1452,
+            "away_pct": -0.1448,
             "status": "open"
           },
           {
@@ -552,7 +463,7 @@
             "qty": 0.00073783,
             "wall": null,
             "placed": "2026-11-04T00:08:12.064414Z",
-            "away_pct": -0.1578,
+            "away_pct": -0.1575,
             "status": "open"
           }
         ],
@@ -571,46 +482,46 @@
     ],
     "pot_in_lots_gbp": 9.45,
     "book": {
-      "bid": 2413.61,
-      "ask": 2413.94,
-      "spread": 0.33,
-      "spread_pct": 0.000137,
-      "pressure": -0.02,
+      "bid": 2412.86,
+      "ask": 2412.88,
+      "spread": 0.02,
+      "spread_pct": 8e-06,
+      "pressure": -0.009,
       "lean": "neutral",
-      "bid_size": 2192.745,
-      "ask_size": 2283.043,
+      "bid_size": 2297.8821,
+      "ask_size": 2339.7588,
       "bid_walls": [
         {
-          "price": 2405.57,
-          "size": 596.0604,
-          "x": 110.1
+          "price": 2408.79,
+          "size": 855.8379,
+          "x": 349.8
         },
         {
-          "price": 2412.47,
-          "size": 586.6564,
-          "x": 108.4
+          "price": 2411.67,
+          "size": 640.6156,
+          "x": 261.8
         },
         {
-          "price": 2410.13,
-          "size": 555.579,
-          "x": 102.6
+          "price": 2404.3,
+          "size": 344.277,
+          "x": 140.7
         }
       ],
       "ask_walls": [
         {
           "price": 2450.05,
-          "size": 1313.7673,
-          "x": 28.4
+          "size": 1313.7203,
+          "x": 25.3
         },
         {
-          "price": 2427.62,
-          "size": 925.215,
-          "x": 20.0
+          "price": 2425.43,
+          "size": 883.7691,
+          "x": 17.0
         },
         {
-          "price": 2417.49,
-          "size": 681.4946,
-          "x": 14.7
+          "price": 2416.44,
+          "size": 842.8203,
+          "x": 16.2
         }
       ]
     },
@@ -620,7 +531,7 @@
     "lots_recovering": 5,
     "lots_in_profit": 1,
     "median_time_to_profit_min": 242,
-    "orders_resting": 26,
+    "orders_resting": 18,
     "invested_gbp": 9.45,
     "cash_gbp": 40.55,
     "trades": 43,
@@ -668,8 +579,8 @@
         "post_only": false,
         "status": "online"
       },
-      "spread": 0.33,
-      "spread_pct": 0.000137,
+      "spread": 0.02,
+      "spread_pct": 8e-06,
       "through_ticks": 1,
       "slip_base": 0.0002,
       "slip_per_1k": 0.001,
@@ -722,13 +633,13 @@
     "realized_pnl_gbp": 0.2926,
     "gross_pnl_gbp": 0.6697,
     "net_pnl_after_fees": 0.2926,
-    "unrealised_gbp": -0.038,
+    "unrealised_gbp": -0.0418,
     "fee_rate": 0.0025,
     "losing_streak": 0,
     "max_losing_streak": 2,
     "cooldown_active": false,
     "cooldown_until": null,
-    "last_price": 2413.86,
+    "last_price": 2412.9,
     "orders": [
       {
         "side": "buy",
@@ -738,21 +649,9 @@
       },
       {
         "side": "buy",
-        "price": 2391.31,
-        "gbp": 2.03,
-        "tier": "fast"
-      },
-      {
-        "side": "buy",
         "price": 2381.7,
         "gbp": 1.14,
         "tier": "medium"
-      },
-      {
-        "side": "buy",
-        "price": 2369.13,
-        "gbp": 2.03,
-        "tier": "fast"
       },
       {
         "side": "buy",
@@ -768,21 +667,9 @@
       },
       {
         "side": "buy",
-        "price": 2347.46,
-        "gbp": 2.03,
-        "tier": "fast"
-      },
-      {
-        "side": "buy",
         "price": 2332.51,
         "gbp": 1.14,
         "tier": "medium"
-      },
-      {
-        "side": "buy",
-        "price": 2326.26,
-        "gbp": 2.03,
-        "tier": "fast"
       },
       {
         "side": "buy",
@@ -792,21 +679,9 @@
       },
       {
         "side": "buy",
-        "price": 2305.54,
-        "gbp": 2.03,
-        "tier": "fast"
-      },
-      {
-        "side": "buy",
         "price": 2296.69,
         "gbp": 1.16,
         "tier": "medium"
-      },
-      {
-        "side": "buy",
-        "price": 2285.28,
-        "gbp": 2.03,
-        "tier": "fast"
       },
       {
         "side": "buy",
@@ -822,21 +697,9 @@
       },
       {
         "side": "buy",
-        "price": 2265.48,
-        "gbp": 2.03,
-        "tier": "fast"
-      },
-      {
-        "side": "buy",
         "price": 2250.52,
         "gbp": 1.14,
         "tier": "medium"
-      },
-      {
-        "side": "buy",
-        "price": 2246.13,
-        "gbp": 2.03,
-        "tier": "fast"
       },
       {
         "side": "buy",
@@ -893,15 +756,15 @@
         "qty": 0.00049867,
         "entry": 2406.44,
         "gbp": 1.2,
-        "value": 1.2037,
-        "unrealised_gbp": 0.0037,
-        "unrealised_pct": 0.0031,
-        "target": 2434.09,
-        "to_target_pct": 0.0084,
-        "ask_wall": 2434.83,
+        "value": 1.2032,
+        "unrealised_gbp": 0.0032,
+        "unrealised_pct": 0.0027,
+        "target": 2434.26,
+        "to_target_pct": 0.0089,
+        "ask_wall": 2435.0,
         "book_snap": null,
         "opened": "2026-11-04T19:50:19.415356Z",
-        "held_minutes": 708,
+        "held_minutes": 715,
         "tier": "medium",
         "status": "in_profit",
         "trail_peak": null,
@@ -912,15 +775,15 @@
         "qty": 0.000999,
         "entry": 2422.43,
         "gbp": 2.42,
-        "value": 2.4114,
-        "unrealised_gbp": -0.0086,
-        "unrealised_pct": -0.0035,
+        "value": 2.4105,
+        "unrealised_gbp": -0.0095,
+        "unrealised_pct": -0.0039,
         "target": 2438.22,
-        "to_target_pct": 0.0101,
+        "to_target_pct": 0.0105,
         "ask_wall": null,
         "book_snap": null,
         "opened": "2026-11-04T23:30:23.194236Z",
-        "held_minutes": 488,
+        "held_minutes": 495,
         "tier": "fast",
         "status": "recovering",
         "trail_peak": null,
@@ -931,15 +794,15 @@
         "qty": 0.00091992,
         "entry": 2435.0,
         "gbp": 2.24,
-        "value": 2.2206,
-        "unrealised_gbp": -0.0194,
-        "unrealised_pct": -0.0087,
+        "value": 2.2197,
+        "unrealised_gbp": -0.0203,
+        "unrealised_pct": -0.0091,
         "target": 2450.87,
-        "to_target_pct": 0.0153,
+        "to_target_pct": 0.0157,
         "ask_wall": null,
         "book_snap": null,
         "opened": "2026-11-04T15:05:27.268757Z",
-        "held_minutes": 993,
+        "held_minutes": 1000,
         "tier": "fast",
         "status": "recovering",
         "trail_peak": null,
@@ -950,15 +813,15 @@
         "qty": 0.00046729,
         "entry": 2418.23,
         "gbp": 1.13,
-        "value": 1.128,
-        "unrealised_gbp": -0.002,
-        "unrealised_pct": -0.0018,
+        "value": 1.1275,
+        "unrealised_gbp": -0.0025,
+        "unrealised_pct": -0.0022,
         "target": 2454.51,
-        "to_target_pct": 0.0168,
+        "to_target_pct": 0.0172,
         "ask_wall": null,
         "book_snap": null,
         "opened": "2026-11-05T00:58:17.468939Z",
-        "held_minutes": 400,
+        "held_minutes": 407,
         "tier": "medium",
         "status": "recovering",
         "trail_peak": null,
@@ -969,15 +832,15 @@
         "qty": 0.00053044,
         "entry": 2431.96,
         "gbp": 1.29,
-        "value": 1.2804,
-        "unrealised_gbp": -0.0096,
-        "unrealised_pct": -0.0074,
+        "value": 1.2799,
+        "unrealised_gbp": -0.0101,
+        "unrealised_pct": -0.0078,
         "target": 2468.44,
-        "to_target_pct": 0.0226,
+        "to_target_pct": 0.023,
         "ask_wall": null,
         "book_snap": null,
         "opened": "2026-11-04T15:05:27.268757Z",
-        "held_minutes": 993,
+        "held_minutes": 1000,
         "tier": "medium",
         "status": "recovering",
         "trail_peak": null,
@@ -988,15 +851,15 @@
         "qty": 0.00048382,
         "entry": 2418.3,
         "gbp": 1.17,
-        "value": 1.1679,
-        "unrealised_gbp": -0.0021,
-        "unrealised_pct": -0.0018,
+        "value": 1.1674,
+        "unrealised_gbp": -0.0026,
+        "unrealised_pct": -0.0022,
         "target": 2494.72,
-        "to_target_pct": 0.0335,
+        "to_target_pct": 0.0339,
         "ask_wall": null,
         "book_snap": null,
         "opened": "2026-11-05T00:08:03.930706Z",
-        "held_minutes": 451,
+        "held_minutes": 458,
         "tier": "slow",
         "status": "recovering",
         "trail_peak": null,
@@ -1005,28 +868,28 @@
     ],
     "projection": {
       "label": "POTENTIAL — estimate, not a promise",
-      "base_potential_week": 3.02,
+      "base_potential_week": 0.28,
       "round_trips_per_day": 131.5,
       "ranging": true,
       "scenarios": [
         {
           "per_day": 1,
-          "potential": 0.29
+          "potential": 0.27
         },
         {
           "per_day": 3,
-          "potential": 0.87
+          "potential": 0.81
         },
         {
           "per_day": 5,
-          "potential": 1.45
+          "potential": 1.35
         }
       ],
       "scenario_basis": "n round trips per day in EACH layer"
     },
     "plan_vs_actual": {
       "week_start": "2026-11-02T00:00:00Z",
-      "planned_round_trips_so_far": 436.4,
+      "planned_round_trips_so_far": 437.1,
       "actual_round_trips": 40,
       "actual_net": 0.2819,
       "status": "BEHIND"
@@ -1040,18 +903,7 @@
         "qty": 0.00042506,
         "wall": null,
         "placed": "2026-11-05T07:18:36.167396Z",
-        "away_pct": -0.0059,
-        "status": "open"
-      },
-      {
-        "side": "buy",
-        "price": 2391.31,
-        "gbp": 2.03,
-        "tier": "fast",
-        "qty": 0.00084891,
-        "wall": null,
-        "placed": "2026-11-05T07:37:41.432465Z",
-        "away_pct": -0.0093,
+        "away_pct": -0.0055,
         "status": "open"
       },
       {
@@ -1062,18 +914,7 @@
         "qty": 0.00047865,
         "wall": null,
         "placed": "2026-11-05T06:07:46.917593Z",
-        "away_pct": -0.0133,
-        "status": "open"
-      },
-      {
-        "side": "buy",
-        "price": 2369.13,
-        "gbp": 2.03,
-        "tier": "fast",
-        "qty": 0.00085685,
-        "wall": null,
-        "placed": "2026-11-05T07:37:41.432465Z",
-        "away_pct": -0.0185,
+        "away_pct": -0.0129,
         "status": "open"
       },
       {
@@ -1084,7 +925,7 @@
         "qty": 0.00043296,
         "wall": null,
         "placed": "2026-11-05T07:18:36.167396Z",
-        "away_pct": -0.024,
+        "away_pct": -0.0236,
         "status": "open"
       },
       {
@@ -1095,18 +936,7 @@
         "qty": 0.00048415,
         "wall": null,
         "placed": "2026-11-05T07:29:08.797065Z",
-        "away_pct": -0.0245,
-        "status": "open"
-      },
-      {
-        "side": "buy",
-        "price": 2347.46,
-        "gbp": 2.03,
-        "tier": "fast",
-        "qty": 0.00086476,
-        "wall": null,
-        "placed": "2026-11-05T07:37:41.432465Z",
-        "away_pct": -0.0275,
+        "away_pct": -0.0241,
         "status": "open"
       },
       {
@@ -1117,18 +947,7 @@
         "qty": 0.00048874,
         "wall": null,
         "placed": "2026-11-05T07:15:35.421667Z",
-        "away_pct": -0.0337,
-        "status": "open"
-      },
-      {
-        "side": "buy",
-        "price": 2326.26,
-        "gbp": 2.03,
-        "tier": "fast",
-        "qty": 0.00087265,
-        "wall": null,
-        "placed": "2026-11-05T07:37:41.432465Z",
-        "away_pct": -0.0363,
+        "away_pct": -0.0333,
         "status": "open"
       },
       {
@@ -1139,18 +958,7 @@
         "qty": 0.00044108,
         "wall": null,
         "placed": "2026-11-05T01:41:00.132388Z",
-        "away_pct": -0.042,
-        "status": "open"
-      },
-      {
-        "side": "buy",
-        "price": 2305.54,
-        "gbp": 2.03,
-        "tier": "fast",
-        "qty": 0.00088049,
-        "wall": null,
-        "placed": "2026-11-05T07:37:41.432465Z",
-        "away_pct": -0.0449,
+        "away_pct": -0.0416,
         "status": "open"
       },
       {
@@ -1161,18 +969,7 @@
         "qty": 0.00050507,
         "wall": null,
         "placed": "2026-11-05T07:15:35.421667Z",
-        "away_pct": -0.0485,
-        "status": "open"
-      },
-      {
-        "side": "buy",
-        "price": 2285.28,
-        "gbp": 2.03,
-        "tier": "fast",
-        "qty": 0.00088829,
-        "wall": null,
-        "placed": "2026-11-05T07:37:41.432465Z",
-        "away_pct": -0.0533,
+        "away_pct": -0.0482,
         "status": "open"
       },
       {
@@ -1183,7 +980,7 @@
         "qty": 0.00044818,
         "wall": null,
         "placed": "2026-11-05T07:18:36.167396Z",
-        "away_pct": -0.0572,
+        "away_pct": -0.0568,
         "status": "open"
       },
       {
@@ -1194,18 +991,7 @@
         "qty": 0.00050112,
         "wall": null,
         "placed": "2026-11-05T07:29:08.797065Z",
-        "away_pct": -0.0576,
-        "status": "open"
-      },
-      {
-        "side": "buy",
-        "price": 2265.48,
-        "gbp": 2.03,
-        "tier": "fast",
-        "qty": 0.00089606,
-        "wall": null,
-        "placed": "2026-11-05T07:37:41.432465Z",
-        "away_pct": -0.0615,
+        "away_pct": -0.0572,
         "status": "open"
       },
       {
@@ -1216,18 +1002,7 @@
         "qty": 0.00050655,
         "wall": null,
         "placed": "2026-11-05T07:29:08.797065Z",
-        "away_pct": -0.0677,
-        "status": "open"
-      },
-      {
-        "side": "buy",
-        "price": 2246.13,
-        "gbp": 2.03,
-        "tier": "fast",
-        "qty": 0.00090378,
-        "wall": null,
-        "placed": "2026-11-05T07:37:41.432465Z",
-        "away_pct": -0.0695,
+        "away_pct": -0.0673,
         "status": "open"
       },
       {
@@ -1238,7 +1013,7 @@
         "qty": 0.00045538,
         "wall": null,
         "placed": "2026-11-05T03:44:05.782658Z",
-        "away_pct": -0.0721,
+        "away_pct": -0.0717,
         "status": "open"
       },
       {
@@ -1249,7 +1024,7 @@
         "qty": 0.00051186,
         "wall": null,
         "placed": "2026-11-05T07:29:08.797065Z",
-        "away_pct": -0.0773,
+        "away_pct": -0.077,
         "status": "open"
       },
       {
@@ -1260,7 +1035,7 @@
         "qty": 0.00046454,
         "wall": null,
         "placed": "2026-11-05T03:30:32.050038Z",
-        "away_pct": -0.0904,
+        "away_pct": -0.09,
         "status": "open"
       },
       {
@@ -1271,7 +1046,7 @@
         "qty": 0.00069518,
         "wall": null,
         "placed": "2026-11-04T00:08:12.064414Z",
-        "away_pct": -0.1061,
+        "away_pct": -0.1058,
         "status": "open"
       },
       {
@@ -1282,7 +1057,7 @@
         "qty": 0.0007056,
         "wall": null,
         "placed": "2026-11-04T00:08:12.064414Z",
-        "away_pct": -0.1193,
+        "away_pct": -0.119,
         "status": "open"
       },
       {
@@ -1293,7 +1068,7 @@
         "qty": 0.00071619,
         "wall": null,
         "placed": "2026-11-04T00:08:12.064414Z",
-        "away_pct": -0.1323,
+        "away_pct": -0.132,
         "status": "open"
       },
       {
@@ -1304,7 +1079,7 @@
         "qty": 0.00072693,
         "wall": null,
         "placed": "2026-11-04T00:08:12.064414Z",
-        "away_pct": -0.1452,
+        "away_pct": -0.1448,
         "status": "open"
       },
       {
@@ -1315,19 +1090,19 @@
         "qty": 0.00073783,
         "wall": null,
         "placed": "2026-11-04T00:08:12.064414Z",
-        "away_pct": -0.1578,
+        "away_pct": -0.1575,
         "status": "open"
       },
       {
         "side": "sell",
-        "price": 2434.09,
+        "price": 2434.26,
         "gbp": 1.21,
         "qty": 0.00049867,
         "tier": "medium",
         "placed": "2026-11-04T19:50:19.415356Z",
         "entry": 2406.44,
-        "wall": 2434.83,
-        "away_pct": 0.0084,
+        "wall": 2435.0,
+        "away_pct": 0.0089,
         "status": "open"
       },
       {
@@ -1339,7 +1114,7 @@
         "placed": "2026-11-04T23:30:23.194236Z",
         "entry": 2422.43,
         "wall": null,
-        "away_pct": 0.0101,
+        "away_pct": 0.0105,
         "status": "open"
       },
       {
@@ -1351,7 +1126,7 @@
         "placed": "2026-11-04T15:05:27.268757Z",
         "entry": 2435.0,
         "wall": null,
-        "away_pct": 0.0153,
+        "away_pct": 0.0157,
         "status": "open"
       },
       {
@@ -1363,7 +1138,7 @@
         "placed": "2026-11-05T00:58:17.468939Z",
         "entry": 2418.23,
         "wall": null,
-        "away_pct": 0.0168,
+        "away_pct": 0.0172,
         "status": "open"
       },
       {
@@ -1375,7 +1150,7 @@
         "placed": "2026-11-04T15:05:27.268757Z",
         "entry": 2431.96,
         "wall": null,
-        "away_pct": 0.0226,
+        "away_pct": 0.023,
         "status": "open"
       },
       {
@@ -1387,83 +1162,11 @@
         "placed": "2026-11-05T00:08:03.930706Z",
         "entry": 2418.3,
         "wall": null,
-        "away_pct": 0.0335,
+        "away_pct": 0.0339,
         "status": "open"
       }
     ],
     "order_events": [
-      {
-        "t": "2026-11-05T07:27:38.488830Z",
-        "kind": "cancelled",
-        "side": "buy",
-        "price": 2256.11,
-        "gbp": 1.79,
-        "tier": "fast",
-        "note": "repriced: older than 10 min"
-      },
-      {
-        "t": "2026-11-05T07:27:38.488830Z",
-        "kind": "placed",
-        "side": "buy",
-        "price": 2375.86,
-        "gbp": 1.95,
-        "tier": "fast",
-        "note": "older than 10 min"
-      },
-      {
-        "t": "2026-11-05T07:27:38.488830Z",
-        "kind": "placed",
-        "side": "buy",
-        "price": 2354.12,
-        "gbp": 3.2,
-        "tier": "fast",
-        "note": "older than 10 min"
-      },
-      {
-        "t": "2026-11-05T07:27:38.488830Z",
-        "kind": "placed",
-        "side": "buy",
-        "price": 2332.87,
-        "gbp": 1.95,
-        "tier": "fast",
-        "note": "older than 10 min"
-      },
-      {
-        "t": "2026-11-05T07:27:38.488830Z",
-        "kind": "placed",
-        "side": "buy",
-        "price": 2312.09,
-        "gbp": 1.95,
-        "tier": "fast",
-        "note": "older than 10 min"
-      },
-      {
-        "t": "2026-11-05T07:27:38.488830Z",
-        "kind": "placed",
-        "side": "buy",
-        "price": 2291.77,
-        "gbp": 1.95,
-        "tier": "fast",
-        "note": "older than 10 min"
-      },
-      {
-        "t": "2026-11-05T07:27:38.488830Z",
-        "kind": "placed",
-        "side": "buy",
-        "price": 2271.92,
-        "gbp": 1.95,
-        "tier": "fast",
-        "note": "older than 10 min"
-      },
-      {
-        "t": "2026-11-05T07:27:38.488830Z",
-        "kind": "placed",
-        "side": "buy",
-        "price": 2252.51,
-        "gbp": 1.95,
-        "tier": "fast",
-        "note": "older than 10 min"
-      },
       {
         "t": "2026-11-05T07:29:08.797065Z",
         "kind": "cancelled",
@@ -1661,12 +1364,84 @@
         "gbp": 2.03,
         "tier": "fast",
         "note": "older than 10 min"
+      },
+      {
+        "t": "2026-11-05T07:40:42.213034Z",
+        "kind": "cancelled",
+        "side": "buy",
+        "price": 2391.31,
+        "gbp": 2.03,
+        "tier": "fast",
+        "note": "repriced: KNIFE GUARD: support $2,419.53 broke with no reclaim — new buys paused"
+      },
+      {
+        "t": "2026-11-05T07:40:42.213034Z",
+        "kind": "cancelled",
+        "side": "buy",
+        "price": 2369.13,
+        "gbp": 2.03,
+        "tier": "fast",
+        "note": "repriced: KNIFE GUARD: support $2,419.53 broke with no reclaim — new buys paused"
+      },
+      {
+        "t": "2026-11-05T07:40:42.213034Z",
+        "kind": "cancelled",
+        "side": "buy",
+        "price": 2347.46,
+        "gbp": 2.03,
+        "tier": "fast",
+        "note": "repriced: KNIFE GUARD: support $2,419.53 broke with no reclaim — new buys paused"
+      },
+      {
+        "t": "2026-11-05T07:40:42.213034Z",
+        "kind": "cancelled",
+        "side": "buy",
+        "price": 2326.26,
+        "gbp": 2.03,
+        "tier": "fast",
+        "note": "repriced: KNIFE GUARD: support $2,419.53 broke with no reclaim — new buys paused"
+      },
+      {
+        "t": "2026-11-05T07:40:42.213034Z",
+        "kind": "cancelled",
+        "side": "buy",
+        "price": 2305.54,
+        "gbp": 2.03,
+        "tier": "fast",
+        "note": "repriced: KNIFE GUARD: support $2,419.53 broke with no reclaim — new buys paused"
+      },
+      {
+        "t": "2026-11-05T07:40:42.213034Z",
+        "kind": "cancelled",
+        "side": "buy",
+        "price": 2285.28,
+        "gbp": 2.03,
+        "tier": "fast",
+        "note": "repriced: KNIFE GUARD: support $2,419.53 broke with no reclaim — new buys paused"
+      },
+      {
+        "t": "2026-11-05T07:40:42.213034Z",
+        "kind": "cancelled",
+        "side": "buy",
+        "price": 2265.48,
+        "gbp": 2.03,
+        "tier": "fast",
+        "note": "repriced: KNIFE GUARD: support $2,419.53 broke with no reclaim — new buys paused"
+      },
+      {
+        "t": "2026-11-05T07:40:42.213034Z",
+        "kind": "cancelled",
+        "side": "buy",
+        "price": 2246.13,
+        "gbp": 2.03,
+        "tier": "fast",
+        "note": "repriced: KNIFE GUARD: support $2,419.53 broke with no reclaim — new buys paused"
       }
     ],
     "grid_stats": {
       "day": "2026-11-05",
-      "reprices": 125,
-      "cancelled": 327,
+      "reprices": 126,
+      "cancelled": 335,
       "placed": 330,
       "filled": 3,
       "sold": 1
@@ -1756,7 +1531,7 @@
       },
       "live": {
         "placed": 1215,
-        "reprices": 416,
+        "reprices": 417,
         "book_reprices": 264,
         "filled": 19,
         "sold": 20,
@@ -1765,15 +1540,15 @@
       }
     },
     "anti_spoof": {
-      "at": "2026-11-05T07:39:11.764476Z",
-      "seen": 9,
+      "at": "2026-11-05T07:45:43.443396Z",
+      "seen": 10,
       "trusted": 1,
-      "flagged": 6,
-      "spoofs_active": 4,
-      "spoofs_24h": 586,
+      "flagged": 8,
+      "spoofs_active": 9,
+      "spoofs_24h": 591,
       "support": null,
       "resistance": {
-        "price": 2434.83,
+        "price": 2435.0,
         "trust": 0.4
       },
       "walls": [
@@ -1786,101 +1561,118 @@
         },
         {
           "side": "ask",
-          "price": 2434.83,
+          "price": 2435.0,
           "trust": 0.4,
           "trusted": true,
           "flagged": false
         },
         {
           "side": "ask",
-          "price": 2427.62,
+          "price": 2425.43,
           "trust": 0.0,
           "trusted": false,
           "flagged": true
         },
         {
           "side": "ask",
-          "price": 2424.81,
+          "price": 2421.47,
           "trust": 0.0,
           "trusted": false,
           "flagged": true
         },
         {
           "side": "ask",
-          "price": 2415.19,
+          "price": 2414.09,
           "trust": 0.0,
           "trusted": false,
           "flagged": true
         },
         {
           "side": "bid",
-          "price": 2412.47,
+          "price": 2411.67,
           "trust": 0.0,
           "trusted": false,
           "flagged": true
         },
         {
           "side": "bid",
-          "price": 2408.59,
+          "price": 2408.79,
           "trust": 0.0,
           "trusted": false,
           "flagged": true
         },
         {
           "side": "bid",
-          "price": 2403.08,
-          "trust": 0.086,
+          "price": 2406.38,
+          "trust": 0.0,
           "trusted": false,
-          "flagged": false
+          "flagged": true
         },
         {
           "side": "bid",
-          "price": 2400.42,
-          "trust": 0.056,
+          "price": 2402.19,
+          "trust": 0.0,
+          "trusted": false,
+          "flagged": true
+        },
+        {
+          "side": "bid",
+          "price": 2394.62,
+          "trust": 0.0,
           "trusted": false,
           "flagged": false
         }
       ]
     },
     "confluence": {
-      "at": "2026-11-05T07:39:11.764476Z",
+      "at": "2026-11-05T07:45:43.443396Z",
       "layers": {
         "fast": {
-          "S": 0.125,
-          "direction": "up",
-          "confidence": 0.125,
-          "pattern": "higher highs + higher lows",
+          "S": -0.171,
+          "direction": "down",
+          "confidence": 0.171,
+          "pattern": "none",
           "support": 2358.05,
           "resistance": 2441.83,
-          "channel_lower": 2420.23,
-          "channel_upper": 2434.26,
+          "channel_lower": 2413.95,
+          "channel_upper": 2435.01,
           "regime": "range",
-          "bounce": true,
+          "bounce": false,
           "bounce_med": 0.011618240013301806,
           "tp_eff": 0.0065,
           "tp_cap": 0.0065,
           "event": {
-            "price": 2419.53,
+            "price": 2418.75,
             "strength": 0.6,
             "class": "medium",
-            "touches": 9,
+            "touches": 10,
             "wall": false,
             "channel": true,
             "round": false,
-            "event": "testing",
+            "event": "breakdown",
             "event_age": 1
           },
-          "knife": null,
+          "knife": {
+            "price": 2418.75,
+            "strength": 0.6,
+            "class": "medium",
+            "touches": 10,
+            "wall": false,
+            "channel": true,
+            "round": false,
+            "event": "breakdown",
+            "event_age": 1
+          },
           "support_map": [
             {
-              "price": 2419.53,
+              "price": 2418.75,
               "strength": 0.6,
               "class": "medium",
-              "touches": 9,
+              "touches": 10,
               "wall": false,
               "channel": true,
               "round": false,
-              "event": "testing",
+              "event": "breakdown",
               "event_age": 1
             },
             {
@@ -1899,43 +1691,43 @@
           "votes": [
             {
               "sig": "book",
-              "vote": 0.132,
+              "vote": -0.056,
+              "w": 1.0,
+              "agrees": false
+            },
+            {
+              "sig": "sr",
+              "vote": -0.308,
               "w": 1.0,
               "agrees": true
             },
             {
-              "sig": "sr",
-              "vote": -0.328,
-              "w": 1.0,
-              "agrees": false
-            },
-            {
               "sig": "trend",
-              "vote": -0.143,
+              "vote": -0.195,
               "w": 1.0,
-              "agrees": false
+              "agrees": true
             },
             {
               "sig": "channel",
               "vote": 1.0,
               "w": 1.0,
-              "agrees": true
-            },
-            {
-              "sig": "momentum",
-              "vote": -0.624,
-              "w": 0.953,
               "agrees": false
             },
             {
-              "sig": "pattern",
-              "vote": 0.6,
-              "w": 1.0,
+              "sig": "momentum",
+              "vote": -0.661,
+              "w": 0.953,
               "agrees": true
             },
             {
+              "sig": "pattern",
+              "vote": 0.0,
+              "w": 1.0,
+              "agrees": false
+            },
+            {
               "sig": "support",
-              "vote": 0.2,
+              "vote": -1.0,
               "w": 1.0,
               "agrees": true
             },
@@ -1948,9 +1740,9 @@
           ]
         },
         "medium": {
-          "S": 0.113,
-          "direction": "up",
-          "confidence": 0.113,
+          "S": 0.087,
+          "direction": "neutral",
+          "confidence": 0.087,
           "pattern": "none",
           "support": 2191.7,
           "resistance": 2438.3,
@@ -2002,13 +1794,13 @@
           "votes": [
             {
               "sig": "book",
-              "vote": 0.132,
+              "vote": -0.056,
               "w": 1.0,
-              "agrees": true
+              "agrees": false
             },
             {
               "sig": "sr",
-              "vote": -0.8,
+              "vote": -0.794,
               "w": 1.0,
               "agrees": false
             },
@@ -2051,9 +1843,9 @@
           ]
         },
         "slow": {
-          "S": -0.109,
+          "S": -0.135,
           "direction": "down",
-          "confidence": 0.109,
+          "confidence": 0.135,
           "pattern": "lower highs + lower lows",
           "support": 2209.76,
           "resistance": 2624.47,
@@ -2126,13 +1918,13 @@
           "votes": [
             {
               "sig": "book",
-              "vote": 0.132,
+              "vote": -0.056,
               "w": 1.0,
               "agrees": false
             },
             {
               "sig": "sr",
-              "vote": 0.017,
+              "vote": 0.021,
               "w": 1.0,
               "agrees": false
             },
@@ -2214,7 +2006,7 @@
           },
           {
             "t": 1793863800,
-            "price": 2415.21,
+            "price": 2413.48,
             "kind": "breakdown ↓ channel"
           }
         ]
@@ -2343,26 +2135,19 @@
       "median_time_to_sell_min": 171,
       "skewed": false
     },
-    "levels_at": "2026-11-05T07:39:11.764476Z",
+    "levels_at": "2026-11-05T07:45:43.443396Z",
     "journal": [
-      "11-05 07:21Z SPOOF @ $2,430.05",
-      "11-05 07:22Z SPOOF @ $2,430.19",
-      "11-05 07:33Z CONFLUENCE @ $2,413.83",
-      "11-05 07:33Z WALLS",
-      "11-05 07:36Z SPOOF @ $2,426.12",
-      "11-05 07:37Z SPOOF @ $2,413.26",
-      "11-05 07:38Z SPOOF @ $2,424.87",
-      "11-05 07:39Z SPOOF @ $2,411.25"
+      "11-05 07:39Z SPOOF @ $2,411.25",
+      "11-05 07:40Z SPOOF @ $2,423.94",
+      "11-05 07:40Z SUPPORT EVENT FAST @ $2,415.25",
+      "11-05 07:41Z SPOOF @ $2,423.28",
+      "11-05 07:43Z SPOOF @ $2,424.97",
+      "11-05 07:44Z SPOOF @ $2,423.96",
+      "11-05 07:45Z SPOOF @ $2,409.64",
+      "11-05 07:45Z SUPPORT EVENT FAST @ $2,412.86"
     ],
     "charts": {
       "15m": [
-        {
-          "t": 1793778300,
-          "o": 2300.84,
-          "h": 2310.43,
-          "l": 2298.76,
-          "c": 2300.0
-        },
         {
           "t": 1793779200,
           "o": 2300.0,
@@ -3026,7 +2811,14 @@
           "o": 2420.0,
           "h": 2420.0,
           "l": 2411.76,
-          "c": 2413.8
+          "c": 2414.22
+        },
+        {
+          "t": 1793864700,
+          "o": 2414.22,
+          "h": 2414.22,
+          "l": 2412.73,
+          "c": 2412.93
         }
       ],
       "1h": [
@@ -3532,7 +3324,7 @@
           "o": 2427.58,
           "h": 2432.52,
           "l": 2411.76,
-          "c": 2413.8
+          "c": 2412.93
         }
       ],
       "4h": [
@@ -4164,7 +3956,7 @@
           "o": 2421.94,
           "h": 2432.52,
           "l": 2411.76,
-          "c": 2413.8
+          "c": 2412.93
         }
       ]
     },
@@ -4652,16 +4444,17 @@
     ],
     "buys_all": 49,
     "thoughts": [
-      "ETH · 07:39Z ETH-USDC $2,413.67 · BOOK bid wall $2,405.57 (596.06) · ask wall $2,450.05 (1313.77) · spread $0.33 · pressure -0.02 NEUTRAL",
-      "ETH · 07:39Z FAST $2,358–$2,442 · MEDIUM $2,192–$2,438 · SLOW $2,210–$2,624 · BUYING",
-      "ETH · 07:39Z -> SPOOF @ $2,411.25 — bid wall $2,411.25 pulled as price approached — distrusted for 15 min",
-      "ETH · 07:39Z ANTI-SPOOF: 9 walls · trusted 1 (no trusted support, resistance $2,434.83 trust 0.40) · 6 flagged · 4 spoof cooldowns",
-      "ETH · 07:39Z CONFLUENCE: FAST ↑ +0.12 (book+ sr− trend− channel+ momentum− pattern+ support+ history0, higher highs + higher lows) tp 0.65% · MEDIUM ↑ +0.11 (book+ sr− trend+ channel0 momentum+ pattern0 support+ history0) tp 1.50% · SLOW ↓ -0.11 (book+ sr0 trend− channel− momentum+ pattern− support+ history0, lower highs + lower lows) [SPRING] tp 3.16%",
-      "ETH · 07:39Z HOUR 07 UTC: QUIET · full trading (throttle off: map is info only)",
-      "ETH · 07:39Z FAST: 8 buys resting · 2 lots $4.66/$22.50 · next sell $2,438.22",
-      "ETH · 07:39Z MEDIUM: 7 buys resting · 3 lots $3.62/$12.50 · next sell $2,434.09",
-      "ETH · 07:39Z SLOW: 6 buys resting · 1 lots $1.17/$7.50 · next sell $2,494.72",
-      "ETH · 07:39Z RESERVE: 5 buys resting · 0 lots $0.00/$7.50"
+      "ETH · 07:45Z ETH-USDC $2,412.86 · BOOK bid wall $2,408.79 (855.838) · ask wall $2,450.05 (1313.72) · spread $0.02 · pressure -0.01 NEUTRAL",
+      "ETH · 07:45Z FAST $2,358–$2,442 · MEDIUM $2,192–$2,438 · SLOW $2,210–$2,624 · BUYING",
+      "ETH · 07:45Z -> SPOOF @ $2,409.64 — bid wall $2,409.64 pulled as price approached — distrusted for 15 min",
+      "ETH · 07:45Z ANTI-SPOOF: 10 walls · trusted 1 (no trusted support, resistance $2,435.00 trust 0.40) · 8 flagged · 9 spoof cooldowns",
+      "ETH · 07:45Z -> SUPPORT EVENT FAST @ $2,412.86 — FAST BREAKDOWN at $2,418.75 (medium support)",
+      "ETH · 07:45Z CONFLUENCE: FAST ↓ -0.17 (book0 sr− trend− channel+ momentum− pattern0 support− history0) [KNIFE GUARD] tp 0.65% · MEDIUM · +0.09 (book0 sr− trend+ channel0 momentum+ pattern0 support+ history0) tp 1.50% · SLOW ↓ -0.14 (book0 sr0 trend− channel− momentum+ pattern− support+ history0, lower highs + lower lows) [SPRING] tp 3.16%",
+      "ETH · 07:45Z HOUR 07 UTC: QUIET · full trading (throttle off: map is info only)",
+      "ETH · 07:45Z FAST: 0 buys resting · 2 lots $4.66/$22.50 · next sell $2,438.22",
+      "ETH · 07:45Z MEDIUM: 7 buys resting · 3 lots $3.62/$12.50 · next sell $2,434.26",
+      "ETH · 07:45Z SLOW: 6 buys resting · 1 lots $1.17/$7.50 · next sell $2,494.72",
+      "ETH · 07:45Z RESERVE: 5 buys resting · 0 lots $0.00/$7.50"
     ],
     "pairs": [
       "ETH-USDC",
@@ -4673,10 +4466,10 @@
         "pair": "ETH-USDC",
         "coin": "ETH",
         "pot": 50,
-        "last_price": 2413.86,
+        "last_price": 2412.9,
         "net": 0.2926,
         "net_today": 0.0037,
-        "unrealised": -0.038,
+        "unrealised": -0.0418,
         "periods": {
           "daily": {
             "net": 0.00372,
@@ -4707,18 +4500,18 @@
         "fills_today": 3,
         "fill_eff_24h": 0.0156,
         "lots_open": 6,
-        "orders_resting": 26,
+        "orders_resting": 18,
         "invested": 9.45,
-        "lean": "up"
+        "lean": "down"
       },
       {
         "pair": "DOGE-USDC",
         "coin": "DOGE",
         "pot": 50,
-        "last_price": 0.07635,
+        "last_price": 0.07638,
         "net": 0.2245,
         "net_today": 0,
-        "unrealised": -0.1847,
+        "unrealised": -0.1785,
         "periods": {
           "daily": {
             "net": 0,
@@ -4751,16 +4544,16 @@
         "lots_open": 10,
         "orders_resting": 14,
         "invested": 15.92,
-        "lean": "neutral"
+        "lean": "down"
       },
       {
         "pair": "SOL-USDC",
         "coin": "SOL",
         "pot": 50,
-        "last_price": 95.811,
+        "last_price": 95.85,
         "net": 0.3032,
         "net_today": 0.0313,
-        "unrealised": -0.1431,
+        "unrealised": -0.1362,
         "periods": {
           "daily": {
             "net": 0.031341,
@@ -4793,7 +4586,7 @@
         "lots_open": 11,
         "orders_resting": 22,
         "invested": 16.84,
-        "lean": "up"
+        "lean": "neutral"
       }
     ],
     "periods_total": {
@@ -4843,15 +4636,15 @@
                 "qty": 34.8,
                 "entry": 0.07651,
                 "gbp": 2.66,
-                "value": 2.657,
-                "unrealised_gbp": -0.0056,
-                "unrealised_pct": -0.0021,
+                "value": 2.658,
+                "unrealised_gbp": -0.0045,
+                "unrealised_pct": -0.0017,
                 "target": 0.07701,
-                "to_target_pct": 0.0086,
+                "to_target_pct": 0.0082,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-05T07:10:34.277010Z",
-                "held_minutes": 28,
+                "held_minutes": 35,
                 "tier": "fast",
                 "status": "recovering",
                 "trail_peak": null,
@@ -4862,15 +4655,15 @@
                 "qty": 30.7,
                 "entry": 0.07692,
                 "gbp": 2.36,
-                "value": 2.3439,
-                "unrealised_gbp": -0.0175,
-                "unrealised_pct": -0.0074,
+                "value": 2.3449,
+                "unrealised_gbp": -0.0166,
+                "unrealised_pct": -0.007,
                 "target": 0.07743,
-                "to_target_pct": 0.0141,
+                "to_target_pct": 0.0137,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-05T00:03:02.370680Z",
-                "held_minutes": 456,
+                "held_minutes": 463,
                 "tier": "fast",
                 "status": "recovering",
                 "trail_peak": null,
@@ -4881,15 +4674,15 @@
                 "qty": 23.7,
                 "entry": 0.07734,
                 "gbp": 1.83,
-                "value": 1.8095,
-                "unrealised_gbp": -0.0235,
-                "unrealised_pct": -0.0128,
+                "value": 1.8102,
+                "unrealised_gbp": -0.0228,
+                "unrealised_pct": -0.0124,
                 "target": 0.07785,
-                "to_target_pct": 0.0196,
+                "to_target_pct": 0.0192,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:26:33.364732Z",
-                "held_minutes": 972,
+                "held_minutes": 979,
                 "tier": "fast",
                 "status": "recovering",
                 "trail_peak": null,
@@ -4900,15 +4693,15 @@
                 "qty": 21.5,
                 "entry": 0.07768,
                 "gbp": 1.67,
-                "value": 1.6415,
-                "unrealised_gbp": -0.0286,
-                "unrealised_pct": -0.0171,
+                "value": 1.6422,
+                "unrealised_gbp": -0.0279,
+                "unrealised_pct": -0.0167,
                 "target": 0.07819,
-                "to_target_pct": 0.0241,
+                "to_target_pct": 0.0237,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:21:01.571063Z",
-                "held_minutes": 978,
+                "held_minutes": 985,
                 "tier": "fast",
                 "status": "recovering",
                 "trail_peak": null,
@@ -4919,15 +4712,15 @@
                 "qty": 22.5,
                 "entry": 0.07805,
                 "gbp": 1.76,
-                "value": 1.7179,
-                "unrealised_gbp": -0.0382,
-                "unrealised_pct": -0.0218,
+                "value": 1.7186,
+                "unrealised_gbp": -0.0376,
+                "unrealised_pct": -0.0214,
                 "target": 0.07856,
-                "to_target_pct": 0.0289,
+                "to_target_pct": 0.0285,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:06:27.516188Z",
-                "held_minutes": 992,
+                "held_minutes": 999,
                 "tier": "fast",
                 "status": "recovering",
                 "trail_peak": null,
@@ -4935,7 +4728,7 @@
               }
             ],
             "lots_recovering": 5,
-            "unrealised_gbp": -0.1134,
+            "unrealised_gbp": -0.1094,
             "realized_gbp": 0.1201,
             "sold": 30,
             "sold_today": 0,
@@ -4947,11 +4740,11 @@
             ],
             "weight": 0.45,
             "max_rungs": 13,
-            "support": 0.07534,
+            "support": 0.07532,
             "resistance": 0.07776,
             "levels": {
               "5m": {
-                "support": 0.07629,
+                "support": 0.07624,
                 "resistance": 0.07754
               },
               "15m": {
@@ -4961,9 +4754,9 @@
             },
             "swings_per_day": 8.0,
             "step_pct": 0.0082,
-            "depth_pct": 0.07452,
+            "depth_pct": 0.07456,
             "lean": "neutral",
-            "built_at": "2026-11-05T07:30:09.096081Z",
+            "built_at": "2026-11-05T07:40:12.063518Z",
             "net_per_round_trip": 0.0,
             "round_trips_per_day": 64.0,
             "potential_week": 0.0
@@ -4985,7 +4778,7 @@
                 "qty": 14.48697501,
                 "wall": null,
                 "placed": "2026-11-05T05:24:34.303818Z",
-                "away_pct": -0.0145,
+                "away_pct": -0.0149,
                 "status": "open"
               },
               {
@@ -4996,7 +4789,7 @@
                 "qty": 14.64463254,
                 "wall": null,
                 "placed": "2026-11-05T06:23:50.672125Z",
-                "away_pct": -0.0251,
+                "away_pct": -0.0255,
                 "status": "open"
               },
               {
@@ -5007,7 +4800,7 @@
                 "qty": 14.81985044,
                 "wall": null,
                 "placed": "2026-11-05T06:23:50.672125Z",
-                "away_pct": -0.0367,
+                "away_pct": -0.0371,
                 "status": "open"
               },
               {
@@ -5018,7 +4811,7 @@
                 "qty": 14.99106038,
                 "wall": null,
                 "placed": "2026-11-05T06:23:50.672125Z",
-                "away_pct": -0.0477,
+                "away_pct": -0.048,
                 "status": "open"
               },
               {
@@ -5029,7 +4822,7 @@
                 "qty": 15.15783618,
                 "wall": null,
                 "placed": "2026-11-05T06:23:50.672125Z",
-                "away_pct": -0.0582,
+                "away_pct": -0.0585,
                 "status": "open"
               },
               {
@@ -5040,7 +4833,7 @@
                 "qty": 15.32190048,
                 "wall": null,
                 "placed": "2026-11-05T06:23:50.672125Z",
-                "away_pct": -0.0682,
+                "away_pct": -0.0686,
                 "status": "open"
               },
               {
@@ -5051,7 +4844,7 @@
                 "qty": 15.48295455,
                 "wall": null,
                 "placed": "2026-11-05T06:23:50.672125Z",
-                "away_pct": -0.0779,
+                "away_pct": -0.0783,
                 "status": "open"
               }
             ],
@@ -5061,15 +4854,15 @@
                 "qty": 13.2,
                 "entry": 0.07677,
                 "gbp": 1.01,
-                "value": 1.0078,
-                "unrealised_gbp": -0.0055,
-                "unrealised_pct": -0.0055,
+                "value": 1.0082,
+                "unrealised_gbp": -0.0051,
+                "unrealised_pct": -0.0051,
                 "target": 0.0776,
-                "to_target_pct": 0.0164,
+                "to_target_pct": 0.016,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T17:13:04.183884Z",
-                "held_minutes": 866,
+                "held_minutes": 873,
                 "tier": "medium",
                 "status": "recovering",
                 "trail_peak": null,
@@ -5080,15 +4873,15 @@
                 "qty": 15.0,
                 "entry": 0.07718,
                 "gbp": 1.16,
-                "value": 1.1453,
-                "unrealised_gbp": -0.0124,
-                "unrealised_pct": -0.0108,
+                "value": 1.1457,
+                "unrealised_gbp": -0.012,
+                "unrealised_pct": -0.0104,
                 "target": 0.07802,
-                "to_target_pct": 0.0219,
+                "to_target_pct": 0.0215,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T17:03:31.519816Z",
-                "held_minutes": 875,
+                "held_minutes": 882,
                 "tier": "medium",
                 "status": "recovering",
                 "trail_peak": null,
@@ -5099,15 +4892,15 @@
                 "qty": 15.8,
                 "entry": 0.07757,
                 "gbp": 1.23,
-                "value": 1.2063,
-                "unrealised_gbp": -0.0193,
-                "unrealised_pct": -0.0157,
+                "value": 1.2068,
+                "unrealised_gbp": -0.0188,
+                "unrealised_pct": -0.0153,
                 "target": 0.07841,
-                "to_target_pct": 0.027,
+                "to_target_pct": 0.0266,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:08:28.047332Z",
-                "held_minutes": 990,
+                "held_minutes": 997,
                 "tier": "medium",
                 "status": "recovering",
                 "trail_peak": null,
@@ -5118,15 +4911,15 @@
                 "qty": 14.4,
                 "entry": 0.07798,
                 "gbp": 1.12,
-                "value": 1.0994,
-                "unrealised_gbp": -0.0235,
-                "unrealised_pct": -0.0209,
+                "value": 1.0999,
+                "unrealised_gbp": -0.023,
+                "unrealised_pct": -0.0205,
                 "target": 0.07883,
-                "to_target_pct": 0.0325,
+                "to_target_pct": 0.0321,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:10:58.660813Z",
-                "held_minutes": 988,
+                "held_minutes": 995,
                 "tier": "medium",
                 "status": "recovering",
                 "trail_peak": null,
@@ -5134,7 +4927,7 @@
               }
             ],
             "lots_recovering": 4,
-            "unrealised_gbp": -0.0607,
+            "unrealised_gbp": -0.0589,
             "realized_gbp": 0.0395,
             "sold": 5,
             "sold_today": 0,
@@ -5184,7 +4977,7 @@
                 "qty": 15.93137255,
                 "wall": null,
                 "placed": "2026-11-05T05:58:14.254656Z",
-                "away_pct": -0.0381,
+                "away_pct": -0.0385,
                 "status": "open"
               },
               {
@@ -5195,7 +4988,7 @@
                 "qty": 16.19601329,
                 "wall": null,
                 "placed": "2026-11-05T05:58:14.254656Z",
-                "away_pct": -0.0538,
+                "away_pct": -0.0542,
                 "status": "open"
               },
               {
@@ -5206,7 +4999,7 @@
                 "qty": 16.60045403,
                 "wall": null,
                 "placed": "2026-11-05T07:34:10.078865Z",
-                "away_pct": -0.0769,
+                "away_pct": -0.0772,
                 "status": "open"
               },
               {
@@ -5217,7 +5010,7 @@
                 "qty": 16.92953263,
                 "wall": null,
                 "placed": "2026-11-05T07:34:10.078865Z",
-                "away_pct": -0.0948,
+                "away_pct": -0.0952,
                 "status": "open"
               }
             ],
@@ -5227,15 +5020,15 @@
                 "qty": 14.5,
                 "entry": 0.07708,
                 "gbp": 1.12,
-                "value": 1.1071,
-                "unrealised_gbp": -0.0106,
-                "unrealised_pct": -0.0095,
+                "value": 1.1075,
+                "unrealised_gbp": -0.0102,
+                "unrealised_pct": -0.0091,
                 "target": 0.0794,
-                "to_target_pct": 0.0399,
+                "to_target_pct": 0.0395,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:57:42.129280Z",
-                "held_minutes": 941,
+                "held_minutes": 948,
                 "tier": "slow",
                 "status": "recovering",
                 "trail_peak": null,
@@ -5243,7 +5036,7 @@
               }
             ],
             "lots_recovering": 1,
-            "unrealised_gbp": -0.0106,
+            "unrealised_gbp": -0.0102,
             "realized_gbp": 0.065,
             "sold": 2,
             "sold_today": 0,
@@ -5293,7 +5086,7 @@
                 "qty": 35.1469141,
                 "wall": null,
                 "placed": "2026-11-04T00:08:12.064414Z",
-                "away_pct": -0.0684,
+                "away_pct": -0.0687,
                 "status": "open"
               },
               {
@@ -5304,7 +5097,7 @@
                 "qty": 36.21089224,
                 "wall": null,
                 "placed": "2026-11-04T00:08:12.064414Z",
-                "away_pct": -0.0957,
+                "away_pct": -0.0961,
                 "status": "open"
               },
               {
@@ -5315,7 +5108,7 @@
                 "qty": 36.88947912,
                 "wall": null,
                 "placed": "2026-11-02T05:50:26.007122Z",
-                "away_pct": -0.1124,
+                "away_pct": -0.1127,
                 "status": "open"
               }
             ],
@@ -5334,46 +5127,46 @@
         ],
         "pot_in_lots_gbp": 15.92,
         "book": {
-          "bid": 0.07632,
-          "ask": 0.07636,
-          "spread": 4e-05,
-          "spread_pct": 0.000524,
-          "pressure": 0.125,
+          "bid": 0.07636,
+          "ask": 0.07638,
+          "spread": 2e-05,
+          "spread_pct": 0.000262,
+          "pressure": 0.025,
           "lean": "neutral",
-          "bid_size": 6653033.1,
-          "ask_size": 5171391.2,
+          "bid_size": 7517339.0,
+          "ask_size": 7155156.9,
           "bid_walls": [
             {
-              "price": 0.07616,
-              "size": 2917372.9,
-              "x": 217.2
+              "price": 0.07619,
+              "size": 3092065.3,
+              "x": 223.2
             },
             {
-              "price": 0.07622,
-              "size": 2126087.5,
-              "x": 158.3
+              "price": 0.07624,
+              "size": 2162092.6,
+              "x": 156.1
             },
             {
-              "price": 0.07592,
-              "size": 861808.4,
-              "x": 64.2
+              "price": 0.07602,
+              "size": 1289231.9,
+              "x": 93.1
             }
           ],
           "ask_walls": [
             {
-              "price": 0.07646,
-              "size": 3243238.5,
-              "x": 469.2
+              "price": 0.07649,
+              "size": 3811882.3,
+              "x": 857.5
             },
             {
-              "price": 0.07652,
-              "size": 1148284.5,
-              "x": 166.1
+              "price": 0.07642,
+              "size": 1586721.8,
+              "x": 356.9
             },
             {
-              "price": 0.07769,
-              "size": 1019944.7,
-              "x": 147.5
+              "price": 0.07654,
+              "size": 1405891.0,
+              "x": 316.2
             }
           ]
         },
@@ -5431,8 +5224,8 @@
             "post_only": false,
             "status": "online"
           },
-          "spread": 4e-05,
-          "spread_pct": 0.000524,
+          "spread": 2e-05,
+          "spread_pct": 0.000262,
           "through_ticks": 1,
           "slip_base": 0.0002,
           "slip_per_1k": 0.001,
@@ -5501,13 +5294,13 @@
         "realized_pnl_gbp": 0.2245,
         "gross_pnl_gbp": 0.5474,
         "net_pnl_after_fees": 0.2245,
-        "unrealised_gbp": -0.1847,
+        "unrealised_gbp": -0.1785,
         "fee_rate": 0.0025,
         "losing_streak": 0,
         "max_losing_streak": 2,
         "cooldown_active": false,
         "cooldown_until": null,
-        "last_price": 0.07635,
+        "last_price": 0.07638,
         "orders": [
           {
             "side": "buy",
@@ -5600,15 +5393,15 @@
             "qty": 34.8,
             "entry": 0.07651,
             "gbp": 2.66,
-            "value": 2.657,
-            "unrealised_gbp": -0.0056,
-            "unrealised_pct": -0.0021,
+            "value": 2.658,
+            "unrealised_gbp": -0.0045,
+            "unrealised_pct": -0.0017,
             "target": 0.07701,
-            "to_target_pct": 0.0086,
+            "to_target_pct": 0.0082,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-05T07:10:34.277010Z",
-            "held_minutes": 28,
+            "held_minutes": 35,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -5619,15 +5412,15 @@
             "qty": 30.7,
             "entry": 0.07692,
             "gbp": 2.36,
-            "value": 2.3439,
-            "unrealised_gbp": -0.0175,
-            "unrealised_pct": -0.0074,
+            "value": 2.3449,
+            "unrealised_gbp": -0.0166,
+            "unrealised_pct": -0.007,
             "target": 0.07743,
-            "to_target_pct": 0.0141,
+            "to_target_pct": 0.0137,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-05T00:03:02.370680Z",
-            "held_minutes": 456,
+            "held_minutes": 463,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -5638,15 +5431,15 @@
             "qty": 13.2,
             "entry": 0.07677,
             "gbp": 1.01,
-            "value": 1.0078,
-            "unrealised_gbp": -0.0055,
-            "unrealised_pct": -0.0055,
+            "value": 1.0082,
+            "unrealised_gbp": -0.0051,
+            "unrealised_pct": -0.0051,
             "target": 0.0776,
-            "to_target_pct": 0.0164,
+            "to_target_pct": 0.016,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T17:13:04.183884Z",
-            "held_minutes": 866,
+            "held_minutes": 873,
             "tier": "medium",
             "status": "recovering",
             "trail_peak": null,
@@ -5657,15 +5450,15 @@
             "qty": 23.7,
             "entry": 0.07734,
             "gbp": 1.83,
-            "value": 1.8095,
-            "unrealised_gbp": -0.0235,
-            "unrealised_pct": -0.0128,
+            "value": 1.8102,
+            "unrealised_gbp": -0.0228,
+            "unrealised_pct": -0.0124,
             "target": 0.07785,
-            "to_target_pct": 0.0196,
+            "to_target_pct": 0.0192,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:26:33.364732Z",
-            "held_minutes": 972,
+            "held_minutes": 979,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -5676,15 +5469,15 @@
             "qty": 15.0,
             "entry": 0.07718,
             "gbp": 1.16,
-            "value": 1.1453,
-            "unrealised_gbp": -0.0124,
-            "unrealised_pct": -0.0108,
+            "value": 1.1457,
+            "unrealised_gbp": -0.012,
+            "unrealised_pct": -0.0104,
             "target": 0.07802,
-            "to_target_pct": 0.0219,
+            "to_target_pct": 0.0215,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T17:03:31.519816Z",
-            "held_minutes": 875,
+            "held_minutes": 882,
             "tier": "medium",
             "status": "recovering",
             "trail_peak": null,
@@ -5695,15 +5488,15 @@
             "qty": 21.5,
             "entry": 0.07768,
             "gbp": 1.67,
-            "value": 1.6415,
-            "unrealised_gbp": -0.0286,
-            "unrealised_pct": -0.0171,
+            "value": 1.6422,
+            "unrealised_gbp": -0.0279,
+            "unrealised_pct": -0.0167,
             "target": 0.07819,
-            "to_target_pct": 0.0241,
+            "to_target_pct": 0.0237,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:21:01.571063Z",
-            "held_minutes": 978,
+            "held_minutes": 985,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -5714,15 +5507,15 @@
             "qty": 15.8,
             "entry": 0.07757,
             "gbp": 1.23,
-            "value": 1.2063,
-            "unrealised_gbp": -0.0193,
-            "unrealised_pct": -0.0157,
+            "value": 1.2068,
+            "unrealised_gbp": -0.0188,
+            "unrealised_pct": -0.0153,
             "target": 0.07841,
-            "to_target_pct": 0.027,
+            "to_target_pct": 0.0266,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:08:28.047332Z",
-            "held_minutes": 990,
+            "held_minutes": 997,
             "tier": "medium",
             "status": "recovering",
             "trail_peak": null,
@@ -5733,15 +5526,15 @@
             "qty": 22.5,
             "entry": 0.07805,
             "gbp": 1.76,
-            "value": 1.7179,
-            "unrealised_gbp": -0.0382,
-            "unrealised_pct": -0.0218,
+            "value": 1.7186,
+            "unrealised_gbp": -0.0376,
+            "unrealised_pct": -0.0214,
             "target": 0.07856,
-            "to_target_pct": 0.0289,
+            "to_target_pct": 0.0285,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:06:27.516188Z",
-            "held_minutes": 992,
+            "held_minutes": 999,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -5752,15 +5545,15 @@
             "qty": 14.4,
             "entry": 0.07798,
             "gbp": 1.12,
-            "value": 1.0994,
-            "unrealised_gbp": -0.0235,
-            "unrealised_pct": -0.0209,
+            "value": 1.0999,
+            "unrealised_gbp": -0.023,
+            "unrealised_pct": -0.0205,
             "target": 0.07883,
-            "to_target_pct": 0.0325,
+            "to_target_pct": 0.0321,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:10:58.660813Z",
-            "held_minutes": 988,
+            "held_minutes": 995,
             "tier": "medium",
             "status": "recovering",
             "trail_peak": null,
@@ -5771,15 +5564,15 @@
             "qty": 14.5,
             "entry": 0.07708,
             "gbp": 1.12,
-            "value": 1.1071,
-            "unrealised_gbp": -0.0106,
-            "unrealised_pct": -0.0095,
+            "value": 1.1075,
+            "unrealised_gbp": -0.0102,
+            "unrealised_pct": -0.0091,
             "target": 0.0794,
-            "to_target_pct": 0.0399,
+            "to_target_pct": 0.0395,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:57:42.129280Z",
-            "held_minutes": 941,
+            "held_minutes": 948,
             "tier": "slow",
             "status": "recovering",
             "trail_peak": null,
@@ -5809,7 +5602,7 @@
         },
         "plan_vs_actual": {
           "week_start": "2026-11-02T00:00:00Z",
-          "planned_round_trips_so_far": 221.0,
+          "planned_round_trips_so_far": 221.4,
           "actual_round_trips": 36,
           "actual_net": 0.2227,
           "status": "BEHIND"
@@ -5823,7 +5616,7 @@
             "qty": 14.48697501,
             "wall": null,
             "placed": "2026-11-05T05:24:34.303818Z",
-            "away_pct": -0.0145,
+            "away_pct": -0.0149,
             "status": "open"
           },
           {
@@ -5834,7 +5627,7 @@
             "qty": 14.64463254,
             "wall": null,
             "placed": "2026-11-05T06:23:50.672125Z",
-            "away_pct": -0.0251,
+            "away_pct": -0.0255,
             "status": "open"
           },
           {
@@ -5845,7 +5638,7 @@
             "qty": 14.81985044,
             "wall": null,
             "placed": "2026-11-05T06:23:50.672125Z",
-            "away_pct": -0.0367,
+            "away_pct": -0.0371,
             "status": "open"
           },
           {
@@ -5856,7 +5649,7 @@
             "qty": 15.93137255,
             "wall": null,
             "placed": "2026-11-05T05:58:14.254656Z",
-            "away_pct": -0.0381,
+            "away_pct": -0.0385,
             "status": "open"
           },
           {
@@ -5867,7 +5660,7 @@
             "qty": 14.99106038,
             "wall": null,
             "placed": "2026-11-05T06:23:50.672125Z",
-            "away_pct": -0.0477,
+            "away_pct": -0.048,
             "status": "open"
           },
           {
@@ -5878,7 +5671,7 @@
             "qty": 16.19601329,
             "wall": null,
             "placed": "2026-11-05T05:58:14.254656Z",
-            "away_pct": -0.0538,
+            "away_pct": -0.0542,
             "status": "open"
           },
           {
@@ -5889,7 +5682,7 @@
             "qty": 15.15783618,
             "wall": null,
             "placed": "2026-11-05T06:23:50.672125Z",
-            "away_pct": -0.0582,
+            "away_pct": -0.0585,
             "status": "open"
           },
           {
@@ -5900,7 +5693,7 @@
             "qty": 15.32190048,
             "wall": null,
             "placed": "2026-11-05T06:23:50.672125Z",
-            "away_pct": -0.0682,
+            "away_pct": -0.0686,
             "status": "open"
           },
           {
@@ -5911,7 +5704,7 @@
             "qty": 35.1469141,
             "wall": null,
             "placed": "2026-11-04T00:08:12.064414Z",
-            "away_pct": -0.0684,
+            "away_pct": -0.0687,
             "status": "open"
           },
           {
@@ -5922,7 +5715,7 @@
             "qty": 16.60045403,
             "wall": null,
             "placed": "2026-11-05T07:34:10.078865Z",
-            "away_pct": -0.0769,
+            "away_pct": -0.0772,
             "status": "open"
           },
           {
@@ -5933,7 +5726,7 @@
             "qty": 15.48295455,
             "wall": null,
             "placed": "2026-11-05T06:23:50.672125Z",
-            "away_pct": -0.0779,
+            "away_pct": -0.0783,
             "status": "open"
           },
           {
@@ -5944,7 +5737,7 @@
             "qty": 16.92953263,
             "wall": null,
             "placed": "2026-11-05T07:34:10.078865Z",
-            "away_pct": -0.0948,
+            "away_pct": -0.0952,
             "status": "open"
           },
           {
@@ -5955,7 +5748,7 @@
             "qty": 36.21089224,
             "wall": null,
             "placed": "2026-11-04T00:08:12.064414Z",
-            "away_pct": -0.0957,
+            "away_pct": -0.0961,
             "status": "open"
           },
           {
@@ -5966,7 +5759,7 @@
             "qty": 36.88947912,
             "wall": null,
             "placed": "2026-11-02T05:50:26.007122Z",
-            "away_pct": -0.1124,
+            "away_pct": -0.1127,
             "status": "open"
           },
           {
@@ -5978,7 +5771,7 @@
             "placed": "2026-11-05T07:10:34.277010Z",
             "entry": 0.07651,
             "wall": null,
-            "away_pct": 0.0086,
+            "away_pct": 0.0082,
             "status": "open"
           },
           {
@@ -5990,7 +5783,7 @@
             "placed": "2026-11-05T00:03:02.370680Z",
             "entry": 0.07692,
             "wall": null,
-            "away_pct": 0.0141,
+            "away_pct": 0.0137,
             "status": "open"
           },
           {
@@ -6002,7 +5795,7 @@
             "placed": "2026-11-04T17:13:04.183884Z",
             "entry": 0.07677,
             "wall": null,
-            "away_pct": 0.0164,
+            "away_pct": 0.016,
             "status": "open"
           },
           {
@@ -6014,7 +5807,7 @@
             "placed": "2026-11-04T15:26:33.364732Z",
             "entry": 0.07734,
             "wall": null,
-            "away_pct": 0.0196,
+            "away_pct": 0.0192,
             "status": "open"
           },
           {
@@ -6026,7 +5819,7 @@
             "placed": "2026-11-04T17:03:31.519816Z",
             "entry": 0.07718,
             "wall": null,
-            "away_pct": 0.0219,
+            "away_pct": 0.0215,
             "status": "open"
           },
           {
@@ -6038,7 +5831,7 @@
             "placed": "2026-11-04T15:21:01.571063Z",
             "entry": 0.07768,
             "wall": null,
-            "away_pct": 0.0241,
+            "away_pct": 0.0237,
             "status": "open"
           },
           {
@@ -6050,7 +5843,7 @@
             "placed": "2026-11-04T15:08:28.047332Z",
             "entry": 0.07757,
             "wall": null,
-            "away_pct": 0.027,
+            "away_pct": 0.0266,
             "status": "open"
           },
           {
@@ -6062,7 +5855,7 @@
             "placed": "2026-11-04T15:06:27.516188Z",
             "entry": 0.07805,
             "wall": null,
-            "away_pct": 0.0289,
+            "away_pct": 0.0285,
             "status": "open"
           },
           {
@@ -6074,7 +5867,7 @@
             "placed": "2026-11-04T15:10:58.660813Z",
             "entry": 0.07798,
             "wall": null,
-            "away_pct": 0.0325,
+            "away_pct": 0.0321,
             "status": "open"
           },
           {
@@ -6086,7 +5879,7 @@
             "placed": "2026-11-04T15:57:42.129280Z",
             "entry": 0.07708,
             "wall": null,
-            "away_pct": 0.0399,
+            "away_pct": 0.0395,
             "status": "open"
           }
         ],
@@ -6364,7 +6157,7 @@
         ],
         "grid_stats": {
           "day": "2026-11-05",
-          "reprices": 157,
+          "reprices": 158,
           "cancelled": 203,
           "placed": 196,
           "filled": 2,
@@ -6469,7 +6262,7 @@
           },
           "live": {
             "placed": 963,
-            "reprices": 410,
+            "reprices": 411,
             "book_reprices": 181,
             "filled": 20,
             "sold": 19,
@@ -6478,12 +6271,12 @@
           }
         },
         "anti_spoof": {
-          "at": "2026-11-05T07:39:11.764476Z",
-          "seen": 8,
+          "at": "2026-11-05T07:45:43.443396Z",
+          "seen": 10,
           "trusted": 0,
-          "flagged": 7,
-          "spoofs_active": 9,
-          "spoofs_24h": 896,
+          "flagged": 8,
+          "spoofs_active": 11,
+          "spoofs_24h": 900,
           "support": null,
           "resistance": null,
           "walls": [
@@ -6496,49 +6289,63 @@
             },
             {
               "side": "ask",
-              "price": 0.07681,
+              "price": 0.07686,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "ask",
-              "price": 0.07673,
+              "price": 0.07678,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "ask",
-              "price": 0.07652,
+              "price": 0.07654,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "ask",
-              "price": 0.07638,
+              "price": 0.07649,
+              "trust": 0.0,
+              "trusted": false,
+              "flagged": true
+            },
+            {
+              "side": "ask",
+              "price": 0.07642,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "bid",
-              "price": 0.07622,
+              "price": 0.07624,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "bid",
-              "price": 0.0761,
+              "price": 0.07609,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "bid",
-              "price": 0.07575,
+              "price": 0.07597,
+              "trust": 0.121,
+              "trusted": false,
+              "flagged": false
+            },
+            {
+              "side": "bid",
+              "price": 0.07589,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
@@ -6546,45 +6353,45 @@
           ]
         },
         "confluence": {
-          "at": "2026-11-05T07:39:11.764476Z",
+          "at": "2026-11-05T07:45:43.443396Z",
           "layers": {
             "fast": {
-              "S": -0.088,
-              "direction": "neutral",
-              "confidence": 0.088,
-              "pattern": "double top",
-              "support": 0.07534,
+              "S": -0.194,
+              "direction": "down",
+              "confidence": 0.194,
+              "pattern": "lower highs + lower lows",
+              "support": 0.07532,
               "resistance": 0.07776,
-              "channel_lower": 0.07636,
-              "channel_upper": 0.07655,
+              "channel_lower": 0.07625,
+              "channel_upper": 0.07653,
               "regime": "downtrend",
               "bounce": false,
               "bounce_med": 0.00970619097586578,
               "tp_eff": 0.0065,
               "tp_cap": 0.0065,
               "event": {
-                "price": 0.07643,
+                "price": 0.0764,
                 "strength": 0.6,
                 "class": "medium",
-                "touches": 6,
+                "touches": 7,
                 "wall": false,
                 "channel": true,
                 "round": false,
                 "event": "testing",
-                "event_age": 1
+                "event_age": 3
               },
               "knife": null,
               "support_map": [
                 {
-                  "price": 0.07643,
+                  "price": 0.0764,
                   "strength": 0.6,
                   "class": "medium",
-                  "touches": 6,
+                  "touches": 7,
                   "wall": false,
                   "channel": true,
                   "round": false,
                   "event": "testing",
-                  "event_age": 1
+                  "event_age": 3
                 },
                 {
                   "price": 0.07691,
@@ -6595,20 +6402,20 @@
                   "channel": false,
                   "round": false,
                   "event": "base",
-                  "event_age": 6
+                  "event_age": 8
                 }
               ],
               "bounce_tf": "15m",
               "votes": [
                 {
                   "sig": "book",
-                  "vote": 0.131,
+                  "vote": 0.042,
                   "w": 1.0,
                   "agrees": false
                 },
                 {
                   "sig": "sr",
-                  "vote": 0.19,
+                  "vote": 0.148,
                   "w": 1.0,
                   "agrees": false
                 },
@@ -6620,19 +6427,19 @@
                 },
                 {
                   "sig": "channel",
-                  "vote": 1.0,
+                  "vote": 0.231,
                   "w": 1.0,
                   "agrees": false
                 },
                 {
                   "sig": "momentum",
-                  "vote": -0.276,
+                  "vote": -0.17,
                   "w": 0.877,
                   "agrees": true
                 },
                 {
                   "sig": "pattern",
-                  "vote": -0.7,
+                  "vote": -0.6,
                   "w": 0.963,
                   "agrees": true
                 },
@@ -6651,9 +6458,9 @@
               ]
             },
             "medium": {
-              "S": 0.228,
+              "S": 0.213,
               "direction": "up",
-              "confidence": 0.228,
+              "confidence": 0.213,
               "pattern": "none",
               "support": 0.07215,
               "resistance": 0.08047,
@@ -6678,17 +6485,6 @@
               "knife": null,
               "support_map": [
                 {
-                  "price": 0.07624,
-                  "strength": 0.15,
-                  "class": "weak",
-                  "touches": 1,
-                  "wall": false,
-                  "channel": false,
-                  "round": false,
-                  "event": "none",
-                  "event_age": null
-                },
-                {
                   "price": 0.07647,
                   "strength": 0.15,
                   "class": "weak",
@@ -6698,6 +6494,17 @@
                   "round": false,
                   "event": "testing",
                   "event_age": 2
+                },
+                {
+                  "price": 0.07624,
+                  "strength": 0.15,
+                  "class": "weak",
+                  "touches": 1,
+                  "wall": false,
+                  "channel": false,
+                  "round": false,
+                  "event": "none",
+                  "event_age": null
                 },
                 {
                   "price": 0.07529,
@@ -6748,13 +6555,13 @@
               "votes": [
                 {
                   "sig": "book",
-                  "vote": 0.131,
+                  "vote": 0.042,
                   "w": 1.0,
-                  "agrees": true
+                  "agrees": false
                 },
                 {
                   "sig": "sr",
-                  "vote": -0.002,
+                  "vote": -0.012,
                   "w": 1.0,
                   "agrees": false
                 },
@@ -6797,9 +6604,9 @@
               ]
             },
             "slow": {
-              "S": -0.171,
+              "S": -0.185,
               "direction": "down",
-              "confidence": 0.171,
+              "confidence": 0.185,
               "pattern": "lower highs + lower lows",
               "support": 0.07278,
               "resistance": 0.0927,
@@ -6872,13 +6679,13 @@
               "votes": [
                 {
                   "sig": "book",
-                  "vote": 0.131,
+                  "vote": 0.042,
                   "w": 1.0,
                   "agrees": false
                 },
                 {
                   "sig": "sr",
-                  "vote": 0.645,
+                  "vote": 0.641,
                   "w": 1.0,
                   "agrees": false
                 },
@@ -6955,7 +6762,7 @@
             "breakouts": [
               {
                 "t": 1793863800,
-                "price": 0.07632,
+                "price": 0.07633,
                 "kind": "breakdown ↓ channel"
               }
             ]
@@ -7086,26 +6893,19 @@
           "median_time_to_sell_min": 207,
           "skewed": false
         },
-        "levels_at": "2026-11-05T07:39:11.764476Z",
+        "levels_at": "2026-11-05T07:45:43.443396Z",
         "journal": [
-          "11-05 07:31Z SPOOF @ $0.07628",
-          "11-05 07:33Z SPOOF @ $0.07644",
-          "11-05 07:35Z SPOOF @ $0.07659",
-          "11-05 07:36Z SPOOF @ $0.07665",
           "11-05 07:36Z CONFLUENCE @ $0.07627",
           "11-05 07:36Z WALLS",
           "11-05 07:38Z SPOOF @ $0.07667",
-          "11-05 07:39Z SPOOF @ $0.07631"
+          "11-05 07:39Z SPOOF @ $0.07631",
+          "11-05 07:40Z SPOOF @ $0.07670",
+          "11-05 07:41Z SPOOF @ $0.07636",
+          "11-05 07:43Z SPOOF @ $0.07655",
+          "11-05 07:44Z SPOOF @ $0.07630"
         ],
         "charts": {
           "15m": [
-            {
-              "t": 1793778300,
-              "o": 0.07494,
-              "h": 0.07506,
-              "l": 0.07472,
-              "c": 0.07477
-            },
             {
               "t": 1793779200,
               "o": 0.07479,
@@ -7769,7 +7569,14 @@
               "o": 0.07642,
               "h": 0.07642,
               "l": 0.0762,
-              "c": 0.07635
+              "c": 0.07638
+            },
+            {
+              "t": 1793864700,
+              "o": 0.07636,
+              "h": 0.07638,
+              "l": 0.07636,
+              "c": 0.07638
             }
           ],
           "1h": [
@@ -8275,7 +8082,7 @@
               "o": 0.07643,
               "h": 0.07662,
               "l": 0.0762,
-              "c": 0.07635
+              "c": 0.07638
             }
           ],
           "4h": [
@@ -8907,7 +8714,7 @@
               "o": 0.07677,
               "h": 0.07707,
               "l": 0.0762,
-              "c": 0.07635
+              "c": 0.07638
             }
           ]
         },
@@ -9395,16 +9202,15 @@
         ],
         "buys_all": 47,
         "thoughts": [
-          "DOGE · 07:39Z DOGE-USDC $0.07632 · BOOK bid wall $0.07616 (2.91737e+06) · ask wall $0.07646 (3.24324e+06) · spread $0.00004 · pressure +0.12 NEUTRAL",
-          "DOGE · 07:39Z FAST $0.07534–$0.07776 · MEDIUM $0.07215–$0.08047 · SLOW $0.07278–$0.09270 · BUYING",
-          "DOGE · 07:39Z -> SPOOF @ $0.07631 — bid wall $0.07631 pulled as price approached — distrusted for 15 min",
-          "DOGE · 07:39Z ANTI-SPOOF: 8 walls · trusted 0 (no trusted support, no trusted resistance) · 7 flagged · 9 spoof cooldowns",
-          "DOGE · 07:39Z CONFLUENCE: FAST · -0.09 (book+ sr+ trend− channel+ momentum− pattern− support0 history0, double top) [DOWNTREND: dip-buys throttled] tp 0.65% · MEDIUM ↑ +0.23 (book+ sr0 trend+ channel+ momentum0 pattern0 support+ history0) tp 1.08% · SLOW ↓ -0.17 (book+ sr+ trend− channel− momentum+ pattern− support+ history0, lower highs + lower lows) tp 3.00%",
-          "DOGE · 07:39Z HOUR 07 UTC: QUIET · full trading (throttle off: map is info only)",
-          "DOGE · 07:39Z FAST: 0 buys resting · 5 lots $10.28/$22.50 · next sell $0.07701",
-          "DOGE · 07:39Z MEDIUM: 7 buys resting · 4 lots $4.52/$12.50 · next sell $0.07760",
-          "DOGE · 07:39Z SLOW: 4 buys resting · 1 lots $1.12/$7.50 · next sell $0.07940",
-          "DOGE · 07:39Z RESERVE: 3 buys resting · 0 lots $0.00/$7.50"
+          "DOGE · 07:45Z DOGE-USDC $0.07636 · BOOK bid wall $0.07619 (3.09207e+06) · ask wall $0.07649 (3.81188e+06) · spread $0.00002 · pressure +0.03 NEUTRAL",
+          "DOGE · 07:45Z FAST $0.07532–$0.07776 · MEDIUM $0.07215–$0.08047 · SLOW $0.07278–$0.09270 · BUYING",
+          "DOGE · 07:45Z ANTI-SPOOF: 10 walls · trusted 0 (no trusted support, no trusted resistance) · 8 flagged · 11 spoof cooldowns",
+          "DOGE · 07:45Z CONFLUENCE: FAST ↓ -0.19 (book0 sr+ trend− channel+ momentum− pattern− support0 history0, lower highs + lower lows) [DOWNTREND: dip-buys throttled] tp 0.65% · MEDIUM ↑ +0.21 (book0 sr0 trend+ channel+ momentum0 pattern0 support+ history0) tp 1.08% · SLOW ↓ -0.18 (book0 sr+ trend− channel− momentum+ pattern− support+ history0, lower highs + lower lows) tp 3.00%",
+          "DOGE · 07:45Z HOUR 07 UTC: QUIET · full trading (throttle off: map is info only)",
+          "DOGE · 07:45Z FAST: 0 buys resting · 5 lots $10.28/$22.50 · next sell $0.07701",
+          "DOGE · 07:45Z MEDIUM: 7 buys resting · 4 lots $4.52/$12.50 · next sell $0.07760",
+          "DOGE · 07:45Z SLOW: 4 buys resting · 1 lots $1.12/$7.50 · next sell $0.07940",
+          "DOGE · 07:45Z RESERVE: 3 buys resting · 0 lots $0.00/$7.50"
         ]
       },
       "SOL-USDC": {
@@ -9422,28 +9228,28 @@
             "fee_floor_pct": 0.0065,
             "cap_gbp": 22.5,
             "in_lots_gbp": 9.67,
-            "resting_gbp": 12.11,
+            "resting_gbp": 11.89,
             "orders": [
               {
                 "side": "buy",
                 "price": 94.88,
-                "gbp": 1.54,
+                "gbp": 1.62,
                 "tier": "fast",
-                "qty": 0.01623103,
+                "qty": 0.0170742,
                 "wall": null,
                 "placed": "2026-11-05T07:30:39.245651Z",
-                "away_pct": -0.0097,
+                "away_pct": -0.0101,
                 "status": "open"
               },
               {
                 "side": "buy",
                 "price": 94.0,
-                "gbp": 1.51,
+                "gbp": 1.46,
                 "tier": "fast",
-                "qty": 0.01606383,
+                "qty": 0.01553191,
                 "wall": null,
                 "placed": "2026-11-05T07:30:39.245651Z",
-                "away_pct": -0.0189,
+                "away_pct": -0.0193,
                 "status": "open"
               },
               {
@@ -9454,62 +9260,62 @@
                 "qty": 0.01621215,
                 "wall": null,
                 "placed": "2026-11-05T07:30:39.245651Z",
-                "away_pct": -0.0279,
+                "away_pct": -0.0283,
                 "status": "open"
               },
               {
                 "side": "buy",
                 "price": 92.3,
-                "gbp": 1.51,
+                "gbp": 1.46,
                 "tier": "fast",
-                "qty": 0.0163597,
+                "qty": 0.01581798,
                 "wall": null,
                 "placed": "2026-11-05T07:30:39.245651Z",
-                "away_pct": -0.0366,
+                "away_pct": -0.037,
                 "status": "open"
               },
               {
                 "side": "buy",
                 "price": 91.48,
-                "gbp": 1.51,
+                "gbp": 1.46,
                 "tier": "fast",
-                "qty": 0.01650634,
+                "qty": 0.01595977,
                 "wall": null,
                 "placed": "2026-11-05T07:30:39.245651Z",
-                "away_pct": -0.0452,
+                "away_pct": -0.0456,
                 "status": "open"
               },
               {
                 "side": "buy",
                 "price": 90.68,
-                "gbp": 1.51,
+                "gbp": 1.46,
                 "tier": "fast",
-                "qty": 0.01665196,
+                "qty": 0.01610057,
                 "wall": null,
                 "placed": "2026-11-05T07:30:39.245651Z",
-                "away_pct": -0.0536,
+                "away_pct": -0.0539,
                 "status": "open"
               },
               {
                 "side": "buy",
                 "price": 89.89,
-                "gbp": 1.51,
+                "gbp": 1.46,
                 "tier": "fast",
-                "qty": 0.01679831,
+                "qty": 0.01624207,
                 "wall": null,
                 "placed": "2026-11-05T07:30:39.245651Z",
-                "away_pct": -0.0618,
+                "away_pct": -0.0622,
                 "status": "open"
               },
               {
                 "side": "buy",
                 "price": 89.12,
-                "gbp": 1.51,
+                "gbp": 1.46,
                 "tier": "fast",
-                "qty": 0.01694345,
+                "qty": 0.01638241,
                 "wall": null,
                 "placed": "2026-11-05T07:30:39.245651Z",
-                "away_pct": -0.0698,
+                "away_pct": -0.0702,
                 "status": "open"
               }
             ],
@@ -9519,17 +9325,17 @@
                 "qty": 0.02932276,
                 "entry": 95.83,
                 "gbp": 2.81,
-                "value": 2.8094,
-                "unrealised_gbp": -0.0006,
-                "unrealised_pct": -0.0002,
+                "value": 2.8106,
+                "unrealised_gbp": 0.0006,
+                "unrealised_pct": 0.0002,
                 "target": 96.46,
-                "to_target_pct": 0.0068,
+                "to_target_pct": 0.0064,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-05T04:06:42.568404Z",
-                "held_minutes": 212,
+                "held_minutes": 219,
                 "tier": "fast",
-                "status": "recovering",
+                "status": "in_profit",
                 "trail_peak": null,
                 "trail_stop": null
               },
@@ -9538,15 +9344,15 @@
                 "qty": 0.01470741,
                 "entry": 96.55,
                 "gbp": 1.42,
-                "value": 1.4091,
-                "unrealised_gbp": -0.0109,
-                "unrealised_pct": -0.0077,
+                "value": 1.4097,
+                "unrealised_gbp": -0.0103,
+                "unrealised_pct": -0.0073,
                 "target": 97.18,
-                "to_target_pct": 0.0143,
+                "to_target_pct": 0.0139,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T17:01:30.635836Z",
-                "held_minutes": 877,
+                "held_minutes": 884,
                 "tier": "fast",
                 "status": "recovering",
                 "trail_peak": null,
@@ -9557,15 +9363,15 @@
                 "qty": 0.0189769,
                 "entry": 96.96,
                 "gbp": 1.84,
-                "value": 1.8182,
-                "unrealised_gbp": -0.0218,
-                "unrealised_pct": -0.0119,
+                "value": 1.8189,
+                "unrealised_gbp": -0.0211,
+                "unrealised_pct": -0.0114,
                 "target": 97.6,
-                "to_target_pct": 0.0187,
+                "to_target_pct": 0.0183,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:22:31.905112Z",
-                "held_minutes": 976,
+                "held_minutes": 983,
                 "tier": "fast",
                 "status": "recovering",
                 "trail_peak": null,
@@ -9576,15 +9382,15 @@
                 "qty": 0.01807724,
                 "entry": 97.36,
                 "gbp": 1.76,
-                "value": 1.732,
-                "unrealised_gbp": -0.028,
-                "unrealised_pct": -0.0159,
+                "value": 1.7327,
+                "unrealised_gbp": -0.0273,
+                "unrealised_pct": -0.0155,
                 "target": 98.0,
-                "to_target_pct": 0.0228,
+                "to_target_pct": 0.0224,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:06:57.665485Z",
-                "held_minutes": 992,
+                "held_minutes": 999,
                 "tier": "fast",
                 "status": "recovering",
                 "trail_peak": null,
@@ -9595,23 +9401,23 @@
                 "qty": 0.01883317,
                 "entry": 97.7,
                 "gbp": 1.84,
-                "value": 1.8044,
-                "unrealised_gbp": -0.0356,
-                "unrealised_pct": -0.0193,
+                "value": 1.8052,
+                "unrealised_gbp": -0.0348,
+                "unrealised_pct": -0.0189,
                 "target": 98.34,
-                "to_target_pct": 0.0264,
+                "to_target_pct": 0.026,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:18:30.905712Z",
-                "held_minutes": 980,
+                "held_minutes": 987,
                 "tier": "fast",
                 "status": "recovering",
                 "trail_peak": null,
                 "trail_stop": null
               }
             ],
-            "lots_recovering": 5,
-            "unrealised_gbp": -0.0969,
+            "lots_recovering": 4,
+            "unrealised_gbp": -0.0929,
             "realized_gbp": 0.1619,
             "sold": 39,
             "sold_today": 3,
@@ -9623,11 +9429,11 @@
             ],
             "weight": 0.45,
             "max_rungs": 13,
-            "support": 93.43,
+            "support": 93.48,
             "resistance": 97.26,
             "levels": {
               "5m": {
-                "support": 94.33,
+                "support": 94.44,
                 "resistance": 96.96
               },
               "15m": {
@@ -9639,10 +9445,10 @@
             "step_pct": 0.0082,
             "depth_pct": 0.07473,
             "lean": "neutral",
-            "built_at": "2026-11-05T07:30:39.245651Z",
-            "net_per_round_trip": 0.0023,
+            "built_at": "2026-11-05T07:40:42.213034Z",
+            "net_per_round_trip": 0.0022,
             "round_trips_per_day": 16.1,
-            "potential_week": 0.26
+            "potential_week": 0.25
           },
           {
             "name": "medium",
@@ -9661,7 +9467,7 @@
                 "qty": 0.01150639,
                 "wall": null,
                 "placed": "2026-11-05T06:49:28.508719Z",
-                "away_pct": -0.0113,
+                "away_pct": -0.0117,
                 "status": "open"
               },
               {
@@ -9672,7 +9478,7 @@
                 "qty": 0.01164779,
                 "wall": null,
                 "placed": "2026-11-05T06:49:28.508719Z",
-                "away_pct": -0.0233,
+                "away_pct": -0.0237,
                 "status": "open"
               },
               {
@@ -9683,7 +9489,7 @@
                 "qty": 0.01178633,
                 "wall": null,
                 "placed": "2026-11-05T06:49:28.508719Z",
-                "away_pct": -0.0348,
+                "away_pct": -0.0352,
                 "status": "open"
               },
               {
@@ -9694,7 +9500,7 @@
                 "qty": 0.01192299,
                 "wall": null,
                 "placed": "2026-11-05T06:49:28.508719Z",
-                "away_pct": -0.0458,
+                "away_pct": -0.0462,
                 "status": "open"
               },
               {
@@ -9705,7 +9511,7 @@
                 "qty": 0.01205619,
                 "wall": null,
                 "placed": "2026-11-05T06:49:28.508719Z",
-                "away_pct": -0.0564,
+                "away_pct": -0.0568,
                 "status": "open"
               },
               {
@@ -9716,7 +9522,7 @@
                 "qty": 0.01218694,
                 "wall": null,
                 "placed": "2026-11-05T06:49:28.508719Z",
-                "away_pct": -0.0665,
+                "away_pct": -0.0669,
                 "status": "open"
               },
               {
@@ -9727,7 +9533,7 @@
                 "qty": 0.01231499,
                 "wall": null,
                 "placed": "2026-11-05T06:49:28.508719Z",
-                "away_pct": -0.0762,
+                "away_pct": -0.0766,
                 "status": "open"
               }
             ],
@@ -9737,15 +9543,15 @@
                 "qty": 0.01115397,
                 "entry": 95.93,
                 "gbp": 1.07,
-                "value": 1.0687,
-                "unrealised_gbp": -0.0013,
-                "unrealised_pct": -0.0012,
+                "value": 1.0691,
+                "unrealised_gbp": -0.0009,
+                "unrealised_pct": -0.0008,
                 "target": 97.3,
-                "to_target_pct": 0.0155,
+                "to_target_pct": 0.0151,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-05T04:59:57.509114Z",
-                "held_minutes": 159,
+                "held_minutes": 166,
                 "tier": "medium",
                 "status": "recovering",
                 "trail_peak": null,
@@ -9756,15 +9562,15 @@
                 "qty": 0.01199959,
                 "entry": 96.67,
                 "gbp": 1.16,
-                "value": 1.1497,
-                "unrealised_gbp": -0.0103,
-                "unrealised_pct": -0.0089,
+                "value": 1.1502,
+                "unrealised_gbp": -0.0098,
+                "unrealised_pct": -0.0085,
                 "target": 98.05,
-                "to_target_pct": 0.0234,
+                "to_target_pct": 0.023,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-05T03:45:36.082102Z",
-                "held_minutes": 233,
+                "held_minutes": 240,
                 "tier": "medium",
                 "status": "recovering",
                 "trail_peak": null,
@@ -9775,15 +9581,15 @@
                 "qty": 0.0154321,
                 "entry": 97.2,
                 "gbp": 1.5,
-                "value": 1.4786,
-                "unrealised_gbp": -0.0214,
-                "unrealised_pct": -0.0143,
+                "value": 1.4792,
+                "unrealised_gbp": -0.0208,
+                "unrealised_pct": -0.0139,
                 "target": 98.59,
-                "to_target_pct": 0.029,
+                "to_target_pct": 0.0286,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:07:57.898037Z",
-                "held_minutes": 991,
+                "held_minutes": 998,
                 "tier": "medium",
                 "status": "recovering",
                 "trail_peak": null,
@@ -9791,7 +9597,7 @@
               }
             ],
             "lots_recovering": 3,
-            "unrealised_gbp": -0.033,
+            "unrealised_gbp": -0.0315,
             "realized_gbp": 0.0841,
             "sold": 8,
             "sold_today": 2,
@@ -9841,7 +9647,7 @@
                 "qty": 0.01087893,
                 "wall": null,
                 "placed": "2026-11-05T00:48:15.073480Z",
-                "away_pct": -0.031,
+                "away_pct": -0.0314,
                 "status": "open"
               },
               {
@@ -9852,7 +9658,7 @@
                 "qty": 0.0111393,
                 "wall": null,
                 "placed": "2026-11-05T04:07:42.847475Z",
-                "away_pct": -0.0537,
+                "away_pct": -0.054,
                 "status": "open"
               },
               {
@@ -9863,7 +9669,7 @@
                 "qty": 0.0113867,
                 "wall": null,
                 "placed": "2026-11-05T04:07:42.847475Z",
-                "away_pct": -0.0742,
+                "away_pct": -0.0746,
                 "status": "open"
               },
               {
@@ -9874,7 +9680,7 @@
                 "qty": 0.01162389,
                 "wall": null,
                 "placed": "2026-11-05T04:07:42.847475Z",
-                "away_pct": -0.0931,
+                "away_pct": -0.0935,
                 "status": "open"
               }
             ],
@@ -9884,15 +9690,15 @@
                 "qty": 0.01061371,
                 "entry": 95.16,
                 "gbp": 1.01,
-                "value": 1.0169,
-                "unrealised_gbp": 0.0069,
-                "unrealised_pct": 0.0068,
+                "value": 1.0173,
+                "unrealised_gbp": 0.0073,
+                "unrealised_pct": 0.0073,
                 "target": 97.71,
-                "to_target_pct": 0.0198,
+                "to_target_pct": 0.0194,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-05T01:20:53.941737Z",
-                "held_minutes": 378,
+                "held_minutes": 385,
                 "tier": "slow",
                 "status": "in_profit",
                 "trail_peak": null,
@@ -9903,15 +9709,15 @@
                 "qty": 0.01310726,
                 "entry": 96.13,
                 "gbp": 1.26,
-                "value": 1.2558,
-                "unrealised_gbp": -0.0042,
-                "unrealised_pct": -0.0033,
+                "value": 1.2563,
+                "unrealised_gbp": -0.0037,
+                "unrealised_pct": -0.0029,
                 "target": 98.71,
-                "to_target_pct": 0.0303,
+                "to_target_pct": 0.0298,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:47:09.176915Z",
-                "held_minutes": 952,
+                "held_minutes": 958,
                 "tier": "slow",
                 "status": "recovering",
                 "trail_peak": null,
@@ -9922,15 +9728,15 @@
                 "qty": 0.01204572,
                 "entry": 97.13,
                 "gbp": 1.17,
-                "value": 1.1541,
-                "unrealised_gbp": -0.0159,
-                "unrealised_pct": -0.0136,
+                "value": 1.1546,
+                "unrealised_gbp": -0.0154,
+                "unrealised_pct": -0.0132,
                 "target": 99.73,
-                "to_target_pct": 0.0409,
+                "to_target_pct": 0.0405,
                 "ask_wall": null,
                 "book_snap": null,
                 "opened": "2026-11-04T15:20:31.421647Z",
-                "held_minutes": 978,
+                "held_minutes": 985,
                 "tier": "slow",
                 "status": "recovering",
                 "trail_peak": null,
@@ -9938,7 +9744,7 @@
               }
             ],
             "lots_recovering": 2,
-            "unrealised_gbp": -0.0132,
+            "unrealised_gbp": -0.0118,
             "realized_gbp": 0.0572,
             "sold": 2,
             "sold_today": 0,
@@ -9988,7 +9794,7 @@
                 "qty": 0.02752698,
                 "wall": null,
                 "placed": "2026-11-04T14:42:51.206153Z",
-                "away_pct": -0.0521,
+                "away_pct": -0.0525,
                 "status": "open"
               },
               {
@@ -9999,7 +9805,7 @@
                 "qty": 0.02794233,
                 "wall": null,
                 "placed": "2026-11-04T11:36:27.242060Z",
-                "away_pct": -0.0662,
+                "away_pct": -0.0666,
                 "status": "open"
               },
               {
@@ -10010,7 +9816,7 @@
                 "qty": 0.0286336,
                 "wall": null,
                 "placed": "2026-11-04T05:31:46.380325Z",
-                "away_pct": -0.0887,
+                "away_pct": -0.0891,
                 "status": "open"
               }
             ],
@@ -10029,54 +9835,54 @@
         ],
         "pot_in_lots_gbp": 16.84,
         "book": {
-          "bid": 95.79,
-          "ask": 95.8,
+          "bid": 95.84,
+          "ask": 95.85,
           "spread": 0.01,
           "spread_pct": 0.000104,
-          "pressure": 0.088,
+          "pressure": 0.052,
           "lean": "neutral",
-          "bid_size": 25615.5821,
-          "ask_size": 21467.2569,
+          "bid_size": 27559.3399,
+          "ask_size": 24821.0835,
           "bid_walls": [
             {
-              "price": 95.65,
-              "size": 9027.1377,
-              "x": 56.2
+              "price": 95.69,
+              "size": 9098.231,
+              "x": 8.8
             },
             {
-              "price": 95.58,
-              "size": 6615.0944,
-              "x": 41.2
+              "price": 95.61,
+              "size": 7480.4139,
+              "x": 7.2
             },
             {
-              "price": 95.46,
-              "size": 4045.0338,
-              "x": 25.2
+              "price": 95.32,
+              "size": 5032.0837,
+              "x": 4.8
             }
           ],
           "ask_walls": [
             {
-              "price": 96.02,
-              "size": 8011.1457,
-              "x": 38.1
+              "price": 95.99,
+              "size": 9737.6004,
+              "x": 45.5
             },
             {
-              "price": 96.48,
-              "size": 6818.5921,
-              "x": 32.4
+              "price": 96.38,
+              "size": 7551.0973,
+              "x": 35.3
             },
             {
-              "price": 95.94,
-              "size": 6262.7251,
-              "x": 29.8
+              "price": 96.07,
+              "size": 4459.9232,
+              "x": 20.9
             }
           ]
         },
         "grid_active": true,
         "guard_why": null,
         "lots_open": 11,
-        "lots_recovering": 10,
-        "lots_in_profit": 1,
+        "lots_recovering": 9,
+        "lots_in_profit": 2,
         "median_time_to_profit_min": 162,
         "orders_resting": 22,
         "invested_gbp": 16.84,
@@ -10196,18 +10002,18 @@
         "realized_pnl_gbp": 0.3032,
         "gross_pnl_gbp": 0.6763,
         "net_pnl_after_fees": 0.3032,
-        "unrealised_gbp": -0.1431,
+        "unrealised_gbp": -0.1362,
         "fee_rate": 0.0025,
         "losing_streak": 0,
         "max_losing_streak": 2,
         "cooldown_active": false,
         "cooldown_until": null,
-        "last_price": 95.811,
+        "last_price": 95.85,
         "orders": [
           {
             "side": "buy",
             "price": 94.88,
-            "gbp": 1.54,
+            "gbp": 1.62,
             "tier": "fast"
           },
           {
@@ -10219,7 +10025,7 @@
           {
             "side": "buy",
             "price": 94.0,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast"
           },
           {
@@ -10249,13 +10055,13 @@
           {
             "side": "buy",
             "price": 92.3,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast"
           },
           {
             "side": "buy",
             "price": 91.48,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast"
           },
           {
@@ -10273,7 +10079,7 @@
           {
             "side": "buy",
             "price": 90.68,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast"
           },
           {
@@ -10291,7 +10097,7 @@
           {
             "side": "buy",
             "price": 89.89,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast"
           },
           {
@@ -10309,7 +10115,7 @@
           {
             "side": "buy",
             "price": 89.12,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast"
           },
           {
@@ -10343,17 +10149,17 @@
             "qty": 0.02932276,
             "entry": 95.83,
             "gbp": 2.81,
-            "value": 2.8094,
-            "unrealised_gbp": -0.0006,
-            "unrealised_pct": -0.0002,
+            "value": 2.8106,
+            "unrealised_gbp": 0.0006,
+            "unrealised_pct": 0.0002,
             "target": 96.46,
-            "to_target_pct": 0.0068,
+            "to_target_pct": 0.0064,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-05T04:06:42.568404Z",
-            "held_minutes": 212,
+            "held_minutes": 219,
             "tier": "fast",
-            "status": "recovering",
+            "status": "in_profit",
             "trail_peak": null,
             "trail_stop": null
           },
@@ -10362,15 +10168,15 @@
             "qty": 0.01470741,
             "entry": 96.55,
             "gbp": 1.42,
-            "value": 1.4091,
-            "unrealised_gbp": -0.0109,
-            "unrealised_pct": -0.0077,
+            "value": 1.4097,
+            "unrealised_gbp": -0.0103,
+            "unrealised_pct": -0.0073,
             "target": 97.18,
-            "to_target_pct": 0.0143,
+            "to_target_pct": 0.0139,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T17:01:30.635836Z",
-            "held_minutes": 877,
+            "held_minutes": 884,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -10381,15 +10187,15 @@
             "qty": 0.01115397,
             "entry": 95.93,
             "gbp": 1.07,
-            "value": 1.0687,
-            "unrealised_gbp": -0.0013,
-            "unrealised_pct": -0.0012,
+            "value": 1.0691,
+            "unrealised_gbp": -0.0009,
+            "unrealised_pct": -0.0008,
             "target": 97.3,
-            "to_target_pct": 0.0155,
+            "to_target_pct": 0.0151,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-05T04:59:57.509114Z",
-            "held_minutes": 159,
+            "held_minutes": 166,
             "tier": "medium",
             "status": "recovering",
             "trail_peak": null,
@@ -10400,15 +10206,15 @@
             "qty": 0.0189769,
             "entry": 96.96,
             "gbp": 1.84,
-            "value": 1.8182,
-            "unrealised_gbp": -0.0218,
-            "unrealised_pct": -0.0119,
+            "value": 1.8189,
+            "unrealised_gbp": -0.0211,
+            "unrealised_pct": -0.0114,
             "target": 97.6,
-            "to_target_pct": 0.0187,
+            "to_target_pct": 0.0183,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:22:31.905112Z",
-            "held_minutes": 976,
+            "held_minutes": 983,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -10419,15 +10225,15 @@
             "qty": 0.01061371,
             "entry": 95.16,
             "gbp": 1.01,
-            "value": 1.0169,
-            "unrealised_gbp": 0.0069,
-            "unrealised_pct": 0.0068,
+            "value": 1.0173,
+            "unrealised_gbp": 0.0073,
+            "unrealised_pct": 0.0073,
             "target": 97.71,
-            "to_target_pct": 0.0198,
+            "to_target_pct": 0.0194,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-05T01:20:53.941737Z",
-            "held_minutes": 378,
+            "held_minutes": 385,
             "tier": "slow",
             "status": "in_profit",
             "trail_peak": null,
@@ -10438,15 +10244,15 @@
             "qty": 0.01807724,
             "entry": 97.36,
             "gbp": 1.76,
-            "value": 1.732,
-            "unrealised_gbp": -0.028,
-            "unrealised_pct": -0.0159,
+            "value": 1.7327,
+            "unrealised_gbp": -0.0273,
+            "unrealised_pct": -0.0155,
             "target": 98.0,
-            "to_target_pct": 0.0228,
+            "to_target_pct": 0.0224,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:06:57.665485Z",
-            "held_minutes": 992,
+            "held_minutes": 999,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -10457,15 +10263,15 @@
             "qty": 0.01199959,
             "entry": 96.67,
             "gbp": 1.16,
-            "value": 1.1497,
-            "unrealised_gbp": -0.0103,
-            "unrealised_pct": -0.0089,
+            "value": 1.1502,
+            "unrealised_gbp": -0.0098,
+            "unrealised_pct": -0.0085,
             "target": 98.05,
-            "to_target_pct": 0.0234,
+            "to_target_pct": 0.023,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-05T03:45:36.082102Z",
-            "held_minutes": 233,
+            "held_minutes": 240,
             "tier": "medium",
             "status": "recovering",
             "trail_peak": null,
@@ -10476,15 +10282,15 @@
             "qty": 0.01883317,
             "entry": 97.7,
             "gbp": 1.84,
-            "value": 1.8044,
-            "unrealised_gbp": -0.0356,
-            "unrealised_pct": -0.0193,
+            "value": 1.8052,
+            "unrealised_gbp": -0.0348,
+            "unrealised_pct": -0.0189,
             "target": 98.34,
-            "to_target_pct": 0.0264,
+            "to_target_pct": 0.026,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:18:30.905712Z",
-            "held_minutes": 980,
+            "held_minutes": 987,
             "tier": "fast",
             "status": "recovering",
             "trail_peak": null,
@@ -10495,15 +10301,15 @@
             "qty": 0.0154321,
             "entry": 97.2,
             "gbp": 1.5,
-            "value": 1.4786,
-            "unrealised_gbp": -0.0214,
-            "unrealised_pct": -0.0143,
+            "value": 1.4792,
+            "unrealised_gbp": -0.0208,
+            "unrealised_pct": -0.0139,
             "target": 98.59,
-            "to_target_pct": 0.029,
+            "to_target_pct": 0.0286,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:07:57.898037Z",
-            "held_minutes": 991,
+            "held_minutes": 998,
             "tier": "medium",
             "status": "recovering",
             "trail_peak": null,
@@ -10514,15 +10320,15 @@
             "qty": 0.01310726,
             "entry": 96.13,
             "gbp": 1.26,
-            "value": 1.2558,
-            "unrealised_gbp": -0.0042,
-            "unrealised_pct": -0.0033,
+            "value": 1.2563,
+            "unrealised_gbp": -0.0037,
+            "unrealised_pct": -0.0029,
             "target": 98.71,
-            "to_target_pct": 0.0303,
+            "to_target_pct": 0.0298,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:47:09.176915Z",
-            "held_minutes": 952,
+            "held_minutes": 958,
             "tier": "slow",
             "status": "recovering",
             "trail_peak": null,
@@ -10533,15 +10339,15 @@
             "qty": 0.01204572,
             "entry": 97.13,
             "gbp": 1.17,
-            "value": 1.1541,
-            "unrealised_gbp": -0.0159,
-            "unrealised_pct": -0.0136,
+            "value": 1.1546,
+            "unrealised_gbp": -0.0154,
+            "unrealised_pct": -0.0132,
             "target": 99.73,
-            "to_target_pct": 0.0409,
+            "to_target_pct": 0.0405,
             "ask_wall": null,
             "book_snap": null,
             "opened": "2026-11-04T15:20:31.421647Z",
-            "held_minutes": 978,
+            "held_minutes": 985,
             "tier": "slow",
             "status": "recovering",
             "trail_peak": null,
@@ -10571,7 +10377,7 @@
         },
         "plan_vs_actual": {
           "week_start": "2026-11-02T00:00:00Z",
-          "planned_round_trips_so_far": 57.4,
+          "planned_round_trips_so_far": 57.5,
           "actual_round_trips": 47,
           "actual_net": 0.2997,
           "status": "ON TRACK"
@@ -10580,12 +10386,12 @@
           {
             "side": "buy",
             "price": 94.88,
-            "gbp": 1.54,
+            "gbp": 1.62,
             "tier": "fast",
-            "qty": 0.01623103,
+            "qty": 0.0170742,
             "wall": null,
             "placed": "2026-11-05T07:30:39.245651Z",
-            "away_pct": -0.0097,
+            "away_pct": -0.0101,
             "status": "open"
           },
           {
@@ -10596,18 +10402,18 @@
             "qty": 0.01150639,
             "wall": null,
             "placed": "2026-11-05T06:49:28.508719Z",
-            "away_pct": -0.0113,
+            "away_pct": -0.0117,
             "status": "open"
           },
           {
             "side": "buy",
             "price": 94.0,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast",
-            "qty": 0.01606383,
+            "qty": 0.01553191,
             "wall": null,
             "placed": "2026-11-05T07:30:39.245651Z",
-            "away_pct": -0.0189,
+            "away_pct": -0.0193,
             "status": "open"
           },
           {
@@ -10618,7 +10424,7 @@
             "qty": 0.01164779,
             "wall": null,
             "placed": "2026-11-05T06:49:28.508719Z",
-            "away_pct": -0.0233,
+            "away_pct": -0.0237,
             "status": "open"
           },
           {
@@ -10629,7 +10435,7 @@
             "qty": 0.01621215,
             "wall": null,
             "placed": "2026-11-05T07:30:39.245651Z",
-            "away_pct": -0.0279,
+            "away_pct": -0.0283,
             "status": "open"
           },
           {
@@ -10640,7 +10446,7 @@
             "qty": 0.01087893,
             "wall": null,
             "placed": "2026-11-05T00:48:15.073480Z",
-            "away_pct": -0.031,
+            "away_pct": -0.0314,
             "status": "open"
           },
           {
@@ -10651,29 +10457,29 @@
             "qty": 0.01178633,
             "wall": null,
             "placed": "2026-11-05T06:49:28.508719Z",
-            "away_pct": -0.0348,
+            "away_pct": -0.0352,
             "status": "open"
           },
           {
             "side": "buy",
             "price": 92.3,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast",
-            "qty": 0.0163597,
+            "qty": 0.01581798,
             "wall": null,
             "placed": "2026-11-05T07:30:39.245651Z",
-            "away_pct": -0.0366,
+            "away_pct": -0.037,
             "status": "open"
           },
           {
             "side": "buy",
             "price": 91.48,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast",
-            "qty": 0.01650634,
+            "qty": 0.01595977,
             "wall": null,
             "placed": "2026-11-05T07:30:39.245651Z",
-            "away_pct": -0.0452,
+            "away_pct": -0.0456,
             "status": "open"
           },
           {
@@ -10684,7 +10490,7 @@
             "qty": 0.01192299,
             "wall": null,
             "placed": "2026-11-05T06:49:28.508719Z",
-            "away_pct": -0.0458,
+            "away_pct": -0.0462,
             "status": "open"
           },
           {
@@ -10695,18 +10501,18 @@
             "qty": 0.02752698,
             "wall": null,
             "placed": "2026-11-04T14:42:51.206153Z",
-            "away_pct": -0.0521,
+            "away_pct": -0.0525,
             "status": "open"
           },
           {
             "side": "buy",
             "price": 90.68,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast",
-            "qty": 0.01665196,
+            "qty": 0.01610057,
             "wall": null,
             "placed": "2026-11-05T07:30:39.245651Z",
-            "away_pct": -0.0536,
+            "away_pct": -0.0539,
             "status": "open"
           },
           {
@@ -10717,7 +10523,7 @@
             "qty": 0.0111393,
             "wall": null,
             "placed": "2026-11-05T04:07:42.847475Z",
-            "away_pct": -0.0537,
+            "away_pct": -0.054,
             "status": "open"
           },
           {
@@ -10728,18 +10534,18 @@
             "qty": 0.01205619,
             "wall": null,
             "placed": "2026-11-05T06:49:28.508719Z",
-            "away_pct": -0.0564,
+            "away_pct": -0.0568,
             "status": "open"
           },
           {
             "side": "buy",
             "price": 89.89,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast",
-            "qty": 0.01679831,
+            "qty": 0.01624207,
             "wall": null,
             "placed": "2026-11-05T07:30:39.245651Z",
-            "away_pct": -0.0618,
+            "away_pct": -0.0622,
             "status": "open"
           },
           {
@@ -10750,7 +10556,7 @@
             "qty": 0.02794233,
             "wall": null,
             "placed": "2026-11-04T11:36:27.242060Z",
-            "away_pct": -0.0662,
+            "away_pct": -0.0666,
             "status": "open"
           },
           {
@@ -10761,18 +10567,18 @@
             "qty": 0.01218694,
             "wall": null,
             "placed": "2026-11-05T06:49:28.508719Z",
-            "away_pct": -0.0665,
+            "away_pct": -0.0669,
             "status": "open"
           },
           {
             "side": "buy",
             "price": 89.12,
-            "gbp": 1.51,
+            "gbp": 1.46,
             "tier": "fast",
-            "qty": 0.01694345,
+            "qty": 0.01638241,
             "wall": null,
             "placed": "2026-11-05T07:30:39.245651Z",
-            "away_pct": -0.0698,
+            "away_pct": -0.0702,
             "status": "open"
           },
           {
@@ -10783,7 +10589,7 @@
             "qty": 0.0113867,
             "wall": null,
             "placed": "2026-11-05T04:07:42.847475Z",
-            "away_pct": -0.0742,
+            "away_pct": -0.0746,
             "status": "open"
           },
           {
@@ -10794,7 +10600,7 @@
             "qty": 0.01231499,
             "wall": null,
             "placed": "2026-11-05T06:49:28.508719Z",
-            "away_pct": -0.0762,
+            "away_pct": -0.0766,
             "status": "open"
           },
           {
@@ -10805,7 +10611,7 @@
             "qty": 0.0286336,
             "wall": null,
             "placed": "2026-11-04T05:31:46.380325Z",
-            "away_pct": -0.0887,
+            "away_pct": -0.0891,
             "status": "open"
           },
           {
@@ -10816,7 +10622,7 @@
             "qty": 0.01162389,
             "wall": null,
             "placed": "2026-11-05T04:07:42.847475Z",
-            "away_pct": -0.0931,
+            "away_pct": -0.0935,
             "status": "open"
           },
           {
@@ -10828,7 +10634,7 @@
             "placed": "2026-11-05T04:06:42.568404Z",
             "entry": 95.83,
             "wall": null,
-            "away_pct": 0.0068,
+            "away_pct": 0.0064,
             "status": "open"
           },
           {
@@ -10840,7 +10646,7 @@
             "placed": "2026-11-04T17:01:30.635836Z",
             "entry": 96.55,
             "wall": null,
-            "away_pct": 0.0143,
+            "away_pct": 0.0139,
             "status": "open"
           },
           {
@@ -10852,7 +10658,7 @@
             "placed": "2026-11-05T04:59:57.509114Z",
             "entry": 95.93,
             "wall": null,
-            "away_pct": 0.0155,
+            "away_pct": 0.0151,
             "status": "open"
           },
           {
@@ -10864,7 +10670,7 @@
             "placed": "2026-11-04T15:22:31.905112Z",
             "entry": 96.96,
             "wall": null,
-            "away_pct": 0.0187,
+            "away_pct": 0.0183,
             "status": "open"
           },
           {
@@ -10876,7 +10682,7 @@
             "placed": "2026-11-05T01:20:53.941737Z",
             "entry": 95.16,
             "wall": null,
-            "away_pct": 0.0198,
+            "away_pct": 0.0194,
             "status": "open"
           },
           {
@@ -10888,7 +10694,7 @@
             "placed": "2026-11-04T15:06:57.665485Z",
             "entry": 97.36,
             "wall": null,
-            "away_pct": 0.0228,
+            "away_pct": 0.0224,
             "status": "open"
           },
           {
@@ -10900,7 +10706,7 @@
             "placed": "2026-11-05T03:45:36.082102Z",
             "entry": 96.67,
             "wall": null,
-            "away_pct": 0.0234,
+            "away_pct": 0.023,
             "status": "open"
           },
           {
@@ -10912,7 +10718,7 @@
             "placed": "2026-11-04T15:18:30.905712Z",
             "entry": 97.7,
             "wall": null,
-            "away_pct": 0.0264,
+            "away_pct": 0.026,
             "status": "open"
           },
           {
@@ -10924,7 +10730,7 @@
             "placed": "2026-11-04T15:07:57.898037Z",
             "entry": 97.2,
             "wall": null,
-            "away_pct": 0.029,
+            "away_pct": 0.0286,
             "status": "open"
           },
           {
@@ -10936,7 +10742,7 @@
             "placed": "2026-11-04T15:47:09.176915Z",
             "entry": 96.13,
             "wall": null,
-            "away_pct": 0.0303,
+            "away_pct": 0.0298,
             "status": "open"
           },
           {
@@ -10948,7 +10754,7 @@
             "placed": "2026-11-04T15:20:31.421647Z",
             "entry": 97.13,
             "wall": null,
-            "away_pct": 0.0409,
+            "away_pct": 0.0405,
             "status": "open"
           }
         ],
@@ -11226,7 +11032,7 @@
         ],
         "grid_stats": {
           "day": "2026-11-05",
-          "reprices": 97,
+          "reprices": 98,
           "cancelled": 281,
           "placed": 283,
           "filled": 5,
@@ -11324,7 +11130,7 @@
           },
           "live": {
             "placed": 1004,
-            "reprices": 364,
+            "reprices": 365,
             "book_reprices": 160,
             "filled": 22,
             "sold": 24,
@@ -11333,12 +11139,12 @@
           }
         },
         "anti_spoof": {
-          "at": "2026-11-05T07:39:11.764476Z",
-          "seen": 11,
+          "at": "2026-11-05T07:45:43.443396Z",
+          "seen": 10,
           "trusted": 0,
-          "flagged": 11,
-          "spoofs_active": 24,
-          "spoofs_24h": 893,
+          "flagged": 10,
+          "spoofs_active": 26,
+          "spoofs_24h": 905,
           "support": null,
           "resistance": null,
           "walls": [
@@ -11351,90 +11157,83 @@
             },
             {
               "side": "ask",
-              "price": 96.48,
+              "price": 96.38,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "ask",
-              "price": 96.32,
+              "price": 96.25,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "ask",
-              "price": 96.22,
+              "price": 96.07,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "ask",
-              "price": 96.02,
-              "trust": 0.0,
-              "trusted": false,
-              "flagged": true
-            },
-            {
-              "side": "ask",
-              "price": 95.94,
+              "price": 95.9,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "bid",
-              "price": 95.72,
+              "price": 95.69,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "bid",
-              "price": 95.58,
+              "price": 95.54,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "bid",
-              "price": 95.46,
+              "price": 95.42,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "bid",
-              "price": 95.31,
+              "price": 95.32,
               "trust": 0.0,
               "trusted": false,
               "flagged": true
             },
             {
               "side": "bid",
-              "price": 95.17,
-              "trust": 0.011,
+              "price": 95.12,
+              "trust": 0.0,
               "trusted": false,
               "flagged": true
             }
           ]
         },
         "confluence": {
-          "at": "2026-11-05T07:39:11.764476Z",
+          "at": "2026-11-05T07:45:43.443396Z",
           "layers": {
             "fast": {
-              "S": 0.186,
-              "direction": "up",
-              "confidence": 0.186,
-              "pattern": "higher highs + higher lows",
-              "support": 93.43,
+              "S": 0.083,
+              "direction": "neutral",
+              "confidence": 0.083,
+              "pattern": "none",
+              "support": 93.48,
               "resistance": 97.26,
-              "channel_lower": 95.64,
-              "channel_upper": 96.2,
+              "channel_lower": 95.7,
+              "channel_upper": 96.19,
               "regime": "range",
-              "bounce": true,
+              "bounce": false,
               "bounce_med": 0.01412703547934857,
               "tp_eff": 0.0065,
               "tp_cap": 0.0065,
@@ -11442,15 +11241,15 @@
               "knife": null,
               "support_map": [
                 {
-                  "price": 95.79,
+                  "price": 95.77,
                   "strength": 0.6,
                   "class": "medium",
-                  "touches": 7,
+                  "touches": 8,
                   "wall": false,
                   "channel": true,
                   "round": false,
                   "event": "reclaim",
-                  "event_age": 17
+                  "event_age": 19
                 },
                 {
                   "price": 95.16,
@@ -11468,39 +11267,39 @@
               "votes": [
                 {
                   "sig": "book",
-                  "vote": -0.009,
+                  "vote": -0.151,
                   "w": 1.149,
                   "agrees": false
                 },
                 {
                   "sig": "sr",
-                  "vote": -0.232,
+                  "vote": -0.238,
                   "w": 1.0,
                   "agrees": false
                 },
                 {
                   "sig": "trend",
-                  "vote": 0.242,
+                  "vote": 0.183,
                   "w": 1.0,
                   "agrees": true
                 },
                 {
                   "sig": "channel",
-                  "vote": 0.449,
+                  "vote": 0.51,
                   "w": 1.0,
                   "agrees": true
                 },
                 {
                   "sig": "momentum",
-                  "vote": -0.2,
+                  "vote": -0.147,
                   "w": 0.922,
                   "agrees": false
                 },
                 {
                   "sig": "pattern",
-                  "vote": 0.6,
+                  "vote": 0.0,
                   "w": 1.0,
-                  "agrees": true
+                  "agrees": false
                 },
                 {
                   "sig": "support",
@@ -11517,9 +11316,9 @@
               ]
             },
             "medium": {
-              "S": 0.062,
+              "S": 0.035,
               "direction": "neutral",
-              "confidence": 0.062,
+              "confidence": 0.035,
               "pattern": "none",
               "support": 90.22,
               "resistance": 102.62,
@@ -11593,15 +11392,15 @@
               "votes": [
                 {
                   "sig": "book",
-                  "vote": -0.009,
+                  "vote": -0.151,
                   "w": 1.149,
                   "agrees": false
                 },
                 {
                   "sig": "sr",
-                  "vote": 0.102,
+                  "vote": 0.097,
                   "w": 1.0,
-                  "agrees": true
+                  "agrees": false
                 },
                 {
                   "sig": "trend",
@@ -11611,7 +11410,7 @@
                 },
                 {
                   "sig": "channel",
-                  "vote": 0.13,
+                  "vote": 0.117,
                   "w": 1.0,
                   "agrees": true
                 },
@@ -11642,9 +11441,9 @@
               ]
             },
             "slow": {
-              "S": 0.052,
+              "S": 0.028,
               "direction": "neutral",
-              "confidence": 0.052,
+              "confidence": 0.028,
               "pattern": "none",
               "support": 92.07,
               "resistance": 115.98,
@@ -11695,13 +11494,13 @@
               "votes": [
                 {
                   "sig": "book",
-                  "vote": -0.009,
+                  "vote": -0.151,
                   "w": 1.149,
                   "agrees": false
                 },
                 {
                   "sig": "sr",
-                  "vote": 0.689,
+                  "vote": 0.686,
                   "w": 1.0,
                   "agrees": true
                 },
@@ -11713,7 +11512,7 @@
                 },
                 {
                   "sig": "channel",
-                  "vote": -0.32,
+                  "vote": -0.325,
                   "w": 1.0,
                   "agrees": false
                 },
@@ -11883,26 +11682,19 @@
           "median_time_to_sell_min": 611,
           "skewed": false
         },
-        "levels_at": "2026-11-05T07:39:11.764476Z",
+        "levels_at": "2026-11-05T07:45:43.443396Z",
         "journal": [
-          "11-05 07:36Z CONFLUENCE @ $95.74",
-          "11-05 07:36Z WALLS",
-          "11-05 07:36Z SPOOF @ $96.47",
-          "11-05 07:36Z SPOOF @ $96.16",
-          "11-05 07:37Z SPOOF @ $95.65",
-          "11-05 07:38Z SPOOF @ $95.51",
-          "11-05 07:38Z SPOOF @ $96.16",
-          "11-05 07:39Z SPOOF @ $96.08"
+          "11-05 07:41Z SPOOF @ $95.88",
+          "11-05 07:42Z SPOOF @ $96.33",
+          "11-05 07:42Z SPOOF @ $96.04",
+          "11-05 07:43Z SPOOF @ $96.48",
+          "11-05 07:44Z SPOOF @ $96.36",
+          "11-05 07:45Z SPOOF @ $96.46",
+          "11-05 07:45Z SPOOF @ $96.28",
+          "11-05 07:45Z SPOOF @ $96.15"
         ],
         "charts": {
           "15m": [
-            {
-              "t": 1793778300,
-              "o": 93.05,
-              "h": 93.23,
-              "l": 92.81,
-              "c": 92.9
-            },
             {
               "t": 1793779200,
               "o": 92.9,
@@ -12566,7 +12358,14 @@
               "o": 95.91,
               "h": 95.91,
               "l": 95.65,
-              "c": 95.82
+              "c": 95.86
+            },
+            {
+              "t": 1793864700,
+              "o": 95.86,
+              "h": 95.87,
+              "l": 95.79,
+              "c": 95.85
             }
           ],
           "1h": [
@@ -13072,7 +12871,7 @@
               "o": 96.13,
               "h": 96.36,
               "l": 95.65,
-              "c": 95.82
+              "c": 95.84
             }
           ],
           "4h": [
@@ -13704,7 +13503,7 @@
               "o": 96.15,
               "h": 96.46,
               "l": 95.53,
-              "c": 95.82
+              "c": 95.84
             }
           ]
         },
@@ -14192,16 +13991,16 @@
         ],
         "buys_all": 60,
         "thoughts": [
-          "SOL · 07:39Z SOL-USDC $95.79 · BOOK bid wall $95.65 (9027.14) · ask wall $96.02 (8011.15) · spread $0.01 · pressure +0.09 NEUTRAL",
-          "SOL · 07:39Z FAST $93–$97 · MEDIUM $90–$103 · SLOW $92–$116 · BUYING",
-          "SOL · 07:39Z -> SPOOF @ $96.08 — ask wall $96.08 pulled as price approached — distrusted for 15 min",
-          "SOL · 07:39Z ANTI-SPOOF: 11 walls · trusted 0 (no trusted support, no trusted resistance) · 11 flagged · 24 spoof cooldowns",
-          "SOL · 07:39Z CONFLUENCE: FAST ↑ +0.19 (book0 sr− trend+ channel+ momentum− pattern+ support+ history0, higher highs + higher lows) tp 0.65% · MEDIUM · +0.06 (book0 sr+ trend0 channel+ momentum+ pattern0 support0 history0) tp 1.42% · SLOW · +0.05 (book0 sr+ trend− channel− momentum+ pattern0 support+ history0) [SPRING] tp 2.67%",
-          "SOL · 07:39Z HOUR 07 UTC: QUIET · full trading (throttle off: map is info only)",
-          "SOL · 07:39Z FAST: 8 buys resting · 5 lots $9.67/$22.50 · next sell $96.46",
-          "SOL · 07:39Z MEDIUM: 7 buys resting · 3 lots $3.73/$12.50 · next sell $97.30",
-          "SOL · 07:39Z SLOW: 4 buys resting · 3 lots $3.44/$7.50 · next sell $97.71",
-          "SOL · 07:39Z RESERVE: 3 buys resting · 0 lots $0.00/$7.50"
+          "SOL · 07:45Z SOL-USDC $95.82 · BOOK bid wall $95.69 (9098.23) · ask wall $95.99 (9737.6) · spread $0.01 · pressure +0.05 NEUTRAL",
+          "SOL · 07:45Z FAST $93–$97 · MEDIUM $90–$103 · SLOW $92–$116 · BUYING",
+          "SOL · 07:45Z -> SPOOF @ $96.15 — ask wall $96.15 pulled as price approached — distrusted for 15 min",
+          "SOL · 07:45Z ANTI-SPOOF: 10 walls · trusted 0 (no trusted support, no trusted resistance) · 10 flagged · 26 spoof cooldowns",
+          "SOL · 07:45Z CONFLUENCE: FAST · +0.08 (book− sr− trend+ channel+ momentum− pattern0 support+ history0) tp 0.65% · MEDIUM · +0.04 (book− sr0 trend0 channel+ momentum+ pattern0 support0 history0) tp 1.42% · SLOW · +0.03 (book− sr+ trend− channel− momentum+ pattern0 support+ history0) [SPRING] tp 2.67%",
+          "SOL · 07:45Z HOUR 07 UTC: QUIET · full trading (throttle off: map is info only)",
+          "SOL · 07:45Z FAST: 8 buys resting · 5 lots $9.67/$22.50 · next sell $96.46",
+          "SOL · 07:45Z MEDIUM: 7 buys resting · 3 lots $3.73/$12.50 · next sell $97.30",
+          "SOL · 07:45Z SLOW: 4 buys resting · 3 lots $3.44/$7.50 · next sell $97.71",
+          "SOL · 07:45Z RESERVE: 3 buys resting · 0 lots $0.00/$7.50"
         ]
       }
     }
@@ -14216,12 +14015,12 @@
       "ZEC-GBP"
     ],
     "prices": {
-      "BTC-GBP": 59609.73,
-      "ETH-GBP": 1793.38,
-      "LINK-GBP": 8.50407,
-      "ZEC-GBP": 977.52,
-      "ZEC-USDC": 1316.88,
-      "USDC-GBP": 0.7421
+      "BTC-GBP": 59633.35,
+      "ETH-GBP": 1792.06,
+      "LINK-GBP": 8.54774,
+      "ZEC-GBP": 978.46,
+      "ZEC-USDC": 1318.32,
+      "USDC-GBP": 0.7422
     },
     "price_via": {
       "ZEC-GBP": "USD"
@@ -14236,31 +14035,31 @@
     }
   },
   "thoughts": [
-    "earlier: 11-05 07:38Z SPOOF @ $2,424.87",
-    "earlier: 11-05 07:39Z SPOOF @ $2,411.25",
-    "ETH · 07:39Z CONFLUENCE: FAST ↑ +0.12 (book+ sr− trend− channel+ momentum− pattern+ support+ history0, higher highs + higher lows) tp 0.65% · MEDIUM ↑ +0.11 (book+ sr− trend+ channel0 momentum+ pattern0 support+ history0) tp 1.50% · SLOW ↓ -0.11 (book+ sr0 trend− channel− momentum+ pattern− support+ history0, lower highs + lower lows) [SPRING] tp 3.16%",
-    "DOGE · 07:39Z CONFLUENCE: FAST · -0.09 (book+ sr+ trend− channel+ momentum− pattern− support0 history0, double top) [DOWNTREND: dip-buys throttled] tp 0.65% · MEDIUM ↑ +0.23 (book+ sr0 trend+ channel+ momentum0 pattern0 support+ history0) tp 1.08% · SLOW ↓ -0.17 (book+ sr+ trend− channel− momentum+ pattern− support+ history0, lower highs + lower lows) tp 3.00%",
-    "SOL · 07:39Z CONFLUENCE: FAST ↑ +0.19 (book0 sr− trend+ channel+ momentum− pattern+ support+ history0, higher highs + higher lows) tp 0.65% · MEDIUM · +0.06 (book0 sr+ trend0 channel+ momentum+ pattern0 support0 history0) tp 1.42% · SLOW · +0.05 (book0 sr+ trend− channel− momentum+ pattern0 support+ history0) [SPRING] tp 2.67%",
-    "ETH · 07:39Z ETH-USDC $2,413.67 · BOOK bid wall $2,405.57 (596.06) · ask wall $2,450.05 (1313.77) · spread $0.33 · pressure -0.02 NEUTRAL",
-    "ETH · 07:39Z FAST $2,358–$2,442 · MEDIUM $2,192–$2,438 · SLOW $2,210–$2,624 · BUYING",
-    "ETH · 07:39Z -> SPOOF @ $2,411.25 — bid wall $2,411.25 pulled as price approached — distrusted for 15 min",
-    "ETH · 07:39Z ANTI-SPOOF: 9 walls · trusted 1 (no trusted support, resistance $2,434.83 trust 0.40) · 6 flagged · 4 spoof cooldowns",
-    "ETH · 07:39Z HOUR 07 UTC: QUIET · full trading (throttle off: map is info only)",
-    "ETH · 07:39Z FAST: 8 buys resting · 2 lots $4.66/$22.50 · next sell $2,438.22",
-    "ETH · 07:39Z MEDIUM: 7 buys resting · 3 lots $3.62/$12.50 · next sell $2,434.09",
-    "ETH · 07:39Z SLOW: 6 buys resting · 1 lots $1.17/$7.50 · next sell $2,494.72",
-    "07:39Z accumulation: live — buying on schedule",
-    "07:39Z BTC -1.00% vs 7d high · no big dip"
+    "earlier: 11-05 07:45Z SPOOF @ $2,409.64",
+    "earlier: 11-05 07:45Z SUPPORT EVENT FAST @ $2,412.86",
+    "ETH · 07:45Z CONFLUENCE: FAST ↓ -0.17 (book0 sr− trend− channel+ momentum− pattern0 support− history0) [KNIFE GUARD] tp 0.65% · MEDIUM · +0.09 (book0 sr− trend+ channel0 momentum+ pattern0 support+ history0) tp 1.50% · SLOW ↓ -0.14 (book0 sr0 trend− channel− momentum+ pattern− support+ history0, lower highs + lower lows) [SPRING] tp 3.16%",
+    "DOGE · 07:45Z CONFLUENCE: FAST ↓ -0.19 (book0 sr+ trend− channel+ momentum− pattern− support0 history0, lower highs + lower lows) [DOWNTREND: dip-buys throttled] tp 0.65% · MEDIUM ↑ +0.21 (book0 sr0 trend+ channel+ momentum0 pattern0 support+ history0) tp 1.08% · SLOW ↓ -0.18 (book0 sr+ trend− channel− momentum+ pattern− support+ history0, lower highs + lower lows) tp 3.00%",
+    "SOL · 07:45Z CONFLUENCE: FAST · +0.08 (book− sr− trend+ channel+ momentum− pattern0 support+ history0) tp 0.65% · MEDIUM · +0.04 (book− sr0 trend0 channel+ momentum+ pattern0 support0 history0) tp 1.42% · SLOW · +0.03 (book− sr+ trend− channel− momentum+ pattern0 support+ history0) [SPRING] tp 2.67%",
+    "ETH · 07:45Z ETH-USDC $2,412.86 · BOOK bid wall $2,408.79 (855.838) · ask wall $2,450.05 (1313.72) · spread $0.02 · pressure -0.01 NEUTRAL",
+    "ETH · 07:45Z FAST $2,358–$2,442 · MEDIUM $2,192–$2,438 · SLOW $2,210–$2,624 · BUYING",
+    "ETH · 07:45Z -> SPOOF @ $2,409.64 — bid wall $2,409.64 pulled as price approached — distrusted for 15 min",
+    "ETH · 07:45Z ANTI-SPOOF: 10 walls · trusted 1 (no trusted support, resistance $2,435.00 trust 0.40) · 8 flagged · 9 spoof cooldowns",
+    "ETH · 07:45Z -> SUPPORT EVENT FAST @ $2,412.86 — FAST BREAKDOWN at $2,418.75 (medium support)",
+    "ETH · 07:45Z HOUR 07 UTC: QUIET · full trading (throttle off: map is info only)",
+    "ETH · 07:45Z FAST: 0 buys resting · 2 lots $4.66/$22.50 · next sell $2,438.22",
+    "ETH · 07:45Z MEDIUM: 7 buys resting · 3 lots $3.62/$12.50 · next sell $2,434.26",
+    "07:46Z accumulation: live — buying on schedule",
+    "07:46Z BTC -0.96% vs 7d high · no big dip"
   ],
   "dip_alert": {
     "level": "none",
     "coin": "BTC",
-    "drop_pct": 1.0,
+    "drop_pct": 0.96,
     "high": 60210.86,
-    "price": 59609.73
+    "price": 59633.35
   },
   "live_view": {
     "url": "https://bread-longest-self-log.trycloudflare.com",
-    "since": "2026-11-05T07:39:14Z"
+    "since": "2026-11-05T07:46:11Z"
   }
 }
