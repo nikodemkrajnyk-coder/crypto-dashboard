@@ -139,6 +139,18 @@
   .cell .v{font-size:clamp(20px,2.3vw,34px);margin-top:4px;text-shadow:0 0 8px var(--g);overflow-wrap:anywhere;font-weight:700}
   .v.pos{color:var(--g)} .v.neg{color:var(--red);text-shadow:0 0 8px var(--red)}
   .k{font-size:.72em;color:var(--gd);letter-spacing:.12em}
+  /* DIP GAUGE (advisory, public BTC data) */
+  .gsig{display:flex;align-items:center;gap:12px;padding:10px 12px;border:2px solid var(--dim);border-radius:7px;margin-bottom:10px}
+  .gsig .lt{width:22px;height:22px;border-radius:50%;flex:none;background:var(--dim)}
+  .gsig b{font-size:clamp(16px,1.7vw,22px);letter-spacing:.1em}
+  .gsig span{display:block;font-size:.82em;color:var(--gd);margin-top:3px;letter-spacing:.02em}
+  .gsig.wait{border-color:var(--dim)} .gsig.wait .lt{background:#3a3a3a} .gsig.wait b{color:var(--gd)}
+  .gsig.decent{border-color:var(--warn)} .gsig.decent .lt{background:var(--warn);box-shadow:0 0 10px var(--warn)} .gsig.decent b{color:var(--warn)}
+  .gsig.strong{border-color:var(--g)} .gsig.strong .lt{background:var(--g);box-shadow:0 0 12px var(--g)} .gsig.strong b{color:var(--g)}
+  .grow{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr);gap:4px 10px;font-size:.84em;line-height:1.55;padding:5px 0;border-top:1px solid #031}
+  .grow>b{color:var(--gd);letter-spacing:.1em;font-size:.88em} .grow .t-falling{color:var(--red)} .grow .t-steadying{color:var(--warn)} .grow .t-turning_up{color:var(--g)}
+  .gdisc{margin-top:8px;font-size:.74em;color:var(--warn);letter-spacing:.04em}
+  @media (max-width:520px){.grow{grid-template-columns:1fr}}
   .bar{height:9px;border:1px solid var(--dim);border-radius:5px;margin-top:8px;overflow:hidden;background:#010}
   .bar i{display:block;height:100%;width:0;background:var(--g);box-shadow:0 0 10px var(--g);transition:width .8s}
   .log{font-size:.8em;line-height:1.65;color:var(--gd);margin-top:10px;overflow:auto;max-height:12em}
@@ -335,6 +347,10 @@
   </section>
 
   <section class="panel" id="tab-btc" role="tabpanel" hidden>
+    <div class="card" id="gauge" hidden>
+      <h2>DIP GAUGE · <span id="g-coin">BTC</span> <span class="tag">ADVISORY · NEVER BUYS</span></h2>
+      <div id="g-body"></div>
+    </div>
     <div class="card" id="acc">
       <h2>ACCUMULATION ENGINE <span><span class="tag" id="acc-mode">—</span><button class="lockbtn" id="acc-lock" type="button" hidden>LOCK</button></span></h2>
       <div class="lockbox" id="acc-locked">
@@ -781,6 +797,38 @@ function renderDip(a){
     ?'🚨 MAJOR DIP: '+a.coin+' -'+d+'% from its 7-day high — strong top-up opportunity'
     :'⚡ BIG DIP: '+a.coin+' -'+d+'% from its 7-day high — consider topping up Coinbase to buy the dip',
     Object.assign(document.createElement('small'),{textContent:'rule-based alert, not financial advice · the bot still spends only its normal weekly budget'}));
+  el.hidden=false;
+}
+
+// ---- DIP GAUGE: how deep the BTC dip is + what happened after similar past dips (odds from history,
+//      never a forecast) + momentum + nearest floor → WAIT / DECENT DIP / STRONG DIP. Public data only. ----
+function renderGauge(g){
+  const el=$('gauge');
+  if(!g){el.hidden=true;return}
+  const mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+  const pct=x=>x==null?'—':Math.round(x*100)+'%',sg=x=>(x>0?'+':'')+Number(x).toFixed(1)+'%';
+  const row=(k,...kids)=>{const r=mk('div',{className:'grow'});const v=mk('div');v.append(...kids);r.append(mk('b',{textContent:k}),v);return r};
+  const SIG={wait:'WAIT',decent:'DECENT DIP',strong:'STRONG DIP'},TR={falling:'STILL FALLING',steadying:'STEADYING',turning_up:'TURNING UP'};
+  $('g-coin').textContent=g.coin;
+  const head=mk('div',{className:'gsig '+g.signal});
+  const txt=mk('div');txt.append(mk('b',{textContent:SIG[g.signal]||g.signal}),mk('span',{textContent:g.read}));
+  head.append(mk('div',{className:'lt'}),txt);
+  const d=Math.round(g.drop30_pct),b=g.bucket_pct;
+  const odds=g.up30==null?'not enough history for a dip this size':
+    'after past −'+Math.max(0,d-b)+'…−'+(d+b)+'% dips: higher 7 days later '+pct(g.up7)+' (n='+g.n7+') · higher 30 days later '+pct(g.up30)+' (n='+g.n30+')'
+    +(g.baseline_up30!=null?' — vs '+pct(g.baseline_up30)+' on any day':'')+(g.low_sample?' · SMALL SAMPLE':'');
+  const fur=g.further_share==null?'—':'past cases: '+pct(g.further_share)+' went 1%+ lower within 30 days; when they did, typically '
+    +sg(g.further_median_pct)+' more'+(g.further_q1_pct!=null?' (1 in 4: '+sg(g.further_q1_pct)+' or worse)':'')+' (n='+g.n_further+')';
+  const sup=(g.supports||[]).map((s,i)=>(i?'then ':'next floor ')+pxf(s.price)+', '+sg(s.dist_pct)+' from here ('+s.touches+' bounces)').join(' · ')
+    ||'no major floor below in the last 2 years of daily lows';
+  $('g-body').replaceChildren(head,
+    row('CURRENT DROP','−'+Number(g.drop7_pct).toFixed(1)+'% vs 7-day high '+pxf(g.high7)+' · −'+Number(g.drop30_pct).toFixed(1)+'% vs 30-day high '+pxf(g.high30)+' · now '+pxf(g.price)),
+    row('ODDS FROM HISTORY',odds),
+    row('FELL FURTHER?',fur),
+    row('TREND',mk('span',{className:'t-'+g.trend,textContent:TR[g.trend]||g.trend}),' · '+g.trend_why),
+    row('NEAREST SUPPORT',sup),
+    mk('div',{className:'gdisc',textContent:'⚠ '+g.disclaimer+' · '+g.coin+' daily history since '+g.history_from
+      +' · light: DECENT ≥ '+g.thresholds.decent_pct+'% · STRONG ≥ '+g.thresholds.strong_pct+'% under the 30-day high and no longer making new lows'}));
   el.hidden=false;
 }
 
@@ -1419,6 +1467,7 @@ async function load(){
       $('ov-dtsub').textContent=S.map(r=>r.coin+' '+dq4(r.net)+' ('+r.trades+' sold)').join(' · ')+' · '
         +S.reduce((x,r)=>x+(r.lots_open||0),0)+' lots waiting · '+S.reduce((x,r)=>x+(r.orders_resting||0),0)+' buys resting'}
     renderDip(d.dip_alert);
+    renderGauge(d.dip_gauge);
     const st=[['ACCUMULATION',(a.mode||'offline').toUpperCase()+' — '+(a.status||'')],
       ['DAY-TRADE',(t.mode||'paper').toUpperCase()+' · '+((DTD.pairs||[t.pair||'ETH-USDC']).join(' / '))+' · showing '+(t.pair||'ETH-USDC')+' '+(t.last_price?dpx(t.last_price):'')
         +' · LAYERS '+(gridOn(t)?'BUYING':'PAUSED (crash guard)')
