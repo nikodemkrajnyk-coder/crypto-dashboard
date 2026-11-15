@@ -149,6 +149,7 @@
   .ohz .sb i{display:block;height:100%;background:var(--g)}
   .otg{font-size:.86em;line-height:1.7;margin:4px 0 8px}
   .otg .up{color:var(--g)} .otg .dn{color:var(--red)} .otg b{letter-spacing:.08em}
+  .ohz .d.n{color:var(--gd)} .otg .mu{color:var(--gd)}
   .oline{font-size:.86em;color:var(--g);margin:6px 0} .oev{font-size:.82em;color:var(--warn);margin:4px 0}
   #o-chart{height:clamp(240px,34vh,380px);margin-top:8px;border:1px solid #052;border-radius:6px;position:relative}
   .owhy{margin-top:8px;font-size:.8em} .owhy summary{cursor:pointer;color:var(--gd);letter-spacing:.1em}
@@ -345,6 +346,7 @@
       <div class="cell key"><div class="k">ACCUMULATION P/L</div><div class="v" id="ov-pl">🔒</div><div class="sub" id="ov-plsub">encrypted</div></div>
       <div class="cell"><div class="k">PORTFOLIO VALUE</div><div class="v" id="ov-val">🔒</div><div class="sub" id="ov-valsub">encrypted</div></div>
       <div class="cell key"><div class="k">DAY-TRADE NET ALL-TIME (PAPER)</div><div class="v" id="ov-dt">$—</div><div class="sub" id="ov-dtsub">—</div></div>
+      <div class="cell"><div class="k">BONUS BTC (PAPER)</div><div class="v" id="ov-bonus">—</div><div class="sub" id="ov-bonussub">booster + day-trade profit turned into BTC</div></div>
       <div class="cell"><div class="k">BTC PRICE</div><div class="v" id="ov-btcpx">£—</div><div class="sub" id="ov-btcdrop">—</div></div>
     </div>
     <div class="card"><h2>SYSTEM STATUS</h2><div class="ovstat" id="ov-status">syncing…</div></div>
@@ -363,6 +365,13 @@
   </section>
 
   <section class="panel" id="tab-btc" role="tabpanel" hidden>
+    <div class="card" id="stack" hidden>
+      <h2>₿ TOTAL BTC · weekly buys + bonus <span class="tag">BONUS = PAPER</span></h2>
+      <div class="ohz" id="s-hz"></div>
+      <div class="oline" id="s-total"></div>
+      <div class="otg" id="s-detail"></div>
+      <div class="gdisc" id="s-disc"></div>
+    </div>
     <div class="card" id="outlook" hidden>
       <h2>BTC OUTLOOK · odds BTC is higher in… <span class="tag">ADVISORY · NEVER BUYS</span></h2>
       <div class="ohz" id="o-hz"></div>
@@ -578,6 +587,7 @@ async function decryptBlob(blob,pass){
 }
 // overview heroes for the encrypted figures: placeholders until unlocked
 function ovLocked(){
+  DCA_BTC=null;renderBonus();
   for(const id of ['ov-btc','ov-pl','ov-val'])cell($(id),'🔒');
   $('ov-btcsub').textContent='encrypted — unlock to view';$('ov-plsub').textContent=$('ov-valsub').textContent='encrypted';
   $('ov-unlock').hidden=false;
@@ -608,6 +618,44 @@ function renderStack(h){
     v.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';v.className='v '+(add>0?'up':add<0?'dn':'');
     s.textContent=(add<0?'−':'+')+Math.abs(add).toFixed(8)+' ₿';
   }
+}
+// ---- ₿ TOTAL BTC: the real weekly-buy stack (decrypted, this browser only) + the PAPER sleeves' bonus BTC ----
+var STK=null,DCA_BTC=null;
+const btc8=n=>Number(n||0).toFixed(8)+' ₿';
+const usd2=n=>(Number(n)<0?'-$':'$')+Math.abs(Number(n||0)).toFixed(2);
+const sgbp2=n=>(Number(n)<0?'-£':'+£')+Math.abs(Number(n||0)).toFixed(2);
+function renderBonus(s){
+  if(s!==undefined)STK=s;
+  s=STK;const card=$('stack');
+  if(!s){card.hidden=true;return}
+  card.hidden=false;
+  const b=s.booster||{},bs=b.stack||{},t=s.daytrade||{},bb=Number(bs.bonus_btc||0),tb=Number(t.bonus_btc||0);
+  const pct=x=>DCA_BTC>0?'+'+(x/DCA_BTC*100).toFixed(2)+'% on top':DCA_BTC===0?'no weekly BTC yet':'unlock for % on top';
+  const cells=[['WEEKLY BUYS · REAL',DCA_BTC!=null?btc8(DCA_BTC):'🔒',DCA_BTC!=null?'the real stack':'encrypted — unlock below'],
+    ['BOOSTER · PAPER',btc8(bb),pct(bb)],['DAY-TRADE · PAPER',btc8(tb),pct(tb)]];
+  $('s-hz').replaceChildren(...cells.map(([h,u,d])=>{const c=document.createElement('div');c.className='c';
+    for(const [cl,tx] of [['h',h],['u',u],['d n',d]]){const e=document.createElement('div');e.className=cl;e.textContent=tx;c.append(e)}return c}));
+  $('s-total').textContent=DCA_BTC!=null
+    ?'TOTAL '+btc8(DCA_BTC+bb+tb)+' · the paper sleeves add '+(DCA_BTC>0?'+'+((bb+tb)/DCA_BTC*100).toFixed(2)+'%':'—')+' on top of the weekly buys'
+    :'BONUS BTC (paper) '+btc8(bb+tb)+' · unlock below to add your real weekly buys';
+  const L=[];
+  const line=(parts)=>{const d=document.createElement('div');for(const [tx,cl] of parts){const e=document.createElement(cl==='b'?'b':'span');
+    e.textContent=tx;if(cl&&cl!=='b')e.className=cl;d.append(e)}L.push(d)};
+  if(b.pot!=null){
+    line([['BOOSTER ','b'],[(b.lots||[]).length+'/'+b.slices+' slices open · cash £'+Number(b.cash).toFixed(2)+' of £'+b.pot+' · realized '],
+      [sgbp2(b.realized),b.realized>0?'up':''],[' after fees ('+b.trades+' sold) · open '],[sgbp2(b.unrealized),b.unrealized<0?'dn':'up'],[' if sold now (it never sells at a loss)','mu']]);
+    line([['NOW ','b'],[b.decision||'—']]);
+    for(const l of b.lots||[])line([['· slice @ £'+Math.round(l.entry).toLocaleString('en-GB')+' → sells ≥ £'+Math.round(l.target).toLocaleString('en-GB')
+      +' (floor £'+Math.round(l.floor).toLocaleString('en-GB')+(l.stop?' · trailing stop £'+Math.round(l.stop).toLocaleString('en-GB'):'')+')','mu']]);
+  }
+  const P=t.pairs||[],live=P.filter(r=>!r.wind_down).map(r=>r.pair),wd=P.filter(r=>r.wind_down);
+  line([['DAY-TRADE ','b'],['trading '+(live.join(', ')||'—')+(wd.length?' · winding down '+wd.map(r=>r.pair.split('-')[0]).join(', ')+' ('+wd.reduce((x,r)=>x+(r.lots_open||0),0)+' old lots)':'')
+    +' · realized since '+String(t.since||'').slice(5,10)+' '],[usd2(t.realized),t.realized>0?'up':''],[' · waiting to convert '+usd2(t.pending)+' (buys BTC at ≥ $1) · open lots '],
+    [usd2(t.unrealized),t.unrealized<0?'dn':'up'],[' if sold now','mu']]);
+  $('s-detail').replaceChildren(...L);
+  $('s-disc').textContent=(s.note||'')+' · not financial advice';
+  cell($('ov-bonus'),btc8(bb+tb));
+  $('ov-bonussub').textContent=DCA_BTC>0?'+'+((bb+tb)/DCA_BTC*100).toFixed(2)+'% on top of the weekly buys (paper)':'booster '+btc8(bb)+' · day-trade '+btc8(tb);
 }
 // ---- money view + this week's plan (REAL money: only ever from the decrypted snapshot) ----
 function renderMoney(p,prices){
@@ -726,7 +774,9 @@ function showPortfolio(p,prices,via){
   const val=rows.filter(r=>r.value!=null).reduce((s,r)=>s+r.value,0);   // everything held, incl. ZEC
   // headline: BTC share of everything held, at live prices (derived from decrypted holdings only)
   renderStack(p.btc_history);
-  const btc=rows.find(r=>r.pair.startsWith('BTC-')),btcPct=val>0&&btc&&btc.value!=null?btc.value/val*100:null;
+  const btc=rows.find(r=>r.pair.startsWith('BTC-'));
+  DCA_BTC=btc?Number(btc.qty||0):null;renderBonus();   // TOTAL BTC = this real stack + the paper bonus (client-side only)
+  const btcPct=val>0&&btc&&btc.value!=null?btc.value/val*100:null;
   $('acc-btc').textContent=btcPct!=null?btcPct.toFixed(1)+'%':'—%';
   $('acc-btcbar').style.width=(btcPct??0)+'%';
   cell($('acc-inv'),gbp(inv));cell($('acc-val'),gbp(val));
@@ -1549,6 +1599,7 @@ async function load(){
     renderDip(d.dip_alert);
     renderGauge(d.dip_gauge);
     renderOutlook(d.btc_outlook);
+    renderBonus(d.btc_stack||null);
     const st=[['ACCUMULATION',(a.mode||'offline').toUpperCase()+' — '+(a.status||'')],
       ['DAY-TRADE',(t.mode||'paper').toUpperCase()+' · '+((DTD.pairs||[t.pair||'ETH-USDC']).join(' / '))+' · showing '+(t.pair||'ETH-USDC')+' '+(t.last_price?dpx(t.last_price):'')
         +' · LAYERS '+(gridOn(t)?'BUYING':'PAUSED (crash guard)')
