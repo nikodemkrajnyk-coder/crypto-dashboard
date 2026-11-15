@@ -424,6 +424,7 @@
           </div>
           <div class="pt" id="acc-wtable"></div>
           <div class="proj" id="acc-rsv" hidden></div>
+          <div class="proj" id="acc-ddf" hidden></div>
           <div class="proj" id="acc-proj"></div>
           <div class="accord" id="acc-orders"></div>
           <details class="proj" id="acc-review" hidden><summary class="k" id="acc-rvsum"></summary><div id="acc-rvlist"></div></details>
@@ -726,6 +727,28 @@ function renderMoney(p,prices){
       Object.assign(document.createElement('div'),{className:'sgq',textContent:'deployed to date '+gbp(Number(r.deployed))+' · 1× = '+gbp(unit)+' = '
         +(per?Math.ceil(unit/per):'—')+' wk of saving · one fire per tier per '+r.debounce_days+'d dip'}));
   }
+  // DIP FUND: owner-funded pot, separate from the weekly budget; tiers by drop from the 30-day high (real £: unlocked view only)
+  const f=p.dip_fund,fd=$('acc-ddf');fd.hidden=!f;
+  if(f){
+    const FL=['TRIGGER','SHARE','STATE','DEPLOYED'],frs=[];let free=Number(f.unassigned),nxt=null;
+    for(const t of f.tiers){
+      const d=Number(t.drop),hold=t.state==='holding',est=hold?null:free*Number(t.pct);
+      if(!hold){if(!nxt&&(DROP30==null||DROP30<d))nxt=[t,est];free-=est}
+      const left=hold?Math.max(0,Number(t.target)-Number(t.committed)):0;
+      frs.push(wrow([['−'+Math.round(d*100)+'%'+(HIGH30?' · '+pxf(HIGH30*(1-d)):''),'',FL[0]],
+        [Math.round(Number(t.pct)*100)+'% of left'+(hold?'':' ≈ '+gbp(est)),'r',FL[1]],
+        [hold?(left>0.005?'BUYING':'FIRED '+String(t.fired||'').slice(5,10))+' · re-arms > '+pxf(Number(t.rearm)):DROP30!=null&&DROP30>=d?'TRIGGERED':'ARMED',
+         'tag2 wnote '+(hold||(DROP30!=null&&DROP30>=d)?'park':'ok'),FL[2]],
+        [hold?gbp(Number(t.committed))+' / '+gbp(Number(t.target)):'—','r',FL[3]]],'p4'));
+    }
+    fd.replaceChildren(
+      Object.assign(document.createElement('div'),{className:'k',textContent:'DIP FUND '+gbp(Number(f.remaining))+' LEFT OF '+gbp(Number(f.fund))
+        +' · deployed '+gbp(Number(f.deployed))+' · '+(f.pair||'BTC').split('-')[0]+(DROP30!=null?' −'+(DROP30*100).toFixed(1)+'% vs 30D HIGH':'')
+        +(nxt?' · NEXT −'+Math.round(Number(nxt[0].drop)*100)+'% ≈ '+gbp(nxt[1]):'')}),
+      wrow(FL.map(l=>[l,l==='TRIGGER'||l==='STATE'?'':'r']),'h p4'),...frs,
+      Object.assign(document.createElement('div'),{className:'sgq',textContent:'separate from the weekly budget · each tier buys a % of what is left, once per dip · re-arms '
+        +Math.round(Number(f.rearm_buffer)*100)+' pts above its level or on a new 30-day high · '+(f.buys||0)+' filled buy(s), '+f.btc+' BTC'}));
+  }
   // potential coins added if the plan runs clean, at today's price
   const now=Date.now(),mEnd=Date.UTC(new Date(now).getUTCFullYear(),new Date(now).getUTCMonth()+1,1),dLeft=Math.max(0,(mEnd-now)/864e5);
   const prow2=[],bq=w.bought_qty||{},mq=(p.month||{}).bought_qty||{},monthName=new Date(now).toUTCString().slice(8,11).toUpperCase();
@@ -879,7 +902,9 @@ function renderDip(a){
 
 // ---- DIP GAUGE: how deep the BTC dip is + what happened after similar past dips (odds from history,
 //      never a forecast) + momentum + nearest floor → WAIT / DECENT DIP / STRONG DIP. Public data only. ----
+var DROP30=null,HIGH30=null;  // public BTC drop from its 30-day high (fraction) — the dip fund's trigger reading
 function renderGauge(g){
+  if(g){DROP30=Number(g.drop30_pct)/100;HIGH30=Number(g.high30)}
   const el=$('gauge');
   if(!g){el.hidden=true;return}
   const mk=(tag,props)=>Object.assign(document.createElement(tag),props);
