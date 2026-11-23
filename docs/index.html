@@ -942,7 +942,7 @@ function drawRisky(){
     const n=document.createElement('div');n.className='rkn';
     const bits=[(a.symbol||'')+' · '+(a.chain||'?')+' · '+(a.contract?a.contract.slice(0,6)+'…'+a.contract.slice(-6):'no contract'),
       px?'pool liquidity $'+Math.round(px.liq||0).toLocaleString('en-US')+' ('+px.dex+')':(a.contract?'no live price yet':'add chain + contract for a price'),
-      a.qty_source==='coinbase'?'holding read from Coinbase':qty==null?'holding not entered':'',
+      a.qty_source==='coinbase'?'holding read from Coinbase':qty==null?'holding not entered':'holding + cost entered by hand',a.held||'',
       cost==null?'cost not entered':'',a.bought?'bought '+a.bought:'',a.note||''].filter(Boolean);
     n.append(bits.join(' · '));
     if(!a.confirmed)n.append(' · ',Object.assign(document.createElement('b'),{textContent:'⚠ CONTRACT UNCONFIRMED — copycats share this name; check it in the Coinbase app'}));
