@@ -189,7 +189,7 @@
   .stream .ln .p{color:var(--dim)}
   .rows{margin-top:12px;display:grid;gap:4px;font-size:.85em}
   /* encrypted portfolio */
-  #acc{container-type:inline-size}
+  #acc,#risky{container-type:inline-size}
   .lockbox{border:1px dashed var(--dim);border-radius:6px;padding:16px;text-align:center}
   .lockmsg{font-size:1.05em;letter-spacing:.12em;margin-bottom:12px;text-shadow:0 0 8px var(--g)}
   .lockbox form{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
@@ -246,10 +246,13 @@
   .btchead{display:flex;align-items:baseline;justify-content:center;gap:.6em;flex-wrap:wrap;letter-spacing:.12em}
   .btcpct{font-size:clamp(34px,4.5vw,64px);color:var(--g);text-shadow:0 0 14px var(--g);font-variant-numeric:tabular-nums}
   #acc-open>.bar{margin:6px 0 14px}
+  .pr.rk{grid-template-columns:minmax(0,1.5fr) repeat(7,minmax(0,1fr))}
+  .rkn{margin:-2px 0 4px;padding:0 8px;font-size:.85em;color:var(--gd);overflow-wrap:anywhere} .rkn a{color:var(--gd)}
+  .rkn b{color:var(--warn);font-weight:normal}
   .pnote{margin:-2px 0 2px;padding:0 8px;font-size:.85em;color:var(--warn);letter-spacing:.04em}
   @container (max-width:600px){
     .grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .pr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:6px}
+    .pr,.pr.rk{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:6px}
     .pr.h{display:none}
     .pr span,.pr span:first-child{text-align:left}
     .pr span::before{content:attr(data-l);display:block;font-size:.75em;color:var(--gd);letter-spacing:.08em}
@@ -335,6 +338,7 @@
     <button type="button" role="tab" data-tab="overview">OVERVIEW</button>
     <button type="button" role="tab" data-tab="btc">BITCOIN / ACCUMULATION</button>
     <button type="button" role="tab" data-tab="daytrade">DAY-TRADE</button>
+    <button type="button" role="tab" data-tab="risky">RISKY ASSETS</button>
     <button type="button" role="tab" data-tab="feed">FEED</button>
   </nav>
 
@@ -440,6 +444,28 @@
         <div class="pt" id="acc-table"></div>
       </div>
       <div class="log" id="acc-status"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="tab-risky" role="tabpanel" hidden>
+    <div class="card" id="risky">
+      <h2>RISKY ASSETS · speculative punts <span class="tag">MONITOR ONLY · NEVER TRADES</span></h2>
+      <div class="lockbox" id="rk-locked">
+        <div class="lockmsg">🔒 LOCKED — positions are encrypted with the same passcode as ACCUMULATION</div>
+        <button class="linkbtn" data-goto="btc" type="button">UNLOCK ON THE BITCOIN TAB →</button>
+      </div>
+      <div id="rk-open" hidden>
+        <div class="grid four">
+          <div class="cell"><div class="k">VALUE NOW</div><div class="v" id="rk-val">£—</div></div>
+          <div class="cell"><div class="k">COST</div><div class="v" id="rk-cost">£—</div></div>
+          <div class="cell"><div class="k">P/L £</div><div class="v" id="rk-pl">£—</div></div>
+          <div class="cell"><div class="k">P/L %</div><div class="v" id="rk-plp">—</div></div>
+        </div>
+        <div class="pt" id="rk-table"></div>
+        <div class="log" id="rk-status"></div>
+      </div>
+      <div class="gdisc">Kept apart on purpose: nothing here is in the accumulation figures, BTC %, P/L or TOTAL BTC, and the bot never
+        buys, sells or moves these. Prices: DexScreener (public, by contract). Add the next one under <b>risky_assets:</b> in config.yaml.</div>
     </div>
   </section>
 
@@ -588,7 +614,7 @@ async function decryptBlob(blob,pass){
 }
 // overview heroes for the encrypted figures: placeholders until unlocked
 function ovLocked(){
-  DCA_BTC=null;renderBonus();
+  DCA_BTC=null;renderBonus();riskyLocked();
   for(const id of ['ov-btc','ov-pl','ov-val'])cell($(id),'🔒');
   $('ov-btcsub').textContent='encrypted — unlock to view';$('ov-plsub').textContent=$('ov-valsub').textContent='encrypted';
   $('ov-unlock').hidden=false;
@@ -776,6 +802,7 @@ function renderMoney(p,prices){
 function wrow(cells,cls){const r=document.createElement('div');r.className='wrow'+(cls?' '+cls:'');
   for(const [t,c,l] of cells){const e=document.createElement('span');e.textContent=t;if(c)e.className=c;if(l)e.dataset.l=l;r.appendChild(e)}return r}
 function showPortfolio(p,prices,via){
+  renderRisky(p.risky,(prices||{})['USDC-GBP']);
   $('acc-locked').hidden=true;$('acc-open').hidden=false;$('acc-lock').hidden=false;
   via=via||{};
   const rows=Object.entries(p.coins||{}).map(([pair,c])=>{
@@ -866,8 +893,77 @@ async function renderAcc(a,tryPass){
 $('acc-form').addEventListener('submit',e=>{e.preventDefault();const v=$('acc-pass').value;if(v&&lastAcc)renderAcc(lastAcc,v)});
 $('acc-lock').addEventListener('click',()=>{store.del();keyCache={id:null,key:null};if(lastAcc)renderAcc(lastAcc)});
 
+// ---- RISKY ASSETS: speculative punts, kept out of every accumulation figure; MONITOR ONLY ----
+// The list, holdings and cost basis arrive only inside the encrypted snapshot (config risky_assets).
+// Live prices come from DexScreener's public API in this browser, asked only for the contract
+// addresses — nothing about the position ever leaves the page.
+let RISKY=null,RKFX=null,RKAT=0;const RKPX={};
+function riskyLocked(){RISKY=null;$('rk-locked').hidden=false;$('rk-open').hidden=true}
+function renderRisky(list,fx){
+  RISKY=Array.isArray(list)?list:[];RKFX=fx!=null?Number(fx):null;
+  $('rk-locked').hidden=true;$('rk-open').hidden=false;drawRisky();
+  if(Date.now()-RKAT>50000)riskyPrices();
+}
+async function riskyPrices(){
+  if(!RISKY||!RISKY.length)return;
+  RKAT=Date.now();
+  const by={};for(const a of RISKY)if(a.chain&&a.contract)(by[a.chain]=by[a.chain]||[]).push(a.contract);
+  await Promise.all(Object.entries(by).map(async([chain,addrs])=>{
+    try{
+      const r=await fetch('https://api.dexscreener.com/tokens/v1/'+encodeURIComponent(chain)+'/'+addrs.map(encodeURIComponent).join(','));
+      if(!r.ok)return;
+      const pairs=await r.json();
+      for(const ad of addrs){   // the deepest pool for this token is its price
+        const best=(Array.isArray(pairs)?pairs:[]).filter(p=>p.baseToken&&String(p.baseToken.address).toLowerCase()===ad.toLowerCase())
+          .sort((x,y)=>((y.liquidity||{}).usd||0)-((x.liquidity||{}).usd||0))[0];
+        if(best&&Number(best.priceUsd)>0)RKPX[chain+':'+ad]={usd:Number(best.priceUsd),ch24:(best.priceChange||{}).h24,
+          liq:(best.liquidity||{}).usd,dex:best.dexId,url:best.url,sym:(best.baseToken||{}).symbol,at:new Date()};
+      }
+    }catch(e){}
+  }));
+  drawRisky();
+}
+function drawRisky(){
+  if(!RISKY)return;
+  const fx=RKFX,usdp=n=>n==null||!isFinite(n)?'—':'$'+n.toFixed(Math.min(12,Math.max(2,3-Math.floor(Math.log10(n))))),
+    gbp=n=>n==null?'£—':'£'+n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}),
+    pc=n=>n==null||!isFinite(n)?'—':(n>0?'+':'')+(n*100).toFixed(1)+'%',cls=n=>n>0?'up':n<0?'dn':'';
+  const kids=[prow([['ASSET'],['PRICE $'],['24H'],['HOLDING'],['VALUE £'],['COST £'],['P/L £'],['P/L %']],'h rk')];
+  let tv=0,tc=0,any=false;const notes=[];
+  for(const a of RISKY){
+    const px=RKPX[a.chain+':'+a.contract],qty=a.qty!=null?Number(a.qty):null,cost=a.cost_gbp!=null?Number(a.cost_gbp):null;
+    const val=px&&qty!=null&&fx!=null?qty*px.usd*fx:null,pl=val!=null&&cost!=null?val-cost:null;
+    const pct=pl!=null&&cost>0?pl/cost:(px&&a.buy_price_usd?px.usd/Number(a.buy_price_usd)-1:null);
+    if(val!=null&&cost!=null){tv+=val;tc+=cost;any=true}
+    const ch=px&&px.ch24!=null?Number(px.ch24)/100:null;
+    kids.push(prow([[a.name||a.symbol,'ASSET'],[usdp(px&&px.usd),'PRICE $'],[pc(ch),'24H',cls(ch)],
+      [qty!=null?amt(qty):'—','HOLDING'],[gbp(val),'VALUE £'],[gbp(cost),'COST £'],
+      [pl!=null?sgbp(pl):'—','P/L £',cls(pl)],[pc(pct),'P/L %',cls(pct)]],'rk'));
+    const n=document.createElement('div');n.className='rkn';
+    const bits=[(a.symbol||'')+' · '+(a.chain||'?')+' · '+(a.contract?a.contract.slice(0,6)+'…'+a.contract.slice(-6):'no contract'),
+      px?'pool liquidity $'+Math.round(px.liq||0).toLocaleString('en-US')+' ('+px.dex+')':(a.contract?'no live price yet':'add chain + contract for a price'),
+      a.qty_source==='coinbase'?'holding read from Coinbase':qty==null?'holding not entered':'',
+      cost==null?'cost not entered':'',a.bought?'bought '+a.bought:'',a.note||''].filter(Boolean);
+    n.append(bits.join(' · '));
+    if(!a.confirmed)n.append(' · ',Object.assign(document.createElement('b'),{textContent:'⚠ CONTRACT UNCONFIRMED — copycats share this name; check it in the Coinbase app'}));
+    if(px&&px.url)n.append(' · ',Object.assign(document.createElement('a'),{href:px.url,target:'_blank',rel:'noopener',textContent:'chart ↗'}));
+    kids.push(n);
+    if(qty==null||cost==null)notes.push(a.name);
+  }
+  $('rk-table').replaceChildren(...kids);
+  cell($('rk-val'),any?gbp(tv):'£—');cell($('rk-cost'),any?gbp(tc):'£—');
+  cell($('rk-pl'),any?sgbp(tv-tc):'£—',any?cls(tv-tc):'');cell($('rk-plp'),any&&tc>0?pc(tv/tc-1):'—',any?cls(tv-tc):'');
+  const at=Object.values(RKPX).map(x=>x.at).sort((x,y)=>x-y).pop();
+  $('rk-status').replaceChildren(...[
+    RISKY.length?RISKY.length+' tracked · prices '+(at?'refreshed '+at.toISOString().slice(11,19)+'Z, every 60s while this tab is open':'loading…')+(fx?' · FX USDC-GBP '+fx.toFixed(4):''):
+      'nothing here yet — add assets under risky_assets: in config.yaml (they appear after the Mac\'s next encrypted snapshot)',
+    notes.length?'totals need holding + cost for: '+notes.join(', ')+' (fill qty / cost_gbp in config.yaml)':''
+  ].filter(Boolean).map(l=>Object.assign(document.createElement('div'),{textContent:l})));
+}
+setInterval(()=>{if(RISKY&&RISKY.length&&!$('tab-risky').hidden)riskyPrices()},60000);
+
 // ---- tabs ----
-const TABS=['overview','btc','daytrade','feed'];
+const TABS=['overview','btc','risky','daytrade','feed'];
 function showTab(t){
   if(!TABS.includes(t))t='overview';
   for(const n of TABS)$('tab-'+n).hidden=n!==t;
@@ -878,6 +974,7 @@ function showTab(t){
   if(t==='daytrade')fitChart();   // a chart sized while hidden needs refitting once visible
   if(t==='btc'&&typeof oChart!=='undefined'&&oChart)requestAnimationFrame(()=>oChart.timeScale().fitContent());
   if(t==='btc'&&!$('acc-form').hidden)$('acc-pass').focus();
+  if(t==='risky'&&RISKY&&RISKY.length&&Date.now()-RKAT>50000)riskyPrices();
 }
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.goto)));
